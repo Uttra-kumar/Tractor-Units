@@ -530,7 +530,7 @@
                         const expiryTime = Date.now() + sessionTime 
                         localStorage.setItem('isLoggedIn', 'true');
                         localStorage.setItem("session", expiryTime)
-                        window.location.href = 'admim-dashboard.html';
+                        window.location.href = 'admin-dashboard.html';
                     }, 3000);
                 } else {
                     showToast('Invalid credentials. Please try again.', 'error');

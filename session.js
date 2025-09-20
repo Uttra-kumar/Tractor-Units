@@ -69,5 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
   window.onpopstate = function () {
     window.history.pushState(null, "", window.location.href);
   };
+  window.addEventListener("pageshow", function(event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
 });
 </script>

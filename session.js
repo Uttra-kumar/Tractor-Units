@@ -1,4 +1,4 @@
-<script>
+
 document.addEventListener('DOMContentLoaded', function() {
   // -----------------------------------
   // 🔒 Session & Login Check
@@ -75,4 +75,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-</script>
+

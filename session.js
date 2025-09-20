@@ -1,24 +1,27 @@
+<script>
 document.addEventListener('DOMContentLoaded', function() {
+  // -----------------------------------
+  // 🔒 Session & Login Check
+  // -----------------------------------
   const isLoggedIn = localStorage.getItem('isLoggedIn');
 
   if (!isLoggedIn || isLoggedIn !== 'true') {
     alert('Please log in to access this page.');
     window.location.replace('admin-login.html');
-    return; // stop execution if not logged in
+    return;
   }
 
-  // -------------------------------
-  // ✅ Login ok, ab session check
-  // -------------------------------
   const expiryTime = localStorage.getItem("session");
   if (!expiryTime) {
-    // Agar session hi nahi hai
     alert("Session not found. Please login again.");
     localStorage.removeItem("isLoggedIn");
     window.location.replace("admin-login.html");
     return;
   }
 
+  // -----------------------------------
+  // ⏳ Session Countdown Timer
+  // -----------------------------------
   const counter = document.getElementById("counter");
   let intervalId;
 
@@ -30,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("session");
       alert("⏳ Session expired! Please login again.");
-      window.location.href = "admin-login.html";
+      window.location.replace("admin-login.html");
       return;
     }
 
@@ -45,18 +48,26 @@ document.addEventListener('DOMContentLoaded', function() {
   updateCountdown();
   intervalId = setInterval(updateCountdown, 1000);
 
-  // -------------------------------
-  // ✅ Logout button
-  // -------------------------------
+  // -----------------------------------
+  // 🚪 Logout Button
+  // -----------------------------------
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       clearInterval(intervalId);
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("session");
-      alert("Logout Successfully");
-      window.location.href = "admin-login.html";
+      alert("✅ Logout Successfully");
+      window.location.replace("admin-login.html");
     });
   }
 
+  // -----------------------------------
+  // 🔄 Prevent Back After Logout
+  // -----------------------------------
+  window.history.pushState(null, "", window.location.href);
+  window.onpopstate = function () {
+    window.history.pushState(null, "", window.location.href);
+  };
 });
+</script>

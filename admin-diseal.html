@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseal Management | Tractor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #ff9933 0%, #138808 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .website-name {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .website-name i {
+            margin-right: 10px;
+            font-size: 32px;
+        }
+        
+        .datetime {
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .menu {
+            display: flex;
+            list-style: none;
+        }
+        
+        .menu li {
+            flex: 1;
+        }
+        
+        .menu a {
+            display: block;
+            color: #444;
+            text-decoration: none;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .menu a:hover {
+            background-color: #f0f5ff;
+            color: #0066cc;
+        }
+        
+        .menu a.active {
+            background: linear-gradient(to right, #ff9933, #138808);
+            color: white;
+        }
+        
+        /* Dashboard Stats */
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #138808;
+        }
+        
+        /* Form Styles */
+        .form-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            color: #138808;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #138808;
+            box-shadow: 0 0 0 2px rgba(19, 136, 8, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff9933, #138808);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* Table Styles */
+        .table-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        .table-section h2 {
+            color: #138808;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        tr:hover {
+            background-color: #f9fff8;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-edit {
+            background: #0066cc;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-delete {
+            background: #cc0000;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        p {
+            line-height: 1rem;
+            color: #34495e;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        footer p {
+            color: #ecf0f1;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer span {
+            color: #FF8200;
+            font-weight: 600;
+        }
+        
+        /* Session counter specific styling */
+        #counter {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            animation: pulse 2s infinite;
+            margin-left: 0.25rem;
+        }
+        
+        p1 {
+            font-size: 1.2rem;
+            color: #ecf0f1 !important;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .menu {
+                flex-direction: column;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Supabase Connection Status */
+        .connection-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="website-name">
+                    <i class="fas fa-tractor"></i>
+                    Tractor-Units</div>
+                <div class="datetime">
+                    <span id="real-time"></span>
+                </div>
+            </div>
+            
+            <nav>
+                <ul class="menu">
+                    <li><a href="admin-dashboard.html">Home</a></li>
+                    <li><a href="admin-fleet.html">Fleet</a></li>
+                    <li><a href="#" class="active">Diseal</a></li>
+                    <li><a href="admin-alluser.html">All User</a></li>
+                    <li><a href="admin-payment.html">Payment</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div id="connection-status" class="connection-status"></div>
+        
+        <div class="dashboard">
+            <div class="stat-card">
+                <h3>Total Amount</h3>
+                <div class="amount" id="total-amount">₹0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Entries</h3>
+                <div class="amount" id="total-entries">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>This Month</h3>
+                <div class="amount" id="month-amount">₹0</div>
+            </div>
+        </div>
+        
+        <section class="form-section">
+            <h2><i class="fas fa-plus-circle"></i> Add New Diseal Entry</h2>
+            <form id="diseal-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id">ID</label>
+                        <input type="text" id="id" name="id" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">Real Time</label>
+                        <input type="text" id="time" name="time" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="custom-day">Custom Day Selection</label>
+                        <select id="custom-day" name="custom-day">
+                            <option value="">Select Day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount">Amount (₹)</label>
+                        <input type="number" id="amount" name="amount" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <button type="submit">Save Entry</button>
+            </form>
+        </section>
+        
+        <section class="table-section">
+            <h2><i class="fas fa-table"></i> Diseal Entries</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Time</th>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Amount</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Data will be populated dynamically -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Entry</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-name">Name</label>
+                    <input type="text" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-date">Date</label>
+                    <input type="date" id="edit-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-custom-day">Day</label>
+                    <select id="edit-custom-day">
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-amount">Amount (₹)</label>
+                    <input type="number" id="edit-amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-notes">Notes</label>
+                    <textarea id="edit-notes" rows="3"></textarea>
+                </div>
+                <button type="submit">Update Entry</button>
+            </form>
+        </div>
+    </div>
+    
+  <footer>
+    <div class="container">
+    <p>&copy; 2025 Tractor Fleet Management || Designed By <span>Uttra Patel</span><br />
+    <p1>session expired is <span id="counter">0s</span></p1></p>
+    </div>
+  </footer>
+    <script src="session.js"></script>
+    <script>
+        // Initialize Supabase client (replace with your actual credentials)
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Real-time clock function
+        function updateClock() {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const time = now.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            
+            document.getElementById('real-time').textContent = `${date} | ${time}`;
+            document.getElementById('time').value = time;
+            
+            // Set today's date as default for the date input
+            const today = now.toISOString().substr(0, 10);
+            if (!document.getElementById('date').value) {
+                document.getElementById('date').value = today;
+            }
+            
+            setTimeout(updateClock, 1000);
+        }
+        
+        // Format currency in Indian style
+        function formatCurrency(amount) {
+            return '₹' + parseInt(amount).toLocaleString('en-IN');
+        }
+        
+        // Calculate and display totals
+        function calculateTotals(entries) {
+            const totalAmount = entries.reduce((sum, entry) => sum + parseInt(entry.amount || 0), 0);
+            const totalEntries = entries.length;
+            
+            // Calculate this month's total
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const monthAmount = entries.reduce((sum, entry) => {
+                const entryDate = new Date(entry.date);
+                if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
+                    return sum + parseInt(entry.amount || 0);
+                }
+                return sum;
+            }, 0);
+            
+            document.getElementById('total-amount').textContent = formatCurrency(totalAmount);
+            document.getElementById('total-entries').textContent = totalEntries;
+            document.getElementById('month-amount').textContent = formatCurrency(monthAmount);
+        }
+        
+        // Load data from Supabase
+        async function loadTableData() {
+            try {
+                const { data, error } = await supabase
+                    .from('admin-diseal')
+                    .select('*')
+                    .order('date', { ascending: false });
+                
+                if (error) {
+                    console.error('Error fetching data:', error);
+                    showConnectionStatus('Error loading data: ' + error.message, false);
+                    return;
+                }
+                
+                const tableBody = document.getElementById('data-table-body');
+                tableBody.innerHTML = '';
+                
+                if (data && data.length > 0) {
+                    data.forEach(entry => {
+                        const row = document.createElement('tr');
+                        
+                        // Format date for display
+                        const entryDate = new Date(entry.date);
+                        const formattedDate = entryDate.toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                        
+                        row.innerHTML = `
+                            <td>${entry.id}</td>
+                            <td>${entry.name}</td>
+                            <td>${entry.time}</td>
+                            <td>${formattedDate}</td>
+                            <td>${entry.day || ''}</td>
+                            <td>${formatCurrency(entry.amount)}</td>
+                            <td>${entry.notes || ''}</td>
+                            <td class="action-buttons">
+                                <button class="btn-edit" data-id="${entry.id}">Edit</button>
+                                <button class="btn-delete" data-id="${entry.id}">Delete</button>
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                    
+                    // Add event listeners to edit and delete buttons
+                    document.querySelectorAll('.btn-edit').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            editEntry(id);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.btn-delete').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            deleteEntry(id);
+                        });
+                    });
+                    
+                    calculateTotals(data);
+                    showConnectionStatus('Connected to Supabase. Data loaded successfully.', true);
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No entries found</td></tr>';
+                    calculateTotals([]);
+                    showConnectionStatus('Connected to Supabase. No data found.', true);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showConnectionStatus('Connection error: ' + error.message, false);
+            }
+        }
+        
+        // Show connection status
+        function showConnectionStatus(message, isSuccess) {
+            const statusElement = document.getElementById('connection-status');
+            statusElement.textContent = message;
+            statusElement.className = isSuccess ? 'connection-status connected' : 'connection-status disconnected';
+            statusElement.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Edit entry
+        async function editEntry(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('admin-diseal')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                if (error) {
+                    console.error('Error fetching entry:', error);
+                    alert('Error loading entry: ' + error.message);
+                    return;
+                }
+                
+                if (data) {
+                    document.getElementById('edit-id').value = data.id;
+                    document.getElementById('edit-name').value = data.name;
+                    document.getElementById('edit-date').value = data.date;
+                    document.getElementById('edit-custom-day').value = data.day || '';
+                    document.getElementById('edit-amount').value = data.amount;
+                    document.getElementById('edit-notes').value = data.notes || '';
+                    
+                    // Show modal
+                    document.getElementById('edit-modal').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // Delete entry
+        async function deleteEntry(id) {
+            if (!confirm('Are you sure you want to delete this entry?')) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('admin-diseal')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    console.error('Error deleting entry:', error);
+                    alert('Error deleting entry: ' + error.message);
+                    return;
+                }
+                
+                // Reload table data
+                loadTableData();
+                alert('Entry deleted successfully!');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // Initialize the application when page loads
+        window.onload = function() {
+            updateClock();
+            
+            // Set up form submission
+            document.getElementById('diseal-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const id = document.getElementById('id').value;
+                const name = document.getElementById('name').value;
+                const time = document.getElementById('time').value;
+                const date = document.getElementById('date').value;
+                const day = document.getElementById('custom-day').value;
+                const amount = document.getElementById('amount').value;
+                const notes = document.getElementById('notes').value;
+                
+                try {
+                    // Insert data into Supabase
+                    const { data, error } = await supabase
+                        .from('admin-diseal')
+                        .insert([
+                        {
+                            id: id,
+                            name: name,
+                            time: time,
+                            date: date,
+                            day: day,
+                            amount: amount,
+                            notes: notes
+                        }]);
+                    
+                    if (error) {
+                        console.error('Error inserting data:', error);
+                        alert('Error saving data: ' + error.message);
+                        return;
+                    }
+                    
+                    // Reset form and reload table
+                    document.getElementById('diseal-form').reset();
+                    loadTableData();
+                    alert('Data saved successfully!');
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                }
+            });
+            
+            // Set up edit form submission
+            document.getElementById('edit-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('edit-id').value;
+                const name = document.getElementById('edit-name').value;
+                const date = document.getElementById('edit-date').value;
+                const day = document.getElementById('edit-custom-day').value;
+                const amount = document.getElementById('edit-amount').value;
+                const notes = document.getElementById('edit-notes').value;
+                
+                try {
+                    // Update data in Supabase
+                    const { error } = await supabase
+                        .from('admin-diseal')
+                        .update({
+                            name: name,
+                            date: date,
+                            day: day,
+                            amount: amount,
+                            notes: notes
+                        })
+                        .eq('id', id);
+                    
+                    if (error) {
+                        console.error('Error updating data:', error);
+                        alert('Error updating data: ' + error.message);
+                        return;
+                    }
+                    
+                    // Hide modal and reload table
+                    document.getElementById('edit-modal').style.display = 'none';
+                    loadTableData();
+                    alert('Entry updated successfully!');
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                }
+            });
+            
+            // Close modal when clicking on X
+            document.querySelector('.close').addEventListener('click', function() {
+                document.getElementById('edit-modal').style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === document.getElementById('edit-modal')) {
+                    document.getElementById('edit-modal').style.display = 'none';
+                }
+            });
+            
+            // Initial load of table data
+            loadTableData();
+        };
+    </script>
+</body>
+
+</html>

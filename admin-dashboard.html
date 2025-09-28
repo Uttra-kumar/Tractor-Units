@@ -866,7 +866,7 @@
         
         <div class="admin-info">
             <div class="admin-details">
-                <h3><i class="fas fa-user"></i> Admin Administrator</h3>
+                <h3 id="admin-name"><i class="fas fa-user"></i> Admin Administrator</h3>
                 <p>System Administrator</p>
             </div>
             <div class="theme-toggle" id="theme-toggle">
@@ -1275,6 +1275,18 @@
             
             document.getElementById('amount').textContent = `${totalPayment.toFixed(2)} ₹`;
             document.getElementById('amount').classList.remove('loading');
+
+            const { data: adminData, error: adminError } = await supabase
+        .from('admin')
+        .select('name')
+        .single(); // agar ek hi admin hai
+
+    if (!adminError && adminData) {
+        document.getElementById('admin-name').textContent = adminData.name;
+        document.getElementById('admin-name').classList.remove('loading');
+    }
+        
+        
         }
         
         document.addEventListener("DOMContentLoaded", fetchRealData);

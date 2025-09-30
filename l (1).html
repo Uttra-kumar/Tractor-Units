@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tractor Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --menu-bg: #2c3e50;
+            --menu-text: #ecf0f1;
+            --footer-bg: #2c3e50;
+            --footer-text: #ecf0f1;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --border-color: #ddd;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        .dark-theme {
+            --primary-color: #34495e;
+            --secondary-color: #2980b9;
+            --accent-color: #c0392b;
+            --text-color: #ecf0f1;
+            --bg-color: #2c3e50;
+            --card-bg: #34495e;
+            --menu-bg: #1a252f;
+            --menu-text: #ecf0f1;
+            --footer-bg: #1a252f;
+            --footer-text: #bdc3c7;
+            --success-color: #27ae60;
+            --warning-color: #e67e22;
+            --danger-color: #c0392b;
+            --border-color: #46637f;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nature-theme {
+            --primary-color: #27ae60;
+            --secondary-color: #2ecc71;
+            --accent-color: #e67e22;
+            --text-color: #2c3e50;
+            --bg-color: #ecf0f1;
+            --card-bg: #ffffff;
+            --menu-bg: #27ae60;
+            --menu-text: #ecf0f1;
+            --footer-bg: #16a085;
+            --footer-text: #ecf0f1;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --border-color: #bdc3c7;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background-color: var(--menu-bg);
+            color: var(--menu-text);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .nav {
+            display: flex;
+        }
+        
+        .nav-item {
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item i {
+            margin-right: 8px;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-item.logout {
+            color: var(--danger-color);
+        }
+        
+        .theme-selector {
+            display: flex;
+            align-items: center;
+            margin-left: 2rem;
+        }
+        
+        .theme-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 2px solid var(--menu-text);
+        }
+        
+        .theme-default {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        }
+        
+        .theme-dark {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+        
+        .theme-nature {
+            background: linear-gradient(135deg, #27ae60 0%, #16a085 100%);
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-bg);
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .sidebar-item {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .card-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 1.5rem;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .search-filter {
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .search-btn {
+            padding: 0.8rem 1.2rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-btn i {
+            margin-right: 5px;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .user-table th,
+        .user-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .user-table th {
+            background-color: rgba(0, 0, 0, 0.03);
+            font-weight: 600;
+        }
+        
+        .user-table tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .action-btn {
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            margin-right: 0.5rem;
+        }
+        
+        .action-btn i {
+            margin-right: 5px;
+        }
+        
+        .btn-edit {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-add {
+            background-color: var(--success-color);
+            color: white;
+            padding: 0.7rem 1.2rem;
+            font-weight: 500;
+        }
+        
+        p {
+            line-height: 1rem;
+            color: #34495e;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        footer p {
+            color: #ecf0f1;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer span {
+            color: #FF8200;
+            font-weight: 600;
+        }
+        
+        /* Session counter specific styling */
+        #counter {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            animation: pulse 2s infinite;
+            margin-left: 0.25rem;
+        }
+        
+        p1 {
+            font-size: 1.2rem;
+            color: #ecf0f1 !important;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 1.2rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .form-input:read-only {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #666;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            background-color: rgba(0, 0, 0, 0.03);
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 0.8rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #FFFFFF;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            color: white;
+            display: none;
+            z-index: 1100;
+            box-shadow: var(--shadow);
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+        }
+        
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .nav {
+                flex-wrap: wrap;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .logo {
+                margin-bottom: 1rem;
+            }
+            
+            .theme-selector {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .page-title {
+                margin-bottom: 1rem;
+            }
+            
+            .user-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-input,
+            .search-filter,
+            .search-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-tractor"></i>
+            <span>Tractor-Units</span>
+        </div>
+        <div class="nav">
+            <a href="admin-dashboard.html">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </div></a>
+                    <a href="admin-fleet.html">
+            <div class="nav-item">
+                <i class="fas fa-tractor"></i>
+                <span>Fleet</span>
+            </div></a>
+                    <a href="admin-payment.html">
+            <div class="nav-item">
+                <i class="fas fa-credit-card"></i>
+                <span>Payment</span>
+            </div></a>
+                    <a href="admin-alluser.html">
+            <div class="nav-item">
+                <a href="admin-alluser.html">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span></a>
+            </div></a>
+            <div class="nav-item logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+            <div class="theme-selector">
+                <div class="theme-btn theme-default" data-theme="default"></div>
+                <div class="theme-btn theme-dark" data-theme="dark"></div>
+                <div class="theme-btn theme-nature" data-theme="nature"></div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="content">
+        <div class="dashboard-header">
+            <h1 class="page-title">User Management</h1>
+            <button class="btn btn-add" id="addUserBtn">
+                <i class="fas fa-plus"></i> Add New User
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <span>Registered Users</span>
+                <span id="userCount">Loading users...</span>
+            </div>
+            <div class="card-body">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
+                    <select id="searchFilter" class="search-filter">
+                        <option value="all">All Fields</option>
+                        <option value="id">ID</option>
+                        <option value="name">Name</option>
+                        <option value="role">Role</option>
+                        <option value="status">Status</option>
+                    </select>
+                    <button class="search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button class="search-btn" id="resetSearchBtn" style="background-color: var(--warning-color);">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Loading user data...</p>
+                </div>
+                
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Password</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Data will be populated from Supabase -->
+                    </tbody>
+                </table>
+                <div id="noResults" class="no-results" style="display: none;">
+                    <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3>No users found</h3>
+                    <p>Try adjusting your search criteria</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Tractor Fleet Management || Designed By <span>Uttra Patel</span><br />
+                <p1>session expired is <span id="counter">0s</span></p1>
+            </p>
+        </div>
+    </footer>
+    <!-- Edit User Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Edit User</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <div class="form-group">
+                        <label for="userId" class="form-label">User ID</label>
+                        <input type="text" id="userId" class="form-input" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="userName" class="form-label">Name</label>
+                        <input type="text" id="userName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile" class="form-label">Mobile No.</label>
+                        <input type="text" id="mobileNo" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPassword" class="form-label">Password</label>
+                        <input type="text" id="userPassword" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole" class="form-label">Role</label>
+                        <select id="userRole" class="form-input" required>
+                            <option value="">Select Role</option>
+                            <option value="Admin">Admin</option>
+                            <option value="User">User</option>
+                            <option value="Sub-User">Sub-User</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="userStatus" class="form-label">Status</label>
+                        <select id="userStatus" class="form-input" required>
+                            <option value="">Select Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" id="cancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    <script src="session.js"></script>
+    <script>
+        // Supabase initialization
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // DOM Elements
+        const usersTableBody = document.getElementById('usersTableBody');
+        const userModal = document.getElementById('userModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const notification = document.getElementById('notification');
+        const loadingElement = document.getElementById('loading');
+        const userCountElement = document.getElementById('userCount');
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        const searchInput = document.getElementById('searchInput');
+        const searchFilter = document.getElementById('searchFilter');
+        const searchBtn = document.getElementById('searchBtn');
+        const resetSearchBtn = document.getElementById('resetSearchBtn');
+        const noResultsElement = document.getElementById('noResults');
+        
+        // State variables
+        let currentUser = null;
+        let users = [];
+        let filteredUsers = [];
+        
+        // Theme switching
+        themeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.getAttribute('data-theme');
+                document.body.className = `${theme}-theme`;
+                // Save theme preference to localStorage
+                localStorage.setItem('theme', theme);
+            });
+        });
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.className = `${savedTheme}-theme`;
+        }
+        
+        // Modal controls
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            openModal();
+        });
+        
+        document.querySelector('.modal-close').addEventListener('click', () => {
+            closeModal();
+        });
+        
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            closeModal();
+        });
+        
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            saveUser();
+        });
+        
+        // Search functionality
+        searchBtn.addEventListener('click', () => {
+            performSearch();
+        });
+        
+        resetSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchFilter.value = 'all';
+            filteredUsers = [...users];
+            renderUsers();
+        });
+        
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+        });
+        
+        // Functions
+        // Add this function to generate unique 6-digit ID
+        async function generateUniqueUserId() {
+            let isUnique = false;
+            let userId;
+            
+            while (!isUnique) {
+                // Generate a 6-digit number
+                userId = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                try {
+                    // Check if this ID already exists in the database
+                    const { data, error } = await supabase
+                        .from('userRegistration-T')
+                        .select('id')
+                        .eq('id', userId)
+                        .single();
+                    
+                    // If no record found, the ID is unique
+                    if (error && error.code === 'PGRST116') { // PGRST116 is the code for no rows returned
+                        isUnique = true;
+                    } else if (error) {
+                        throw error;
+                    }
+                } catch (error) {
+                    console.error('Error checking ID uniqueness:', error);
+                    throw new Error('Failed to generate unique ID');
+                }
+            }
+            
+            return userId;
+        }
+        
+        function openModal(user = null) {
+            currentUser = user;
+            if (user) {
+                modalTitle.textContent = 'Edit User';
+                document.getElementById('userId').value = user.id;
+                document.getElementById('userName').value = user.name;
+                document.getElementById('mobileNo').value = user.mobile;
+                document.getElementById('userPassword').value = user.password;
+                document.getElementById('userRole').value = user.role || '';
+                document.getElementById('userStatus').value = user.status || 'Active';
+                
+                // Hide ID field for editing existing users
+                document.getElementById('userId').style.display = 'none';
+                document.querySelector('label[for="userId"]').style.display = 'none';
+            } else {
+                modalTitle.textContent = 'Add User';
+                document.getElementById('userForm').reset();
+                
+                // Show ID field and generate unique ID
+                document.getElementById('userId').style.display = 'block';
+                document.querySelector('label[for="userId"]').style.display = 'block';
+                
+                // Generate and set unique ID
+                generateUniqueUserId().then(id => {
+                    document.getElementById('userId').value = id;
+                }).catch(error => {
+                    console.error('Error generating ID:', error);
+                    showNotification('Failed to generate user ID', 'error');
+                });
+            }
+            userModal.style.display = 'flex';
+        }
+        
+        function closeModal() {
+            userModal.style.display = 'none';
+        }
+        
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filterType = searchFilter.value;
+            
+            if (!searchTerm) {
+                filteredUsers = [...users];
+            } else {
+                if (filterType === 'all') {
+                    filteredUsers = users.filter(user =>
+                        user.id.toLowerCase().includes(searchTerm) ||
+                        user.name.toLowerCase().includes(searchTerm) ||
+                        (user.role && user.role.toLowerCase().includes(searchTerm)) ||
+                        (user.status && user.status.toLowerCase().includes(searchTerm))
+                    );
+                } else {
+                    filteredUsers = users.filter(user => {
+                        if (filterType === 'id') {
+                            return user.id.toLowerCase().includes(searchTerm);
+                        } else if (filterType === 'name') {
+                            return user.name.toLowerCase().includes(searchTerm);
+                        } else if (filterType === 'role') {
+                            return user.role && user.role.toLowerCase().includes(searchTerm);
+                        } else if (filterType === 'status') {
+                            return user.status && user.status.toLowerCase().includes(searchTerm);
+                        }
+                        return false;
+                    });
+                }
+            }
+            
+            renderUsers();
+        }
+        
+        function renderUsers() {
+            usersTableBody.innerHTML = '';
+            
+            if (filteredUsers.length === 0) {
+                noResultsElement.style.display = 'block';
+                userCountElement.textContent = 'No users found';
+                return;
+            }
+            
+            noResultsElement.style.display = 'none';
+            userCountElement.textContent = `Showing ${filteredUsers.length} of ${users.length} users`;
+            
+            filteredUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.mobile}</td>
+                    <td>${user.password}</td>
+                    <td>${user.role || 'N/A'}</td>
+                    <td><span style="color: ${user.status === 'Active' ? 'var(--success-color)' : 'var(--warning-color)'};">${user.status || 'N/A'}</span></td>
+                    <td>
+                        <button class="action-btn btn-edit" data-id="${user.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn btn-delete" data-id="${user.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const userId = btn.getAttribute('data-id');
+                    const user = users.find(u => u.id == userId);
+                    openModal(user);
+                });
+            });
+            
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const userId = btn.getAttribute('data-id');
+                    deleteUser(userId);
+                });
+            });
+        }
+        
+        async function loadUsers() {
+            loadingElement.style.display = 'block';
+            usersTableBody.innerHTML = '';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('userRegistration-T')
+                    .select('*')
+                    .order('id', { ascending: true });
+                
+                if (error) throw error;
+                
+                users = data;
+                filteredUsers = [...users];
+                renderUsers();
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('Failed to load users: ' + error.message, 'error');
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+        
+        async function saveUser() {
+            const userId = document.getElementById('userId').value;
+            const name = document.getElementById('userName').value;
+            const mobile = document.getElementById('mobileNo').value;
+            const password = document.getElementById('userPassword').value;
+            const role = document.getElementById('userRole').value;
+            const status = document.getElementById('userStatus').value;
+            
+            // Validation
+            if (!name || !mobile || !password || !role || !status) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            try {
+                if (currentUser) {
+                    // Update existing user
+                    const { error } = await supabase
+                        .from('userRegistration-T')
+                        .update({ name, mobile, password, role, status })
+                        .eq('id', userId);
+                    
+                    if (error) throw error;
+                    
+                    showNotification('User updated successfully');
+                } else {
+                    // Add new user with generated ID
+                    const { error } = await supabase
+                        .from('userRegistration-T')
+                        .insert([{ 
+                            id: userId, 
+                            name, 
+                            mobile, 
+                            password, 
+                            role, 
+                            status 
+                        }]);
+                    
+                    if (error) throw error;
+                    
+                    showNotification('User added successfully with ID: ' + userId);
+                }
+                
+                closeModal();
+                loadUsers();
+            } catch (error) {
+                console.error('Error saving user:', error);
+                showNotification('Failed to save user: ' + error.message, 'error');
+            }
+        }
+        
+        async function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('userRegistration-T')
+                    .delete()
+                    .eq('id', userId);
+                
+                if (error) throw error;
+                
+                showNotification('User deleted successfully');
+                loadUsers();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showNotification('Failed to delete user: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>

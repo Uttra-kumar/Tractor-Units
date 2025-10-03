@@ -1639,7 +1639,7 @@
                 
                 if (!dieselError) {
                     const totalDiesel = dieselData.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-                    animateValue(dieselAmount, 0, totalDiesel, 1500, 'L');
+                    animateValue(dieselAmount, 0, totalDiesel, 1500, '₹');
                 } else {
                     dieselAmount.textContent = 'Error';
                     dieselAmount.classList.remove('loading');

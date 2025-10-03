@@ -526,7 +526,7 @@
                     
                     // Redirect to admin dashboard after delay
                     setTimeout(() => {
-                        const sessionTime = 10*60*1000;
+                        const sessionTime = 15*60*1000;
                         const expiryTime = Date.now() + sessionTime 
                         localStorage.setItem('isLoggedIn', 'true');
                         localStorage.setItem("session", expiryTime)

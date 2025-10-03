@@ -892,7 +892,7 @@
                 
                 setTimeout(() => {
                     // data.name ko bhi URL me bhejo
-                    window.location.href = `userDashboard.html?userId=${encodeURIComponent(userId)}&name=${encodeURIComponent(data.name)}`;
+                    window.location.href = `userDashboard.html?user_id=${data.user_id}`;
                 }, 2000);
                 
             } catch (error) {

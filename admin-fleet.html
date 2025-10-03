@@ -45,13 +45,14 @@
         body {
             background: linear-gradient(135deg, #1A1D2B 0%, #12141F 100%);
             color: var(--light);
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            margin: 0;
         }
         
         .container {
             display: flex;
-            min-height: 100vh;
+            max-height: 100vh;
+            overflow-y: auto;
         }
         
         /* Sidebar Styles */

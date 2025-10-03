@@ -677,10 +677,10 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         
         
         
-       async function fetchPayments(data) {
+       // ✅ OPTION 1: Edit button mein user_id add karna (BEST SOLUTION)
+async function fetchPayments(data) {
     paymentBody.innerHTML = "";
 
-    // Ensure data is an array
     if (!data || !Array.isArray(data) || data.length === 0) {
         paymentTable.style.display = "none";
         return;
@@ -697,10 +697,10 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
             <td>${item.date || "-"}</td>
             <td>${item.day || "-"}</td>
             <td>₹${item.paid_amount}</td>
-            <td>${item.remain}</td>
+            <td>₹${item.remain}</td>
             <td>₹${item.total_amount}</td>
             <td class="actions">
-                <button class="btn btn-edit btn-sm" onclick="editItem(${item.id}, '${item.name}', ${item.paid_amount}, ${item.remain}, ${item.total_amount})">Edit</button>
+                <button class="btn btn-edit btn-sm" onclick="editItem(${item.id}, '${item.name}', ${item.paid_amount}, ${item.remain}, ${item.total_amount}, ${item.user_id})">Edit</button>
                 <button class="btn btn-delete btn-sm" onclick="deleteItem(${item.id})">Delete</button>
             </td>
         `;
@@ -708,16 +708,20 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
     });
 }
 
-        
-        // ✅ Fill Form for Editing
-        function editItem(id, user_id,name, paid, remain, total) {
-            document.getElementById("payment-id").value = id;
-            document.getElementById("payment-id2").value = user_id;
-            document.getElementById("payment-name").value = name;
-            document.getElementById("payment-paid").value = paid;
-            document.getElementById("payment-remain").value = remain;
-            document.getElementById("payment-total").value = total;
-        }
+// ✅ EDIT FUNCTION - sab parameters sahi se milenge
+function editItem(id, name, paid, remain, total, user_id) {
+    console.log('Editing item:', { id, name, paid, remain, total, user_id });
+    
+    document.getElementById("payment-id").value = id;
+    document.getElementById("payment-id2").value = user_id;
+    document.getElementById("payment-name").value = name;
+    document.getElementById("payment-paid").value = paid;
+    document.getElementById("payment-remain").value = remain;
+    document.getElementById("payment-total").value = total;
+    
+    document.getElementById("payment-form").scrollIntoView({ behavior: 'smooth' });
+}
+
         
         // ✅ Delete Payment
         async function deleteItem(id) {

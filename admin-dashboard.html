@@ -1561,8 +1561,7 @@
         const amount = document.getElementById('amount');
         
         // Session Counter
-        const counter = document.getElementById('counter');
-        let sessionSeconds = 0;
+        
         
         // Chart Variables
         let fleetChart, fuelChart, revenueChart, userDistributionChart;
@@ -1574,7 +1573,6 @@
             setInterval(updateTime, 1000);
             
             // Initialize session counter
-            setInterval(updateSessionCounter, 1000);
             
             // Initialize stats with loading animation
             loadStats();
@@ -1605,10 +1603,7 @@
         }
         
         // Update Session Counter
-        function updateSessionCounter() {
-            sessionSeconds++;
-            counter.textContent = sessionSeconds;
-        }
+        
         
         // Load Stats from Supabase
         async function loadStats() {

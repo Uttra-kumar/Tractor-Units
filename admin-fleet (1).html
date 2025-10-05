@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracktor-Unit - Fleet Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5A52D5;
+            --primary-light: #8B85FF;
+            --secondary: #FF6584;
+            --accent: #36D1DC;
+            --accent-gradient: linear-gradient(135deg, #36D1DC, #5B86E5);
+            --success: #4CD964;
+            --warning: #FFCC00;
+            --danger: #FF3B30;
+            --dark: #1A1D2B;
+            --darker: #12141F;
+            --light: #F7F9FC;
+            --gray: #8F9BB3;
+            --gray-light: #E4E9F2;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --sidebar-bg: linear-gradient(180deg, #1A1D2B 0%, #12141F 100%);
+            --header-bg: rgba(26, 29, 43, 0.8);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --shadow-light: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1A1D2B 0%, #12141F 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 0;
+            height: 100vh;
+            position: fixed;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--glass-border);
+        }
+        
+        .logo {
+            padding: 25px 20px;
+            font-size: 26px;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+            font-size: 28px;
+        }
+        
+        .logo span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .menu {
+            list-style-type: none;
+            padding: 20px 0;
+        }
+        
+        .menu li {
+            padding: 15px 25px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin: 5px 15px;
+            border-radius: 10px;
+        }
+        
+        .menu li:hover {
+            background: var(--glass);
+        }
+        
+        .menu li a {
+            color: var(--gray);
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            transition: color 0.3s;
+        }
+        
+        .menu li:hover a {
+            color: white;
+        }
+        
+        .menu li i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            color: var(--primary-light);
+        }
+        
+        .menu li.active {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
+        }
+        
+        .menu li.active a {
+            color: white;
+        }
+        
+        .menu li.active i {
+            color: white;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--header-bg);
+            box-shadow: var(--shadow);
+            border-radius: 16px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header h1 i {
+            margin-right: 12px;
+        }
+        
+        .datetime {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--gray);
+            background: var(--glass);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            color: white;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group label.required::after {
+            content: '*';
+            color: var(--danger);
+            margin-left: 5px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: var(--glass);
+            color: white;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.3);
+            background: rgba(108, 99, 255, 0.1);
+        }
+        
+        .form-control.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.3);
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(54, 209, 220, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger), #FF6B6B);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 59, 48, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, var(--success), #4CD964);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 217, 100, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+        
+        th,
+        td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: var(--glass);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-buttons button {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        /* Status Styles */
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-accepted {
+            background-color: #d1edff;
+            color: #0c5460;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--dark);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
+            animation: modalFadeIn 0.3s;
+            border: 1px solid var(--glass-border);
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .modal-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: var(--danger);
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--gray);
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--accent-gradient);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: var(--gray);
+        }
+        
+        /* Notification Styles */
+        .notification {
+            padding: 16px 20px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            color: white;
+            display: none;
+            box-shadow: var(--shadow-light);
+            animation: slideIn 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .notification.success {
+            background: linear-gradient(to right, var(--success), #4CD964);
+        }
+        
+        .notification.error {
+            background: linear-gradient(to right, var(--danger), #FF6B6B);
+        }
+        
+        .notification.warning {
+            background: linear-gradient(to right, var(--warning), #FFD166);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 230px;
+            }
+            
+            .main-content {
+                margin-left: 230px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px 0;
+            }
+            
+            .menu li {
+                padding: 12px 15px;
+                white-space: nowrap;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+        
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238F9BB3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+        
+        p {
+            line-height: 1rem;
+            color: #34495e;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            max-height: 90px;
+            padding: 1.5rem 0;
+            margin-top: 25px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        footer p {
+            color: #ecf0f1;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        /* Session counter specific styling */
+        #counter {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: linear-gradient(45deg, var(--accent), var(--secondary));
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            animation: pulse 2s infinite;
+            margin-left: 0.25rem;
+        }
+        
+        p1 {
+            font-size: 1.2rem;
+            color: #ecf0f1 !important;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+        
+        .id-input {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 6px 20px rgba(54, 209, 220, 0.4);
+            cursor: pointer;
+            z-index: 99;
+            transition: all 0.3s;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(54, 209, 220, 0.6);
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+        
+        .bg-circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .bg-circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            left: 80%;
+            animation-delay: 3s;
+        }
+        
+        .bg-circle:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            top: 40%;
+            left: 40%;
+            animation-delay: 6s;
+        }
+        
+        .bg-circle:nth-child(4) {
+            width: 250px;
+            height: 250px;
+            top: 80%;
+            left: 20%;
+            animation-delay: 9s;
+        }
+        
+        .bg-circle:nth-child(5) {
+            width: 350px;
+            height: 350px;
+            top: 20%;
+            left: 70%;
+            animation-delay: 12s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            
+            33% {
+                transform: translate(30px, -50px) rotate(120deg);
+            }
+            
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+            
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+    
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-tractor"></i>
+                <span>Tracktor-Unit</span>
+            </div>
+            <ul class="menu">
+                <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="active"><a href="#"><i class="fas fa-truck"></i> Fleet</a></li>
+                <li><a href="admin-diseal.html"><i class="fas fa-gas-pump"></i> Diesel</a></li>
+                <li><a href="admin-payment.html"><i class="fas fa-credit-card"></i> Payment</a></li>
+                <li><a href="admin-alluser.html"><i class="fas fa-users"></i> All Users</a></li>
+                <li><a href="adminfilter.html"><i class="fas fa-filter"></i>Admin Filter</a></li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-truck"></i> Fleet Management</h1>
+                <div class="datetime" id="datetime">Loading date and time...</div>
+            </div>
+            
+            <div id="notification" class="notification"></div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="stat-value" id="totalVehicles">
+                        <span class="loading"></span>
+                    </div>
+                    <div class="stat-label">Total Entry</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value" id="avgRunningTime">
+                        <span class="loading"></span>
+                    </div>
+                    <div class="stat-label">Avg. Running Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="stat-value" id="pendingApprovals">
+                        <span class="loading"></span>
+                    </div>
+                    <div class="stat-label">Pending Approvals</div>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" data-tab="admin">Admin Fleet</div>
+                <div class="tab" data-tab="user">User Fleet Approval</div>
+            </div>
+            
+            <!-- Admin Fleet Tab -->
+            <div class="tab-content active" id="admin-tab">
+                <!-- Form Section -->
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-plus-circle"></i> Add/Edit Fleet Record</h2>
+                    <form id="fleetForm">
+                        <input type="hidden" id="recordId">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="id" class="required">ID</label>
+                                <input type="number" id="id" class="form-control id-input" placeholder="Enter ID" required>
+                                <div class="error-message" id="idError">ID is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user_id" class="required">User ID</label>
+                                <input type="number" id="user_id" class="form-control id-input" placeholder="Enter User ID" required>
+                                <div class="error-message" id="userIdError">User ID is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="name" class="required">Farmer Name</label>
+                                <input type="text" id="name" class="form-control" placeholder="Enter farmer name" required>
+                                <div class="error-message" id="nameError">Farmer name is required</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="date" class="required">Date</label>
+                                <input type="date" id="date" class="form-control" required>
+                                <div class="error-message" id="dateError">Date is required</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="time" class="required">Time</label>
+                                <input type="time" id="time" class="form-control" required>
+                                <div class="error-message" id="timeError">Time is required</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="daySelect" class="required">Select Day</label>
+                                <select id="daySelect" class="form-control" required>
+                                    <option value="">Select a day</option>
+                                    <option value="Sunday">Sunday</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                </select>
+                                <div class="error-message" id="dayError">Day selection is required</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="runningTime" class="required">Running Time (Minutes)</label>
+                                <input type="number" id="runningTime" class="form-control" min="0" step="0.1" placeholder="Enter running time" required>
+                                <div class="error-message" id="runningTimeError">Running time is required</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" class="form-control" rows="3" placeholder="Add any additional notes"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Record</button>
+                            <button type="button" id="cancelEdit" class="btn btn-outline" style="display: none;"><i class="fas fa-times"></i> Cancel Edit</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Table Section -->
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-table"></i> Fleet Records</h2>
+                    <div class="table-container">
+                        <table id="fleetTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Day</th>
+                                    <th>Running Time</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fleetTableBody">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 30px;">
+                                        <span class="loading"></span> Loading fleet data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-user-check"></i> User Fleet Approval Requests</h2>
+                    <div class="table-container">
+                        <table id="userFleetApprovalTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Day</th>
+                                    <th>Running Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userFleetApprovalTableBody">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 30px;">
+                                        <span class="loading"></span> Loading approval requests...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- User Fleet Approval Tab -->
+            <div class="tab-content" id="user-tab">
+                <!-- Approval Requests Section -->
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-user-check"></i> User Fleet Approval Requests</h2>
+                    <div class="table-container">
+                        <table id="userFleetApprovalTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Day</th>
+                                    <th>Running Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userFleetApprovalTableBody">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 30px;">
+                                        <span class="loading"></span> Loading approval requests...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Accepted Records Section -->
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-users"></i> Accepted User Fleet Records</h2>
+                    <div class="table-container">
+                        <table id="userFleetTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Day</th>
+                                    <th>Running Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userFleetTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 30px;">
+                                        <span class="loading"></span> Loading accepted fleet records...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <div class="container">
+                    <p>&copy; 2025 Tractor Fleet Management || Designed By <span>Uttra Patel</span><br />
+                        <p1>session expired is <span id="counter">0s</span></p1>
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- Floating Action Button -->
+    <div class="fab" id="addRecordBtn">
+        <i class="fas fa-plus"></i>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirm Action</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="confirmMessage">
+                Are you sure you want to perform this action?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelConfirm">Cancel</button>
+                <button class="btn btn-danger" id="confirmAction">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Modal -->
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-info-circle"></i> Information</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="alertMessage">
+                This is an alert message.
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="closeAlert">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // DOM Elements
+        const datetimeElement = document.getElementById('datetime');
+        const fleetForm = document.getElementById('fleetForm');
+        const recordIdInput = document.getElementById('recordId');
+        const cancelEditBtn = document.getElementById('cancelEdit');
+        const fleetTableBody = document.getElementById('fleetTableBody');
+        const notificationElement = document.getElementById('notification');
+        const totalVehiclesElement = document.getElementById('totalVehicles');
+        const avgRunningTimeElement = document.getElementById('avgRunningTime');
+        const pendingApprovalsElement = document.getElementById('pendingApprovals');
+        const idInput = document.getElementById('id');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Modal Elements
+        const confirmModal = document.getElementById('confirmModal');
+        const alertModal = document.getElementById('alertModal');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const alertMessage = document.getElementById('alertMessage');
+        const confirmActionBtn = document.getElementById('confirmAction');
+        const cancelConfirmBtn = document.getElementById('cancelConfirm');
+        const closeAlertBtn = document.getElementById('closeAlert');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        
+        // Current action to be confirmed
+        let currentAction = null;
+        let currentActionParams = null;
+        
+        // Update datetime in real-time
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            datetimeElement.textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notificationElement.textContent = message;
+            notificationElement.className = `notification ${type}`;
+            notificationElement.style.display = 'block';
+            
+            setTimeout(() => {
+                notificationElement.style.display = 'none';
+            }, 4000);
+        }
+        
+        // Show modal functions
+        function showConfirmModal(message, action, params = null) {
+            confirmMessage.textContent = message;
+            currentAction = action;
+            currentActionParams = params;
+            confirmModal.style.display = 'flex';
+        }
+        
+        function showAlertModal(message) {
+            alertMessage.textContent = message;
+            alertModal.style.display = 'flex';
+        }
+        
+        // Close modal functions
+        function closeModals() {
+            confirmModal.style.display = 'none';
+            alertModal.style.display = 'none';
+            currentAction = null;
+            currentActionParams = null;
+        }
+        
+        // Modal event listeners
+        confirmActionBtn.addEventListener('click', () => {
+            if (currentAction) {
+                currentAction(currentActionParams);
+            }
+            closeModals();
+        });
+        
+        cancelConfirmBtn.addEventListener('click', closeModals);
+        closeAlertBtn.addEventListener('click', closeModals);
+        
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', closeModals);
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === confirmModal || e.target === alertModal) {
+                closeModals();
+            }
+        });
+        
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabId}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+                
+                // Refresh data when switching to user tab
+                if (tabId === 'user') {
+                    renderUserFleetApprovalTable();
+                    renderUserFleetRecords();
+                }
+            });
+        });
+        
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            const fields = [
+                { id: 'id', errorId: 'idError' },
+                { id: 'user_id', errorId: 'userIdError' },
+                { id: 'name', errorId: 'nameError' },
+                { id: 'date', errorId: 'dateError' },
+                { id: 'time', errorId: 'timeError' },
+                { id: 'daySelect', errorId: 'dayError' },
+                { id: 'runningTime', errorId: 'runningTimeError' }
+            ];
+            
+            fields.forEach(field => {
+                const element = document.getElementById(field.id);
+                const errorElement = document.getElementById(field.errorId);
+                
+                if (!element.value.trim()) {
+                    element.classList.add('error');
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                } else {
+                    element.classList.remove('error');
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            return isValid;
+        }
+        
+        // Fetch all fleet records from Supabase
+        async function fetchFleetRecords() {
+            try {
+                const { data, error } = await supabase
+                    .from('admin-fleet')
+                    .select('*')
+                    .order('id', { ascending: true });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                return data || [];
+            } catch (error) {
+                console.error('Error fetching fleet records:', error);
+                showNotification('Error fetching fleet records: ' + error.message, 'error');
+                return [];
+            }
+        }
+        
+        // Fetch user fleet records from Supabase
+        async function fetchUserFleetRecords() {
+            try {
+                const { data, error } = await supabase
+                    .from('userFleet')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                return data || [];
+            } catch (error) {
+                console.error('Error fetching user fleet records:', error);
+                showNotification('Error fetching user fleet records: ' + error.message, 'error');
+                return [];
+            }
+        }
+        
+        // Update statistics
+        function updateStatistics(records) {
+            // Total vehicles
+            const uniqueVehicles = new Set(records.map(record => record.name));
+            totalVehiclesElement.textContent = uniqueVehicles.size;
+            
+            // Average running time
+            if (records.length > 0) {
+                const totalRunningTime = records.reduce(
+                    (sum, record) => sum + (+record.running_time || 0),
+                    0
+                );
+                const avgRunningTime = totalRunningTime / records.length;
+                avgRunningTimeElement.textContent = avgRunningTime.toFixed(0) + 'M';
+            } else {
+                avgRunningTimeElement.textContent = '0M';
+            }
+            
+            // Count pending approvals from user fleet
+            updatePendingApprovalsCount();
+        }
+        
+        // Update pending approvals count
+        async function updatePendingApprovalsCount() {
+            try {
+                const userRecords = await fetchUserFleetRecords();
+                const pendingCount = userRecords.filter(record => record.status === 'pending').length;
+                pendingApprovalsElement.textContent = pendingCount;
+            } catch (error) {
+                console.error('Error updating pending approvals count:', error);
+                pendingApprovalsElement.textContent = '0';
+            }
+        }
+        
+        // Render fleet records in the table
+        async function renderFleetRecords() {
+            const records = await fetchFleetRecords();
+            
+            updateStatistics(records);
+            
+            if (records.length === 0) {
+                fleetTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;">No fleet records found</td></tr>';
+                return;
+            }
+            
+            fleetTableBody.innerHTML = '';
+            
+            records.forEach(record => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${record.id}</td>
+                    <td>${record.user_id}</td>
+                    <td>${record.name}</td>
+                    <td>${record.date}</td>
+                    <td>${record.time}</td>
+                    <td>${record.day || 'N/A'}</td>
+                    <td>${record.running_time} Minutes</td>
+                    <td>${record.notes || 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-primary edit-btn" data-id="${record.id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger delete-btn" data-id="${record.id}"><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                `;
+                
+                fleetTableBody.appendChild(row);
+            });
+            
+            // Add event listeners for edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    editRecord(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    showConfirmModal(
+                        `Are you sure you want to delete record with ID ${id}? This action cannot be undone.`,
+                        deleteRecord,
+                        id
+                    );
+                });
+            });
+        }
+        
+        // Render user fleet approval table
+        async function renderUserFleetApprovalTable() {
+            const records = await fetchUserFleetRecords();
+            const userFleetApprovalTableBody = document.getElementById('userFleetApprovalTableBody');
+            
+            if (records.length === 0) {
+                userFleetApprovalTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;">No user fleet records found</td></tr>';
+                return;
+            }
+            
+            userFleetApprovalTableBody.innerHTML = '';
+            
+            records.forEach(record => {
+                // Determine status class and text
+                let statusClass = 'status-pending';
+                let statusText = 'Pending';
+                
+                if (record.status === 'accepted') {
+                    statusClass = 'status-accepted';
+                    statusText = 'Accepted';
+                } else if (record.status === 'rejected') {
+                    statusClass = 'status-rejected';
+                    statusText = 'Rejected';
+                }
+                
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${record.id}</td>
+                    <td>${record.user_id}</td>
+                    <td>${record.name}</td>
+                    <td>${record.date}</td>
+                    <td>${record.time}</td>
+                    <td>${record.day || 'N/A'}</td>
+                    <td>${record.runningtime} Minutes</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td class="action-buttons">
+                        ${record.status !== 'accepted' ? 
+                            `<button class="btn btn-success approve-btn" data-id="${record.id}">
+                                <i class="fas fa-check"></i> Accept
+                            </button>` : ''
+                        }
+                        ${record.status !== 'rejected' ? 
+                            `<button class="btn btn-danger reject-btn" data-id="${record.id}">
+                                <i class="fas fa-times"></i> Reject
+                            </button>` : ''
+                        }
+                    </td>
+                `;
+                
+                userFleetApprovalTableBody.appendChild(row);
+            });
+            
+            // Add event listeners for approve and reject buttons
+            document.querySelectorAll('.approve-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    showConfirmModal(
+                        `Are you sure you want to accept this fleet entry?`,
+                        approveUserFleetRecord,
+                        id
+                    );
+                });
+            });
+            
+            document.querySelectorAll('.reject-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    showConfirmModal(
+                        `Are you sure you want to reject this fleet entry?`,
+                        rejectUserFleetRecord,
+                        id
+                    );
+                });
+            });
+            
+            // Update pending approvals count
+            updatePendingApprovalsCount();
+        }
+        
+        // Render accepted user fleet records
+        async function renderUserFleetRecords() {
+            const records = await fetchUserFleetRecords();
+            const userFleetTableBody = document.getElementById('userFleetTableBody');
+            
+            // Filter only accepted records for display
+            const acceptedRecords = records.filter(record => record.status === 'accepted');
+            
+            if (acceptedRecords.length === 0) {
+                userFleetTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">No accepted user fleet records found</td></tr>';
+                return;
+            }
+            
+            userFleetTableBody.innerHTML = '';
+            
+            acceptedRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.id}</td>
+                    <td>${record.user_id}</td>
+                    <td>${record.name}</td>
+                    <td>${record.date}</td>
+                    <td>${record.time}</td>
+                    <td>${record.day || 'N/A'}</td>
+                    <td>${record.runningtime} Minutes</td>
+                    <td><span class="status-accepted">Accepted</span></td>
+                `;
+                userFleetTableBody.appendChild(row);
+            });
+        }
+        
+        // Approve user fleet record
+        async function approveUserFleetRecord(id) {
+            try {
+                const { error } = await supabase
+                    .from('userFleet')
+                    .update({ status: 'accepted' })
+                    .eq('id', id);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                showNotification(`Fleet entry with ID ${id} accepted successfully`, 'success');
+                renderUserFleetApprovalTable();
+                renderUserFleetRecords();
+            } catch (error) {
+                console.error('Error approving fleet record:', error);
+                showNotification('Error approving fleet record: ' + error.message, 'error');
+            }
+        }
+        
+        // Reject user fleet record
+        async function rejectUserFleetRecord(id) {
+            try {
+                const { error } = await supabase
+                    .from('userFleet')
+                    .update({ status: 'rejected' })
+                    .eq('id', id);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                showNotification(`Fleet entry with ID ${id} rejected successfully`, 'success');
+                renderUserFleetApprovalTable();
+                renderUserFleetRecords();
+            } catch (error) {
+                console.error('Error rejecting fleet record:', error);
+                showNotification('Error rejecting fleet record: ' + error.message, 'error');
+            }
+        }
+        
+        // Edit record
+        async function editRecord(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('admin-fleet')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (data) {
+                    // Populate form with record data
+                    recordIdInput.value = data.id;
+                    document.getElementById('id').value = data.id;
+                    document.getElementById('user_id').value = data.user_id;
+                    document.getElementById('name').value = data.name;
+                    document.getElementById('date').value = data.date;
+                    document.getElementById('time').value = data.time;
+                    document.getElementById('daySelect').value = data.day || '';
+                    document.getElementById('runningTime').value = data.running_time;
+                    document.getElementById('notes').value = data.notes || '';
+                    
+                    // Show cancel button
+                    cancelEditBtn.style.display = 'inline-flex';
+                    
+                    // Scroll to form
+                    document.getElementById('fleetForm').scrollIntoView({ behavior: 'smooth' });
+                    
+                    showNotification(`Editing record with ID ${id}`, 'warning');
+                }
+            } catch (error) {
+                console.error('Error fetching record for edit:', error);
+                showNotification('Error fetching record for edit: ' + error.message, 'error');
+            }
+        }
+        
+        // Delete record
+        async function deleteRecord(id) {
+            try {
+                const { error } = await supabase
+                    .from('admin-fleet')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                showNotification(`Record with ID ${id} deleted successfully`, 'success');
+                renderFleetRecords();
+            } catch (error) {
+                console.error('Error deleting record:', error);
+                showNotification('Error deleting record: ' + error.message, 'error');
+            }
+        }
+        
+        // Form submission
+        fleetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                showAlertModal('Please fill in all required fields correctly.');
+                return;
+            }
+            
+            const id = recordIdInput.value ? parseInt(recordIdInput.value) : parseInt(document.getElementById('id').value);
+            const user_id = parseInt(document.getElementById('user_id').value);
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const day = document.getElementById('daySelect').value;
+            const running_time = parseFloat(document.getElementById('runningTime').value);
+            const notes = document.getElementById('notes').value;
+            
+            const recordData = {
+                id,
+                user_id,
+                name,
+                date,
+                time,
+                day,
+                running_time,
+                notes
+            };
+            
+            try {
+                if (recordIdInput.value) {
+                    // Update existing record
+                    const { error } = await supabase
+                        .from('admin-fleet')
+                        .update(recordData)
+                        .eq('id', id);
+                    
+                    if (error) {
+                        throw error;
+                    }
+                    
+                    showNotification(`Record with ID ${id} updated successfully`, 'success');
+                } else {
+                    // Insert new record
+                    const { error } = await supabase
+                        .from('admin-fleet')
+                        .insert([recordData]);
+                    
+                    if (error) {
+                        throw error;
+                    }
+                    
+                    showNotification(`New record added successfully`, 'success');
+                }
+                
+                // Reset form
+                fleetForm.reset();
+                recordIdInput.value = '';
+                cancelEditBtn.style.display = 'none';
+                
+                // Refresh table
+                renderFleetRecords();
+            } catch (error) {
+                console.error('Error saving record:', error);
+                showNotification('Error saving record: ' + error.message, 'error');
+            }
+        });
+        
+        // Cancel edit
+        cancelEditBtn.addEventListener('click', () => {
+            fleetForm.reset();
+            recordIdInput.value = '';
+            cancelEditBtn.style.display = 'none';
+            showNotification('Edit cancelled', 'warning');
+        });
+        
+        // Add record button
+        document.getElementById('addRecordBtn').addEventListener('click', () => {
+            document.getElementById('fleetForm').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await renderFleetRecords();
+            await renderUserFleetApprovalTable();
+            await renderUserFleetRecords();
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            
+            // Set current time as default
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').value = `${hours}:${minutes}`;
+        });
+    </script>
+</body>
+
+</html>

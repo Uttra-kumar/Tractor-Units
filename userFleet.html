@@ -1006,7 +1006,7 @@
                 const { data, error } = await supabase
                     .from('userFleet')
                     .select('*')
-                    .order('time', { ascending: false });
+                    .order('time', { ascending: true});
                 
                 if (error) {
                     console.error('Error fetching data:', error);

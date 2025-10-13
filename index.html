@@ -654,7 +654,7 @@
             timeElem.textContent = `${hours}:${minutes}:${seconds}`;
             
             // Format date
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric','hour12': 'true' };
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',hour12: true};
             dateElem.textContent = now.toLocaleDateString('en-US', options);
         }
         

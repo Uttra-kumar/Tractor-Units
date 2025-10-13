@@ -775,7 +775,7 @@
     <div class="modal" id="tractorModal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2 id="modalTitle">Add New Tractor</h2>
+            <h2 id="modalTitle">Add New Fleet</h2>
             <form id="tractorForm">
                 <input type="hidden" id="recordId">
                 <div class="form-group">
@@ -789,7 +789,7 @@
                     <label for="runningTime">Running Time (Minutes)</label>
                     <input type="number" id="runningTime" class="form-control" min="0" step="0.1" required placeholder="Enter running time in minutes">
                 </div>
-                <button type="submit" class="btn btn-primary">Save Tractor</button>
+                <button type="submit" class="btn btn-primary">Save Entry</button>
             </form>
         </div>
     </div>
@@ -1091,7 +1091,7 @@
             fleetTableBody.innerHTML = '';
             
             if (tractors.length === 0) {
-                fleetTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No tractors found</td></tr>';
+                fleetTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No data found</td></tr>';
                 return;
             }
             

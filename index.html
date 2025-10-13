@@ -643,24 +643,32 @@
     <script>
         // Real-time Clock
         function updateClock() {
-            const now = new Date();
-            const timeElem = document.getElementById('clock');
-            const dateElem = document.getElementById('date');
-            
-            // Format time
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';  
-            hours = hours % 12;
-            hours = hours ? hours : 12; // the hour '0' should be '12'
-            hours = hours.toString().padStart(2, '0');
-            timeElem.textContent = `${hours}:${minutes}:${seconds} ${ampm}`;
-            
-            // Format date
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-            dateElem.textContent = now.toLocaleDateString('en-US', options);
-        }
+  const now = new Date();
+
+  const timeElem = document.getElementById('clock');
+  const dateElem = document.getElementById('date');
+
+  // Extract hours, minutes, seconds
+  let hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+
+  // Determine AM/PM
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+
+  // Convert 24-hour → 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // hour '0' should be '12'
+  hours = hours.toString().padStart(2, '0');
+
+  // Set time text
+  timeElem.textContent = `${hours}:${minutes}:${seconds} ${ampm}`;
+
+  // Format date
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  dateElem.textContent = now.toLocaleDateString('en-US', options);
+}
+
         
         // Update clock immediately and then every second
         updateClock();

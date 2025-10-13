@@ -1458,9 +1458,9 @@
                 await refreshData();
                 
                 // Show welcome alert after a short delay
-                setTimeout(() => {
+                /*setTimeout(() => {
                     showAlert('Welcome!', 'Tractor Fleet Management System is ready.', 'info');
-                }, 500);
+                }, 500);*/
             } catch (error) {
                 console.error('Error initializing application:', error);
                 await showAlert('Error', 'Failed to load application data. Please refresh the page.', 'error');

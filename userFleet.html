@@ -1217,7 +1217,7 @@
                 // Refresh data
                 await refreshData();
                 closeModal('tractorModal');
-                await showAlert('Success', 'Tractor entry added successfully! It is now pending admin approval.', 'success');
+                await showAlert('Success', 'Data added successfully! It is now pending admin approval.', 'success');
                 
                 // Remove from recent entries after 3 seconds
                 setTimeout(() => {
@@ -1292,7 +1292,7 @@
                 
                 await refreshData();
                 closeModal('tractorModal');
-                await showAlert('Success', 'Tractor updated successfully!', 'success');
+                await showAlert('Success', 'data updated successfully!', 'success');
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -1302,7 +1302,7 @@
         async function deleteTractor(id) {
             const confirmed = await showAlert(
                 'Confirm Deletion', 
-                'Are you sure you want to delete this tractor?', 
+                'Are you sure you want to delete this data?', 
                 'warning'
             );
             
@@ -1315,12 +1315,12 @@
                 
                 if (error) {
                     console.error('Error deleting tractor:', error);
-                    await showAlert('Error', 'Error deleting tractor. Please try again.', 'error');
+                    await showAlert('Error', 'Error deleting data. Please try again.', 'error');
                     return;
                 }
                 
                 await refreshData();
-                await showAlert('Success', 'Tractor deleted successfully!', 'success');
+                await showAlert('Success', 'Data deleted successfully!', 'success');
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -1364,7 +1364,7 @@
         
         addTractorCard.addEventListener('click', async () => {
             await populateUserDropdown();
-            document.getElementById('modalTitle').textContent = 'Add New Tractor';
+            document.getElementById('modalTitle').textContent = 'Add New Data';
             openModal('tractorModal');
         });
         

@@ -1219,14 +1219,14 @@
                 closeModal('tractorModal');
                 await showAlert('Success', 'Data added successfully! It is now pending admin approval.', 'success');
                 
-                // Remove from recent entries after 3 seconds
+                // Remove from recent entries after 10 seconds
                 setTimeout(() => {
                     const index = recentEntries.indexOf(tractorData.id);
                     if (index > -1) {
                         recentEntries.splice(index, 1);
                         refreshData(); // Re-render to remove highlight
                     }
-                }, 3000);
+                }, 10000);
             } catch (error) {
                 console.error('Error:', error);
             }

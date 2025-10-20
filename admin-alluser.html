@@ -1010,7 +1010,19 @@
                 container.appendChild(userCard);
             });
         }
+
+                function fleetUser(userId) {
+            window.location.href = `singlefleet.html?id=${userId}`;
+        }
         
+        // Placeholder functions for other actions
+        function payUser(userId) {
+            window.location.href = `singleUserFleet.html?id=${userId}`;
+        }
+        
+        function fnpUser(userId) {
+            window.location.href = `singlepayment.html?id=${userId}`;
+        }
         // Function to update statistics
         function updateStats(users, fleetData, paymentData) {
             document.getElementById('total-users').textContent = users.length;

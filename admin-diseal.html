@@ -1277,7 +1277,8 @@
                     date: formData.get('date'),
                     day: formData.get('custom-day'),
                     amount: formData.get('amount'),
-                    notes: formData.get('notes')
+                    notes: formData.get('notes'),
+                    created_at: new Date().toISOString()
                 };
                 
                 try {

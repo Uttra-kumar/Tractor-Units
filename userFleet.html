@@ -1438,7 +1438,8 @@
                 runningtime: parseFloat(runningTime),
                 date: date,
                 time: time,
-                day: day
+                day: day,
+                created_at: new Date().toISOString()
             };
             
             if (recordId) {

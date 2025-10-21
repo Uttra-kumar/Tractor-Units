@@ -744,7 +744,8 @@ function updatePaymentTable(data, user_id) {
 
     paidAmountElement.textContent = formatCurrency(totalPaid);
     remainingElement.textContent = formatCurrency(latest.remain || 0);
-    totalAmountElement.textContent = formatCurrency(maxTotalAmount || 0);
+    //totalAmountElement.textContent = formatCurrency(maxTotalAmount || 0);
+    totalAmountElement.textContent = Number(totalPaid+latest.remain || 0);
 }
 
         

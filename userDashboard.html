@@ -427,9 +427,13 @@
                     <div class="profile-header">
                     <i class="fas fa-user"></i>
                         <div class="profile-info">
-                            <h3 id="profile-name"></h3>
+                         <h3>
+                          <span id="profile-name"></span>
+                           <span id="profileid" style="font-size:18px; color:#666; margin-left:8px;"></span>
+                           </h3>
                             <p id="profile-role"></p>
-                        </div>
+                           </div>
+
                     </div>
                     <div class="profile-details">
                         <div class="detail-item">
@@ -550,6 +554,7 @@
         
         // Profile elements
         const profileNameElement = document.getElementById('profile-name');
+        const profileid = document.getElementById('profile-id');
         const profileRoleElement = document.getElementById('profile-role');
         const profileStatusElement = document.getElementById('profile-status');
         const profileJoinDateElement = document.getElementById('profile-join-date');
@@ -656,7 +661,8 @@
         function updateProfileData(userData) {
             if (!userData) return;
             
-            profileNameElement.textContent = userData.name || 'Driver User';
+            profileNameElement.textContent = userData.name || 'Unknown';
+            profileid.textContent = userData.id || 'N/A';
             profileRoleElement.textContent = userData.role || 'User';
             
             if (userData.status) {

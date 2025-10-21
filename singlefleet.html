@@ -390,6 +390,7 @@
                             <th>Date</th>
                             <th>Day</th>
                             <th>Running Time (Minutes)</th>
+                            <th>Amount</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
@@ -487,6 +488,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const totalAmountInput = document.getElementById('total-amount-input');
         const paidAmountInput = document.getElementById('paid-amount');
         const calculatorResult = document.getElementById('calculator-result');
+        const tm = 15;
         
         // Format number as Indian currency
         function formatIndianCurrency(amount) {
@@ -529,7 +531,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
             
             data.forEach(item => {
                 const row = document.createElement('tr');
-                
+                const pay = Number(item.running_time * tm );
                 row.innerHTML = `
                     <td>${item.id}</td>
                     <td>${item.user_id}</td>
@@ -537,6 +539,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
                     <td>${formatDate(item.date)}</td>
                     <td>${getDayOfWeek(item.date)}</td>
                     <td>${item.running_time || 0}</td>
+                    <td>${pay}</td>
                 `;
                 
                 tableBody.appendChild(row);
@@ -549,7 +552,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         // Calculate totals
         function calculateTotals(data) {
             const totalRunningTime = data.reduce((sum, item) => sum + (parseInt(item.running_time) || 0), 0);
-            const totalAmount = totalRunningTime * 15; // ₹150 per hour
+            const totalAmount = totalRunningTime * tm; // ₹150 per hour
             
             totalRunningTimeElement.textContent = `${totalRunningTime.toFixed(0)} Minutes`;
             totalAmountElement.textContent = formatIndianCurrency(totalAmount);

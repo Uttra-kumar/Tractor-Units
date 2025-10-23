@@ -627,7 +627,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
             const remain = parseInt(document.getElementById("payment-remain").value);
             const paid_amount = parseInt(document.getElementById("payment-paid").value);
             let total_amount = parseInt(document.getElementById("payment-total").value);
-            
+            const created_at = created_at: new Date().toISOString();
             total_amount = paid_amount + remain;
             // ✅ Auto Date + Day
             const today = new Date();
@@ -636,7 +636,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
             
             const { error } = await supabase
                 .from("admin-singePay")
-                .upsert([{ id, user_id, name, paid_amount, remain, total_amount, date, day }]);
+                .upsert([{ id, user_id, name, paid_amount, remain, total_amount, date, day,created_at}]);
             
             if (error) {
                 alert("❌ Error: " + error.message);

@@ -627,7 +627,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
             const remain = parseInt(document.getElementById("payment-remain").value);
             const paid_amount = parseInt(document.getElementById("payment-paid").value);
             let total_amount = parseInt(document.getElementById("payment-total").value);
-            const created_at = created_at: new Date().toISOString();
+            const created_at = new Date().toISOString();
             total_amount = paid_amount + remain;
             // ✅ Auto Date + Day
             const today = new Date();

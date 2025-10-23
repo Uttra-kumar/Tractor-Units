@@ -312,6 +312,17 @@
     .theme-ocean .theme-color {
       background: linear-gradient(135deg, #1e88e5, #4fc3f7);
     }
+
+    .navbar-nav {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* hide scrollbar for mobile */
+}
+
+.navbar-nav::-webkit-scrollbar {
+  display: none;
+}
     
     /* Horizontal Menu */
     .horizontal-menu {
@@ -930,6 +941,16 @@
       .stats-cards {
         grid-template-columns: 1fr;
       }
+     .navbar-nav {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* hide scrollbar for mobile */
+}
+
+.navbar-nav::-webkit-scrollbar {
+  display: none;
+}
       
       .header {
         flex-wrap: wrap;
@@ -1026,7 +1047,18 @@
         margin-top: calc(var(--header-height));
         padding: 15px;
       }
-      
+
+      .navbar-nav {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* hide scrollbar for mobile */
+}
+
+.navbar-nav::-webkit-scrollbar {
+  display: none;
+}
+
       .section-header {
         flex-direction: column;
         align-items: flex-start;

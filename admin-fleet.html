@@ -1598,7 +1598,7 @@
                                 <i class="fas fa-check"></i> Accept
                             </button>` : ''
                         }
-                        ${record.status !== 'rejected' ? 
+                        ${record.status !== 'pending' ? 
                             `<button class="btn btn-danger reject-btn" data-id="${record.id}">
                                 <i class="fas fa-times"></i> Reject
                             </button>` : ''
@@ -1693,7 +1693,7 @@
       try {
         const { error } = await supabase
           .from('userFleet')
-          .update({ status: 'rejected' })
+          .update({ status: 'pending' })
           .eq('id', id);
         
         if (error) {

@@ -643,6 +643,7 @@ const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
             } else {
                 alert("✅ Payment record saved!");
                 paymentForm.reset();
+                location.relod();
             }
         });
         
@@ -740,6 +741,7 @@ function editItem(id, name, paid, remain, total, user_id) {
             } else {
                 alert("🗑️ Record deleted!");
                 fetchPayData(); // fetch again for this fleet
+                location.relod();
             }
         }
         

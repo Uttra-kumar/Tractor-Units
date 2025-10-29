@@ -1630,7 +1630,11 @@
                 // ONLY KEEP THE LATEST ENTRY - Clear array and add only current ID
                 recentEntries = [tractorData.id];
                 localStorage.setItem('recentEntries', JSON.stringify(recentEntries));
-                
+               
+                setTimeout(() => {
+    localStorage.removeItem('recentEntries');
+}, 5000);
+        
                 // Refresh data
                 await refreshData();
                 closeModal('tractorModal');

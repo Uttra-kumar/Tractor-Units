@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tractor Unit - Modern Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --dark: #121212;
+            --dark-secondary: #1e1e1e;
+            --light: #f8f9fa;
+            --light-secondary: #e9ecef;
+            --text-dark: #f8f9fa;
+            --text-light: #212529;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        .dark-theme {
+            --bg-primary: var(--dark);
+            --bg-secondary: var(--dark-secondary);
+            --text-primary: var(--text-dark);
+            --text-secondary: var(--light-secondary);
+            --card-bg: var(--dark-secondary);
+        }
+
+        .light-theme {
+            --bg-primary: var(--light);
+            --bg-secondary: var(--light-secondary);
+            --text-primary: var(--text-light);
+            --text-secondary: var(--dark-secondary);
+            --card-bg: var(--light);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--bg-secondary);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo i {
+            font-size: 2.2rem;
+            transform: rotateY(0deg);
+            transition: transform 1s ease;
+        }
+
+        .logo:hover i {
+            transform: rotateY(360deg);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav a:before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover:before {
+            width: 100%;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-primary);
+            transform: rotate(30deg);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.1) 0%, rgba(131, 56, 236, 0.1) 100%);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .explore-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(58, 134, 255, 0.4);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .explore-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .explore-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(58, 134, 255, 0.6);
+        }
+
+        .explore-btn:hover:before {
+            opacity: 1;
+        }
+
+        .explore-btn:after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+
+        .explore-btn:hover:after {
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        /* Time and Date Section */
+        .time-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 60px 0;
+            flex-wrap: wrap;
+        }
+
+        .time-card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            min-width: 250px;
+            text-align: center;
+            transition: var(--transition);
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateY(0deg);
+        }
+
+        .time-card:hover {
+            transform: perspective(1000px) rotateY(10deg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        #current-time, #current-date {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Content Section */
+        .content-section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(0deg);
+        }
+
+        .feature-card:hover {
+            transform: perspective(1000px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-secondary);
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .time-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .explore-btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        /* 3D Animation for Cards */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .floating {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        /* Glow Effect */
+        .glow {
+            text-shadow: 0 0 10px rgba(58, 134, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tractor"></i>
+                    <span>Tractor Unit</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Fleet</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">User</a></li>
+                        <li><a href="#">Admin</a></li>
+                    </ul>
+                </nav>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1 class="glow">Revolutionizing Agriculture Technology</h1>
+                <p>Experience the future of farming with our advanced tractor units. Powerful, efficient, and designed for modern agriculture needs.</p>
+                <a href="#" class="explore-btn floating">Explore Fleet</a>
+            </div>
+        </section>
+
+        <section class="time-section">
+            <div class="time-card">
+                <h3>Current Time</h3>
+                <div id="current-time">Loading...</div>
+            </div>
+            <div class="time-card">
+                <h3>Today's Date</h3>
+                <div id="current-date">Loading...</div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <h2 class="section-title">Our Features</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h3>Advanced Technology</h3>
+                        <p>Our tractors are equipped with the latest GPS and automation technology to optimize your farming operations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3>Eco-Friendly</h3>
+                        <p>Reduced emissions and fuel consumption make our tractors environmentally responsible choices.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h3>High Performance</h3>
+                        <p>Powerful engines and durable construction ensure maximum productivity in all conditions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-text">
+                    &copy; 2025 Design And Hosted by Uttra Patel
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Real-time Clock and Date
+        function updateTime() {
+            const now = new Date();
+            
+            // Format time
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            const currentTime = now.toLocaleTimeString('en-US', timeOptions);
+            
+            // Format date
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const currentDate = now.toLocaleDateString('en-US', dateOptions);
+            
+            document.getElementById('current-time').textContent = currentTime;
+            document.getElementById('current-date').textContent = currentDate;
+        }
+
+        // Update time immediately and then every second
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Add 3D effect to cards on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card, .time-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+                        entry.target.style.opacity = '1';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                card.style.opacity = '0.7';
+                card.style.transform = 'perspective(1000px) rotateY(10deg)';
+                card.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

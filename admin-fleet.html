@@ -1416,6 +1416,7 @@
         } else {
           // Clear form if "Select an ID" is chosen
           clearForm();
+          location.reload();
         }
       });
     }
@@ -1426,6 +1427,7 @@
       recordIdInput.value = '';
       cancelEditBtn.style.display = 'none';
       showNotification('Form cleared', 'warning');
+      
     }
     
     // Fetch all fleet records from Supabase

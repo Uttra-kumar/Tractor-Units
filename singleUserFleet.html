@@ -122,6 +122,20 @@
         nav ul li {
             margin: 0 15px;
         }
+        .delete-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--danger), #c0392b);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
         
         nav ul li a {
             color: white;
@@ -1207,7 +1221,7 @@ function displaySmsHistory(history) {
                     </div>
                 </div>
                 <div class="history-message">${record.message}</div>
-                <button class="btn btn-danger" style="padding:6px 12px;font-size:0.9rem;border-radius:6px;" onclick="deleteSmsHistory(${record.id})">
+                <button class="btn btn-danger delete-btn" onclick="deleteSmsHistory(${record.id})">
                             <i class="fas fa-trash"></i> Delete
                         </button>
             </div>

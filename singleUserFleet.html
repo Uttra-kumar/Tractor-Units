@@ -1203,12 +1203,13 @@ function displaySmsHistory(history) {
                     <div class="history-date">${sentAt}</div>
                     <div class="history-phone">
                         ${record.user_name} - ${record.phone_number}
-                        <button class="btn btn-danger" style="padding:6px 12px;font-size:0.9rem;border-radius:6px;" onclick="deleteSmsHistory(${record.id})">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
+                        
                     </div>
                 </div>
                 <div class="history-message">${record.message}</div>
+                <button class="btn btn-danger" style="padding:6px 12px;font-size:0.9rem;border-radius:6px;" onclick="deleteSmsHistory(${record.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
             </div>
         `;
     });

@@ -899,7 +899,7 @@
             </p>
         </div>
     </footer>
-
+<script src="session.js"></script>
     <script>
         // Initialize Supabase client
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
@@ -1231,25 +1231,7 @@
             dateFilter.addEventListener('change', filterAndSortData);
             sortBy.addEventListener('change', filterAndSortData);
         }
-        
-        // Session counter
-        function startSessionCounter() {
-            let counter = 1800; // 30 minutes in seconds
-            const counterElement = document.getElementById('counter');
-            
-            const interval = setInterval(() => {
-                counter--;
-                const minutes = Math.floor(counter / 60);
-                const seconds = counter % 60;
-                counterElement.textContent = `${minutes}m ${seconds}s`;
-                
-                if (counter <= 0) {
-                    clearInterval(interval);
-                    counterElement.textContent = 'Expired';
-                    showAlert('Session Expired', 'Your session has expired. Please refresh the page.', 'warning');
-                }
-            }, 1000);
-        }
+
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
@@ -1261,9 +1243,7 @@
             
             // Setup search and filters
             setupSearch();
-            
-            // Start session counter
-            startSessionCounter();
+        
             
             // Form submission
             document.getElementById('diesel-form').addEventListener('submit', async function(e) {

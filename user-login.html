@@ -740,10 +740,6 @@
                     Already have an account? <a id="show-login">Login here</a>
                 </div>
             </form>
-            
-            <div class="session-timer" id="session-timer-container">
-                Session will expire in: <span class="timer-value" id="session-timer">10:00</span>
-            </div>
         </div>
     </div>
     
@@ -918,24 +914,7 @@
             return userId;
         }
         
-        // Session Timer
-        function startSessionTimer() {
-            let timeLeft = 600; // 10 minutes in seconds
-            
-            const timerInterval = setInterval(() => {
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                
-                sessionTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    showMessage('Session expired. Please login again.', 'error');
-                } else {
-                    timeLeft--;
-                }
-            }, 1000);
-        }
+    
         
         // Initialize Supabase
         function initializeSupabase() {
@@ -1097,7 +1076,7 @@
             
             // Initialize Supabase with hardcoded credentials
             if (initializeSupabase()) {
-                startSessionTimer();
+
             }
         });
     </script>

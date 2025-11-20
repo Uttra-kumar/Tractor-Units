@@ -1146,58 +1146,87 @@
         });
         
         // Fetch payment data
-        async function fetchPayData() {
-            try {
-                const tableName = currentDataType === 'payment' ? 'admin-singePay' : 'admin-trollysingpay';
-                
-                const { data, error } = await supabase
-                    .from(tableName)
-                    .select('*')
-                
-                if (error) throw error;
-                
-                if (!data || data.length === 0) {
-                    if (currentDataType === 'payment') {
-                        paymentTable.style.display = "none";
-                    } else {
-                        trolleyTable.style.display = "none";
-                    }
-                    loadingElement.textContent = `No ${currentDataType} records found`;
-                    updateStatistics({ total: 0, completed: 0, pending: 0, month: 0 });
-                    return;
-                }
-                
-                fetchRecords(data);
-                updateStatistics(data);
-                updateReports(data);
-                
-            } catch (error) {
-                showError(`Error fetching ${currentDataType} data: ` + error.message);
+        // Fetch payment data
+async function fetchPayData() {
+    try {
+        loadingElement.style.display = 'block';
+        errorElement.style.display = 'none';
+        
+        const tableName = currentDataType === 'payment' ? 'admin-singePay' : 'admin-trollysingpay';
+        
+        const { data, error } = await supabase
+            .from(tableName)
+            .select('*')
+            .order('date', { ascending: false });
+
+        if (error) throw error;
+        
+        // Check if data is valid array
+        if (!data || !Array.isArray(data)) {
+            console.error('Invalid data format:', data);
+            if (currentDataType === 'payment') {
+                paymentTable.style.display = "none";
+            } else {
+                trolleyTable.style.display = "none";
             }
+            loadingElement.textContent = `No ${currentDataType} records found`;
+            updateStatistics([]); // Pass empty array
+            return;
+        }
+
+        if (data.length === 0) {
+            if (currentDataType === 'payment') {
+                paymentTable.style.display = "none";
+            } else {
+                trolleyTable.style.display = "none";
+            }
+            loadingElement.textContent = `No ${currentDataType} records found`;
+            updateStatistics([]); // Pass empty array
+            return;
         }
         
+        fetchRecords(data);
+        updateStatistics(data);
+        updateReports(data);
+        
+    } catch (error) {
+        console.error('Fetch error:', error);
+        showError(`Error fetching ${currentDataType} data: ` + error.message);
+    }
+}
+        
         // Update statistics
-        function updateStatistics(data) {
-            const total = data.reduce((sum, item) => sum + (item.total_amount || 0), 0);
-            const completed = data.reduce((sum, item) => sum + (item.paid_amount || 0), 0);
-            const pending = data.reduce((sum, item) => sum + (item.remain || 0), 0);
-            
-            // Calculate this month's payments
-            const currentMonth = new Date().getMonth() + 1;
-            const currentYear = new Date().getFullYear();
-            const monthPayments = data
-                .filter(item => {
-                    if (!item.date) return false;
-                    const itemDate = new Date(item.date);
-                    return itemDate.getMonth() + 1 === currentMonth && itemDate.getFullYear() === currentYear;
-                })
-                .reduce((sum, item) => sum + (item.total_amount || 0), 0);
-            
-            document.getElementById('total-payments').textContent = formatIndianCurrency(total);
-            document.getElementById('completed-payments').textContent = formatIndianCurrency(completed);
-            document.getElementById('pending-payments').textContent = formatIndianCurrency(pending);
-            document.getElementById('month-payments').textContent = formatIndianCurrency(monthPayments);
-        }
+        // Update statistics
+function updateStatistics(data) {
+    // Ensure data is an array
+    if (!data || !Array.isArray(data)) {
+        data = [];
+    }
+    
+    const total = data.reduce((sum, item) => sum + (Number(item.total_amount) || 0), 0);
+    const completed = data.reduce((sum, item) => sum + (Number(item.paid_amount) || 0), 0);
+    const pending = data.reduce((sum, item) => sum + (Number(item.remain) || 0), 0);
+    
+    // Calculate this month's payments
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    const monthPayments = data
+        .filter(item => {
+            if (!item.date) return false;
+            try {
+                const itemDate = new Date(item.date);
+                return itemDate.getMonth() + 1 === currentMonth && itemDate.getFullYear() === currentYear;
+            } catch (e) {
+                return false;
+            }
+        })
+        .reduce((sum, item) => sum + (Number(item.total_amount) || 0), 0);
+    
+    document.getElementById('total-payments').textContent = formatIndianCurrency(total);
+    document.getElementById('completed-payments').textContent = formatIndianCurrency(completed);
+    document.getElementById('pending-payments').textContent = formatIndianCurrency(pending);
+    document.getElementById('month-payments').textContent = formatIndianCurrency(monthPayments);
+}
         
         // Display records in table
         async function fetchRecords(data) {

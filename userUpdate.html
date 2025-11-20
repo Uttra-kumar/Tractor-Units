@@ -1253,78 +1253,81 @@
         }
         
         async function saveUser() {
-            const id = document.getElementById('userId').value;
-            const user_id = document.getElementById('userUserId').value;
-            const name = document.getElementById('userName').value;
-            const mobile = document.getElementById('mobileNo').value;
-            const password = document.getElementById('userPassword').value;
-            const role = document.getElementById('userRole').value;
-            const status = document.getElementById('userStatus').value;
+    const id = document.getElementById('userId').value;
+    const user_id = document.getElementById('userUserId').value;
+    const name = document.getElementById('userName').value;
+    const mobile = document.getElementById('mobileNo').value;
+    const password = document.getElementById('userPassword').value;
+    const role = document.getElementById('userRole').value;
+    const status = document.getElementById('userStatus').value;
+    
+    // Validation
+    if (!id || !user_id || !name || !mobile || !password || !role || !status) {
+        showNotification('Please fill all required fields', 'error');
+        return;
+    }
+    
+    // Determine which table to use for validation
+    const tableForValidation = currentUser ? currentTable : selectedTableForAdd;
+    const expectedLength = tableForValidation === 'userRegistration-T' ? 6 : 4;
+    
+    // Validate digit length based on the appropriate table
+    if (id.length !== expectedLength || user_id.length !== expectedLength) {
+        showNotification(`ID and User ID must be ${expectedLength} digits for ${tableForValidation}`, 'error');
+        return;
+    }
+    
+    try {
+        if (currentUser) {
+            // Update existing user in the current table
+            const { error } = await supabase
+                .from(currentTable)
+                .update({ 
+                    name, 
+                    mobile, 
+                    password, 
+                    role, 
+                    status 
+                })
+                .eq('id', id);
             
-            // Validation
-            if (!id || !user_id || !name || !mobile || !password || !role || !status) {
-                showNotification('Please fill all required fields', 'error');
-                return;
-            }
+            if (error) throw error;
             
-            // Validate digit length based on selected table
-            const expectedLength = selectedTableForAdd === 'userRegistration-T' ? 6 : 4;
-            if (id.length !== expectedLength || user_id.length !== expectedLength) {
-                showNotification(`ID and User ID must be ${expectedLength} digits for ${selectedTableForAdd}`, 'error');
-                return;
-            }
+            showNotification('User updated successfully');
+        } else {
+            // Add new user to the selected table
+            const { error } = await supabase
+                .from(selectedTableForAdd)
+                .insert([{ 
+                    id: id,
+                    user_id: user_id, 
+                    name, 
+                    mobile, 
+                    password, 
+                    role, 
+                    status 
+                }]);
             
-            try {
-                if (currentUser) {
-                    // Update existing user in the current table
-                    const { error } = await supabase
-                        .from(currentTable)
-                        .update({ 
-                            name, 
-                            mobile, 
-                            password, 
-                            role, 
-                            status 
-                        })
-                        .eq('id', id);
-                    
-                    if (error) throw error;
-                    
-                    showNotification('User updated successfully');
-                } else {
-                    // Add new user to the selected table
-                    const { error } = await supabase
-                        .from(selectedTableForAdd)
-                        .insert([{ 
-                            id: id,
-                            user_id: user_id, 
-                            name, 
-                            mobile, 
-                            password, 
-                            role, 
-                            status 
-                        }]);
-                    
-                    if (error) throw error;
-                    
-                    showNotification(`User added successfully to ${selectedTableForAdd} with ID: ${id} and User ID: ${user_id}`);
-                    
-                    // If the user was added to the currently viewed table, refresh the view
-                    if (selectedTableForAdd === currentTable) {
-                        loadUsers();
-                    }
-                }
-                
-                closeModal();
-                
-                // Always refresh the current view after save
+            if (error) throw error;
+            
+            showNotification(`User added successfully to ${selectedTableForAdd} with ID: ${id} and User ID: ${user_id}`);
+            
+            // If the user was added to the currently viewed table, refresh the view
+            if (selectedTableForAdd === currentTable) {
                 loadUsers();
-                
-            } catch (error) {
-                console.error('Error saving user:', error);
-                showNotification('Failed to save user: ' + error.message, 'error');
             }
         }
+        
+        closeModal();
+        
+        // Always refresh the current view after save
+        loadUsers();
+        
+    } catch (error) {
+        console.error('Error saving user:', error);
+        showNotification('Failed to save user: ' + error.message, 'error');
+    }
+}
         
         async function deleteUser(id) {
             if (!confirm('Are you sure you want to delete this user?')) return;

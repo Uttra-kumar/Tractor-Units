@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tractor Fleet Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4bb543;
+            --warning: #ffcc00;
+            --danger: #dc3545;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px 0;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 36px;
+        }
+        
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .user-info img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        nav {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem;
+            margin-top: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        nav ul li a:hover,
+        nav ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .stat-item:nth-child(2) {
+            border-left-color: var(--success);
+        }
+        
+        .stat-item:nth-child(3) {
+            border-left-color: var(--accent);
+        }
+        
+        .stat-item:nth-child(4) {
+            border-left-color: var(--warning);
+        }
+        
+        .stat-info h3 {
+            font-size: 15px;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+        
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 15px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--light-gray);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fdfdfd;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
+            background: white;
+        }
+        
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #3a9c33);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(75, 181, 67, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #c82333);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(220, 53, 69, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+        
+        th {
+            padding: 18px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--dark);
+            border-bottom: 1px solid var(--light-gray);
+            font-size: 1.4rem;
+        }
+        
+        td {
+            padding: 18px;
+            border-bottom: 1px solid var(--light-gray);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        tbody tr {
+            transition: background 0.3s ease;
+        }
+        
+        tbody tr:hover {
+            background: rgba(67, 97, 238, 0.04);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .edit-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+        
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .export-btn {
+            background: rgba(75, 181, 67, 0.1);
+            color: var(--success);
+        }
+        
+        .export-btn:hover {
+            background: var(--success);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            background-color: #ffecec;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .calculator-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4fc;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            border: 1px dashed #3498db;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            color: var(--gray);
+            font-size: 15px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        #counter {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            animation: pulse 2s infinite;
+            margin-left: 0.25rem;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 5px 0;
+            }
+            
+            .filters {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+            
+            .actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tractor"></i>
+                    <h1 id="page-title">Tractor Fleet Management For Single User</h1>
+                </div>
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=4361ee&color=fff" alt="User">
+                    <span id="admin-name">Loading...</span>
+                </div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="admin-alluser.html"><i class="fas fa-arrow-left"></i> Back</a></li>
+                    <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-chart-pie"></i> Fleet Statistics</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-info">
+                            <h3 id="running-time-label">Total Running Time</h3>
+                            <div id="total-running-time" class="stat-value">0 Minutes</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-info">
+                            <h3>Total Amount</h3>
+                            <div id="total-amount" class="stat-value">₹0</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-calculator"></i> Payment Calculator</h2>
+                </div>
+                <div class="calculator-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="total-amount-input">Total Amount (₹)</label>
+                        <input type="number" id="total-amount-input" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="paid-amount">Paid Amount (₹)</label>
+                        <input type="number" id="paid-amount" class="form-control" placeholder="Enter paid amount">
+                    </div>
+                </div>
+                <div id="calculator-result" class="calculator-result">Remaining amount: ₹0</div>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">Loading data...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="card-title"><i class="fas fa-table"></i> Fleet Records</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filter-id">ID</label>
+                        <input type="text" id="filter-id" class="form-control" placeholder="Filter by ID">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-name">Name</label>
+                        <input type="text" id="filter-name" class="form-control" placeholder="Filter by Name">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-date">Date</label>
+                        <input type="date" id="filter-date" class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="fleet-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th id="running-time-header">Running Time (Minutes)</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Payment Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-plus-circle"></i> Add Payment Record</h2>
+            </div>
+            <form id="payment-form">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="payment-id">ID</label>
+                        <input type="number" id="payment-id" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-id2">User ID</label>
+                        <input type="number" id="payment-id2" class="form-control" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-name">Name</label>
+                        <input type="text" id="payment-name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="payment-paid">Paid Amount (₹)</label>
+                        <input type="number" id="payment-paid" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-remain">Remain Amount (₹)</label>
+                        <input type="number" id="payment-remain" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="payment-total">Total Amount (₹)</label>
+                        <input type="number" id="payment-total" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Submit
+                    </button>
+                    <button type="reset" class="btn btn-outline">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Payment Records Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="card-title"><i class="fas fa-credit-card"></i> Payment Records</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="paymentFilterId">ID</label>
+                        <input type="text" id="paymentFilterId" class="form-control" placeholder="Filter by ID">
+                    </div>
+                    <div class="filter-group">
+                        <label for="paymentFilterName">Name</label>
+                        <input type="text" id="paymentFilterName" class="form-control" placeholder="Filter by Name">
+                    </div>
+                    <div class="filter-group">
+                        <label for="paymentFilterDate">Date</label>
+                        <input type="date" id="paymentFilterDate" class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="payment-table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>Paid Amount (₹)</th>
+                            <th>Remain</th>
+                            <th>Total Amount (₹)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payment-body"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 Tractor Fleet Management || Designed By <span style="color: #FF8200; font-weight: 600;">Uttra Patel</span></p>
+            <p style="margin-top: 10px; font-size: 1rem;">
+                <span style="background: rgba(0, 0, 0, 0.1); padding: 5px 10px; border-radius: 5px;">
+                    Session expired is <span id="counter" style="display: inline-block; padding: 2px 8px; border-radius: 10px; background: linear-gradient(45deg, #ff6b6b, #ff8e53); color: white; font-weight: bold;">0s</span>
+                </span>
+            </p>
+        </footer>
+    </div>
+    <script src="session.js"></script>
+    <script>
+        // Your existing JavaScript code remains exactly the same
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Get ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const user_id = urlParams.get('id');
+        console.log("User ID from URL:", user_id);
+        
+        // Determine if it's fleet or trolley based on ID length
+        let isFleet = false;
+        let isTrolley = false;
+        let dataTable = '';
+        let paymentTable = '';
+        let ratePerMinute = 15; // Default for fleet
+        
+        if (user_id) {
+            if (user_id.length === 6) {
+                // 6-digit ID - Fleet
+                isFleet = true;
+                dataTable = 'admin-fleet';
+                paymentTable = 'admin-singePay';
+                ratePerMinute = 15; // ₹15 per minute for fleet
+                updatePageTitles("Fleet", "Running Time (Minutes)");
+            } else if (user_id.length === 4) {
+                // 4-digit ID - Trolley
+                isTrolley = true;
+                dataTable = 'admin-trolly';
+                paymentTable = 'admin-trollysingpay';
+                ratePerMinute = 10; // ₹10 per minute for trolley
+                updatePageTitles("Trolley", "Trolley Count");
+            }
+        }
+        
+        // Update page titles based on type
+        function updatePageTitles(type, runningTimeLabel) {
+            document.getElementById('page-title').textContent = `Tractor ${type} Management For Single User`;
+            document.getElementById('running-time-label').textContent = `Total ${runningTimeLabel}`;
+            document.getElementById('running-time-header').textContent = runningTimeLabel;
+        }
+        
+        // DOM elements
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+        const fleetTable = document.getElementById('fleet-table');
+        const tableBody = document.getElementById('table-body');
+        const totalRunningTimeElement = document.getElementById('total-running-time');
+        const totalAmountElement = document.getElementById('total-amount');
+        const totalAmountInput = document.getElementById('total-amount-input');
+        const paidAmountInput = document.getElementById('paid-amount');
+        const calculatorResult = document.getElementById('calculator-result');
+        
+        // Format number as Indian currency
+        function formatIndianCurrency(amount) {
+            return '₹' + amount.toFixed(0).replace(/\d(?=(\d{2})+\.)/g, '$&,');
+        }
+        
+        // Fetch data from Supabase
+        async function fetchData() {
+            if (!user_id) {
+                showError('No ID provided in URL');
+                return;
+            }
+            
+            if (!dataTable) {
+                showError('Invalid ID format. Must be 6-digit (fleet) or 4-digit (trolley)');
+                return;
+            }
+            
+            try {
+                // Fetch data from Supabase
+                const { data, error } = await supabase
+                    .from(dataTable)
+                    .select('*')
+                    .eq('user_id', user_id);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log("Fetched data:", data);
+                
+                // Display data in table
+                displayData(data);
+                
+                // Calculate and display totals
+                calculateTotals(data);
+                
+            } catch (error) {
+                showError('Error fetching data: ' + error.message);
+            }
+        }
+        
+        // Display data in table
+        function displayData(data) {
+            tableBody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // For trolley, use trolley_count field instead of running_time
+                const timeField = isTrolley ? item.trolley : item.running_time;
+                const timeValue = timeField || 0;
+            console.log('this is data', timeValue)
+                // For trolley, amount comes from database, for fleet we calculate
+                const amount = isTrolley ? (item.amount || 0) : (timeValue * ratePerMinute);
+                
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.user_id}</td>
+                    <td>${item.name || 'N/A'}</td>
+                    <td>${formatDate(item.date)}</td>
+                    <td>${getDayOfWeek(item.date)}</td>
+                    <td>${timeValue}</td>
+                    <td>${formatIndianCurrency(amount)}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            loadingElement.style.display = 'none';
+            fleetTable.style.display = 'table';
+        }
+        
+        // Calculate totals
+        function calculateTotals(data) {
+            let totalTime = 0;
+            let totalAmount = 0;
+            
+            data.forEach(item => {
+                
+                // For trolley, use trolley_count field instead of running_time
+                const timeField = isTrolley ? item.trolley : item.running_time;
+                
+                const timeValue = parseInt(timeField) || 0;
+                totalTime += timeValue;
+                
+                // For trolley, amount comes from database, for fleet we calculate
+                if (isTrolley) {
+                    totalAmount += parseInt(item.amount) || 0;
+                } else {
+                    totalAmount += timeValue * ratePerMinute;
+                }
+            });
+            
+            // Update running time label based on type
+            const timeLabel = isTrolley ? 'Trolley Count' : 'Minutes';
+            
+            totalRunningTimeElement.textContent = `${totalTime} ${timeLabel}`;
+            console.log('this is data',totalTime)
+            totalAmountElement.textContent = formatIndianCurrency(totalAmount);
+            totalAmountInput.value = totalAmount.toFixed(0);
+            
+            // Update calculator when paid amount changes
+            paidAmountInput.addEventListener('input', updateCalculator);
+            updateCalculator(); // Initial calculation
+        }
+        
+        // Update calculator
+        function updateCalculator() {
+            const totalAmount = parseInt(totalAmountInput.value) || 0;
+            const paidAmount = parseInt(paidAmountInput.value) || 0;
+            const remainingAmount = totalAmount - paidAmount;
+            
+            calculatorResult.textContent = `Remaining amount: ${formatIndianCurrency(remainingAmount)}`;
+            
+            if (remainingAmount < 0) {
+                calculatorResult.style.color = '#e74c3c';
+            } else {
+                calculatorResult.style.color = '#2c3e50';
+            }
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+        
+        // Get day of week
+        function getDayOfWeek(dateString) {
+            if (!dateString) return 'N/A';
+            
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const date = new Date(dateString);
+            return days[date.getDay()];
+        }
+        
+        // Show error
+        function showError(message) {
+            loadingElement.style.display = 'none';
+            errorElement.style.display = 'block';
+            errorElement.textContent = message;
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set user ID in payment form
+            document.getElementById('payment-id2').value = user_id;
+            
+            // Fetch data
+            fetchData();
+            fetchPayData();
+        });
+        
+        // Payment form handling
+        const paymentForm = document.getElementById("payment-form");
+        const paymentTableElement = document.getElementById("payment-table");
+        const paymentBody = document.getElementById("payment-body");
+        
+        // ✅ Insert or Update Payment
+        paymentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            if (!paymentTable) {
+                alert('Invalid ID format. Cannot save payment.');
+                return;
+            }
+            
+            const id = parseInt(document.getElementById("payment-id").value);
+            const user_id = parseInt(document.getElementById("payment-id2").value);
+            const name = document.getElementById("payment-name").value;
+            const remain = parseInt(document.getElementById("payment-remain").value);
+            const paid_amount = parseInt(document.getElementById("payment-paid").value);
+            let total_amount = parseInt(document.getElementById("payment-total").value);
+            const created_at = new Date().toISOString();
+            total_amount = paid_amount + remain;
+            
+            // ✅ Auto Date + Day
+            const today = new Date();
+            const date = today.toISOString().split("T")[0]; // YYYY-MM-DD
+            const day = today.toLocaleDateString("en-US", { weekday: "long" }); // e.g. Thursday
+            
+            const { error } = await supabase
+                .from(paymentTable)
+                .upsert([{ id, user_id, name, paid_amount, remain, total_amount, date, day, created_at }]);
+            
+            if (error) {
+                alert("❌ Error: " + error.message);
+            } else {
+                alert("✅ Payment record saved!");
+                paymentForm.reset();
+                document.getElementById('payment-id2').value = user_id; // Reset user ID
+                fetchPayData();
+            }
+        });
+        
+        async function fetchPayData() {
+            if (!user_id || !paymentTable) {
+                showError('No valid ID provided in URL');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from(paymentTable)
+                    .select('*')
+                    .eq('user_id', user_id);
+
+                if (error) throw error;
+
+                console.log("user_id from URL:", user_id);
+                console.log("Payments fetched:", data);
+
+                // ✅ Display only matching payments
+                fetchPayments(data);
+
+            } catch (error) {
+                showError('Error fetching payment data: ' + error.message);
+            }
+        }
+        
+        // ✅ Display Payments
+        async function fetchPayments(data) {
+            paymentBody.innerHTML = "";
+
+            if (!data || !Array.isArray(data) || data.length === 0) {
+                paymentTableElement.style.display = "none";
+                return;
+            }
+
+            paymentTableElement.style.display = "table";
+
+            data.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.user_id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.date || "-"}</td>
+                    <td>${item.day || "-"}</td>
+                    <td>₹${item.paid_amount}</td>
+                    <td>₹${item.remain}</td>
+                    <td>₹${item.total_amount}</td>
+                    <td class="action-buttons">
+                        <div class="action-btn edit-btn" title="Edit" onclick="editItem(${item.id}, '${item.name}', ${item.paid_amount}, ${item.remain}, ${item.total_amount}, ${item.user_id})">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="action-btn delete-btn" title="Delete" onclick="deleteItem(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    </td>
+                `;
+                paymentBody.appendChild(row);
+            });
+        }
+
+        // ✅ EDIT FUNCTION
+        function editItem(id, name, paid, remain, total, user_id) {
+            console.log('Editing item:', { id, name, paid, remain, total, user_id });
+            
+            document.getElementById("payment-id").value = id;
+            document.getElementById("payment-id2").value = user_id;
+            document.getElementById("payment-name").value = name;
+            document.getElementById("payment-paid").value = paid;
+            document.getElementById("payment-remain").value = remain;
+            document.getElementById("payment-total").value = total;
+            
+            document.getElementById("payment-form").scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // ✅ Delete Payment
+        async function deleteItem(id) {
+            if (!paymentTable) {
+                alert('Invalid ID format. Cannot delete payment.');
+                return;
+            }
+            
+            if (!confirm("Are you sure you want to delete this record?")) return;
+            
+            const { error } = await supabase
+                .from(paymentTable)
+                .delete()
+                .eq("id", id);
+            
+            if (error) {
+                alert("❌ Delete Error: " + error.message);
+            } else {
+                alert("🗑️ Record deleted!");
+                fetchPayData();
+            }
+        }
+    </script>
+</body>
+
+</html>

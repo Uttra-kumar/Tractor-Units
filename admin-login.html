@@ -498,7 +498,7 @@
                 const { data, error } = await supabase
                     .from('admin')
                     .select('*')
-                    .eq('email', adminId)
+                    .eq('id', adminId)
                     .eq('password', password)
                     .single();
                 

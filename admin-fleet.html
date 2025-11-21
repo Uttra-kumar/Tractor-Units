@@ -929,7 +929,7 @@
           <div class="stat-value" id="avgRunningTime">
             <span class="loading"></span>
           </div>
-          <div class="stat-label">Avg. Running Time</div>
+          <div class="stat-label">Total Running Time</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">
@@ -1482,7 +1482,7 @@
           (sum, record) => sum + (+record.running_time || 0),
           0
         );
-        const avgRunningTime = totalRunningTime / records.length;
+        const avgRunningTime = totalRunningTime;
         avgRunningTimeElement.textContent = avgRunningTime.toFixed(0) + 'M';
       } else {
         avgRunningTimeElement.textContent = '0M';

@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Management - Tractor</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1a1d29;
+      --secondary: #1a8c29;
+      --accent: #1a84c9;
+      --light: #2a2f42;
+      --dark: #0f111a;
+      --success: #27ae60;
+      --warning: #e67e22;
+      --danger: #e74c3c;
+      --gray: #6c757d;
+      --light-gray: #3a3f52;
+      --text: #e9ecef;
+      --text-muted: #adb5bd;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--dark) 0%, #1a1d29 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 15px 0;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .website-name {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .website-name i {
+      font-size: 28px;
+    }
+    
+    .website-name span {
+      color: var(--text);
+    }
+    
+    .datetime {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+    }
+    
+    .time-display {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 15px;
+      border-radius: 6px;
+      color: var(--secondary);
+    }
+    
+    .date-display {
+      font-size: 1.4rem;
+      opacity: 0.9;
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+    
+    nav {
+      background: var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .menu {
+      display: flex;
+      list-style: none;
+    }
+    
+    .menu li {
+      position: relative;
+    }
+    
+    .menu li a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      text-decoration: none;
+      padding: 15px 20px;
+      transition: all 0.3s;
+    }
+    
+    .menu li a:hover {
+      background-color: var(--light);
+      color: var(--secondary);
+    }
+    
+    .menu li a.active {
+      background-color: var(--secondary);
+      color: var(--dark);
+    }
+    
+    .menu li a i {
+      font-size: 18px;
+    }
+    
+    .content {
+      padding: 30px 0;
+    }
+    
+    .card {
+      background-color: var(--primary);
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      margin-bottom: 30px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .section-title {
+      font-size: 24px;
+      margin-bottom: 25px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--secondary);
+    }
+    
+    .section-title i {
+      color: var(--secondary);
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-group label i {
+      color: var(--secondary);
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      background-color: var(--light);
+      border: 2px solid var(--light-gray);
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border 0.3s;
+      color: var(--text);
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--secondary);
+      outline: none;
+    }
+    
+    .form-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    
+    .time-date-group {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .time-date-group .form-group {
+      flex: 1;
+    }
+    
+    .btn {
+      padding: 14px 25px;
+      background-color: var(--secondary);
+      color: var(--dark);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn:hover {
+      background-color: #ff9a3d;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-delete {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .btn-delete:hover {
+      background-color: #c0392b;
+    }
+    
+    .btn-edit {
+      background-color: var(--accent);
+      color: white;
+    }
+    
+    .btn-edit:hover {
+      background-color: #00a58e;
+    }
+    
+    .btn-cancel {
+      background-color: var(--gray);
+      color: white;
+    }
+    
+    .btn-cancel:hover {
+      background-color: #5a6268;
+    }
+    
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th,
+    td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    th {
+      background-color: var(--light);
+      font-weight: 600;
+      color: var(--text);
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:hover {
+      background-color: var(--light);
+    }
+    
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .amount {
+      font-weight: 600;
+      color: var(--success);
+    }
+    
+    p {
+      line-height: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    footer {
+      background: var(--primary);
+      color: white;
+      padding: 1.5rem 0;
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+    
+    footer p {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    footer span {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+    
+    /* Session counter specific styling */
+    #counter {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+      animation: pulse 2s infinite;
+      margin-left: 0.25rem;
+    }
+    
+    p1 {
+      font-size: 1.2rem;
+      color: var(--text-muted) !important;
+      display: inline-block;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+    }
+    
+    .notification {
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .notification i {
+      font-size: 24px;
+    }
+    
+    .success {
+      background-color: rgba(39, 174, 96, 0.2);
+      color: var(--success);
+      border-left: 4px solid var(--success);
+    }
+    
+    .error {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: var(--danger);
+      border-left: 4px solid var(--danger);
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .modal-content {
+      background-color: var(--primary);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .modal-header {
+      background-color: var(--light);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .modal-header h3 {
+      color: var(--text);
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .modal-header h3 i {
+      color: var(--secondary);
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    
+    .close-btn:hover {
+      color: var(--secondary);
+    }
+    
+    .modal-body {
+      padding: 25px;
+    }
+    
+    .modal-footer {
+      padding: 20px;
+      background-color: var(--light);
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      border-top: 1px solid var(--light-gray);
+    }
+    
+    .delete-confirm {
+      text-align: center;
+      padding: 20px 0;
+    }
+    
+    .delete-confirm i {
+      font-size: 48px;
+      color: var(--danger);
+      margin-bottom: 20px;
+    }
+    
+    .delete-confirm h4 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    
+    .delete-confirm p {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .menu {
+        flex-direction: column;
+      }
+      
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      .datetime {
+        align-items: center;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .time-date-group {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+      }
+      
+      .modal-content {
+        width: 95%;
+      }
+      
+      .modal-footer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="website-name">
+          <i class="fas fa-tractor"></i>
+          <span>Tractor-Units</span>
+        </div>
+        <div class="datetime">
+          <div class="time-display" id="time-display">Loading time...</div>
+          <div class="date-display" id="date-display">Loading date...</div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <nav>
+    <div class="container">
+      <ul class="menu">
+        <li><a href="admin-dashboard.html"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="admin-fleet.html"><i class="fas fa-truck"></i> Fleet</a></li>
+        <li><a href="admin-diseal.html"><i class="fas fa-gas-pump"></i> Diesel</a></li>
+        <li><a href="admin-alluser.html"><i class="fas fa-users"></i> All User</a></li>
+        <li><a href="#" class="active"><i class="fas fa-credit-card"></i> Payment</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <main class="container content">
+    <div id="notification" class="notification">
+      <i class="fas fa-info-circle"></i>
+      <span id="notification-text"></span>
+    </div>
+    
+    <section class="card">
+      <h2 class="section-title">
+        <i class="fas fa-money-check"></i>
+        Payment Form
+      </h2>
+      <form id="payment-form">
+        <input type="hidden" id="edit-mode" value="false">
+        <input type="hidden" id="original-id" value="">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="id"><i class="fas fa-fingerprint"></i> ID</label>
+            <select id="id" name="id" required>
+    <option value="">Select ID</option>
+</select>
+          </div>
+       
+          <div class="form-group">
+            <label for="user_id"><i class="fas fa-fingerprint"></i>User ID</label>
+            <input type="text" id="user_id" name="user_id" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="name"><i class="fas fa-user"></i> Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          
+          <div class="time-date-group">
+            <div class="form-group">
+              <label for="time"><i class="fas fa-clock"></i> Real Time</label>
+              <input type="text" id="time" name="time" readonly>
+            </div>
+            
+            <div class="form-group">
+              <label for="date"><i class="fas fa-calendar"></i> Date</label>
+              <input type="date" id="date" name="date" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="custom-day"><i class="fas fa-calendar-day"></i> Custom Day Selection</label>
+            <select id="custom-day" name="custom-day">
+              <option value="">Select a day</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="amount"><i class="fas fa-dollar-sign"></i> Amount</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="0" placeholder="Enter amount" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="notes"><i class="fas fa-sticky-note"></i> Notes</label>
+          <textarea id="notes" name="notes" placeholder="Add any additional notes here..."></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" id="submit-btn" class="btn">
+            <i class="fas fa-save"></i>
+            Save Payment
+          </button>
+          <button type="button" id="cancel-edit" class="btn btn-cancel" style="display: none;">
+            <i class="fas fa-times"></i>
+            Cancel Edit
+          </button>
+        </div>
+      </form>
+    </section>
+    
+    <section class="card">
+      <h2 class="section-title">
+        <i class="fas fa-table"></i>
+        Payment Records
+      </h2>
+      <div class="table-responsive">
+        <table id="fleet-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Day</th>
+              <th>Amount(₹)</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="9" style="text-align: center;">Loading data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
+    <section class="card">
+      <h2 class="section-title">
+        <i class="fas fa-chart-bar"></i>
+        Payment Summary
+      </h2>
+      <div class="table-responsive">
+        <table id="payment-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Date</th>
+              <th>Day</th>
+              <th>Paid(₹)</th>
+              <th>Remains(₹)</th>
+              <th>Total Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="payment-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Edit Modal -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-edit"></i> Edit Payment Record</h3>
+        <button class="close-btn" id="close-edit-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-form">
+          <input type="hidden" id="edit-id">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="edit-user_id"><i class="fas fa-fingerprint"></i> User ID</label>
+              <input type="text" id="edit-user_id" name="user_id" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-name"><i class="fas fa-user"></i> Name</label>
+              <input type="text" id="edit-name" name="name" required>
+            </div>
+            
+            <div class="time-date-group">
+              <div class="form-group">
+                <label for="edit-time"><i class="fas fa-clock"></i> Real Time</label>
+                <input type="text" id="edit-time" name="time" readonly>
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-date"><i class="fas fa-calendar"></i> Date</label>
+                <input type="date" id="edit-date" name="date" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-custom-day"><i class="fas fa-calendar-day"></i> Custom Day Selection</label>
+              <select id="edit-custom-day" name="custom-day">
+                <option value="">Select a day</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-amount"><i class="fas fa-dollar-sign"></i> Amount</label>
+              <input type="number" id="edit-amount" name="amount" step="0.01" min="0" placeholder="Enter amount" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-notes"><i class="fas fa-sticky-note"></i> Notes</label>
+            <textarea id="edit-notes" name="notes" placeholder="Add any additional notes here..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" id="cancel-edit-modal">Cancel</button>
+        <button type="button" class="btn" id="update-payment-btn">
+          <i class="fas fa-save"></i>
+          Update Payment
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-trash"></i> Delete Payment Record</h3>
+        <button class="close-btn" id="close-delete-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-confirm">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h4>Are you sure?</h4>
+          <p>You are about to delete this payment record. This action cannot be undone.</p>
+          <p><strong>ID: <span id="delete-id-text"></span></strong></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" id="cancel-delete-modal">Cancel</button>
+        <button type="button" class="btn btn-delete" id="confirm-delete-btn">
+          <i class="fas fa-trash"></i>
+          Delete Payment
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 Tractor Fleet Management || Designed By <span>Uttra Patel</span><br />
+        <p1>session expired is <span id="counter">0s</span></p1>
+      </p>
+    </div>
+  </footer>
+  <script src="session.js"></script>
+  <script>
+    // Update real-time clock
+    function updateDateTime() {
+      const now = new Date();
+      const date = now.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      const time = now.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      
+      // Format date (Day, Month DD, YYYY)
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const dayStr = days[now.getDay()];
+      const monthStr = months[now.getMonth()];
+      const dateStr = `${dayStr}, ${monthStr} ${now.getDate()}, ${now.getFullYear()}`;
+      
+      // Update displays
+      document.getElementById('time-display').textContent = time;
+      document.getElementById('date-display').textContent = dateStr;
+      document.getElementById('time').value = time;
+      document.getElementById('edit-time').value = time;
+      
+      // Set today's date as default for the date field if empty
+      if (!document.getElementById('date').value) {
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        document.getElementById('date').value = `${year}-${month}-${day}`;
+      }
+    }
+    
+    // Initialize and update clock every second
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    
+    // Supabase initialization
+    const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    
+    // Show notification
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      const notificationText = document.getElementById('notification-text');
+      
+      notificationText.textContent = message;
+      notification.className = `notification ${type}`;
+      
+      // Change icon based on type
+      const icon = notification.querySelector('i');
+      if (type === 'success') {
+        icon.className = 'fas fa-check-circle';
+      } else {
+        icon.className = 'fas fa-exclamation-circle';
+      }
+      
+      notification.style.display = 'flex';
+      
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 4000);
+    }
+    
+    // Reset form
+    function resetForm() {
+      document.getElementById('payment-form').reset();
+      document.getElementById('edit-mode').value = 'false';
+      document.getElementById('original-id').value = '';
+      document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Payment';
+      document.getElementById('cancel-edit').style.display = 'none';
+      updateDateTime(); // Reset time fields
+    }
+    
+    // Cancel edit mode
+    document.getElementById('cancel-edit').addEventListener('click', resetForm);
+    
+    // Form submission handler
+    document.getElementById('payment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Get and validate amount
+      const amountInput = document.getElementById('amount').value;
+      const amount = parseFloat(amountInput);
+      
+      if (isNaN(amount) || amount <= 0) {
+        showNotification('Please enter a valid amount greater than 0', 'error');
+        return;
+      }
+      
+      const formData = {
+        id: document.getElementById('id').value,
+        user_id: document.getElementById('user_id').value,
+        name: document.getElementById('name').value,
+        time: document.getElementById('time').value,
+        date: document.getElementById('date').value,
+        custom_day: document.getElementById('custom-day').value,
+        amount: amount,
+        notes: document.getElementById('notes').value
+      };
+      
+      const isEditMode = document.getElementById('edit-mode').value === 'true';
+      const originalId = document.getElementById('original-id').value;
+      
+      try {
+        if (isEditMode) {
+          // Update existing record
+          const { data, error } = await supabase
+            .from('admin-payment')
+            .update(formData)
+            .eq('id', originalId);
+          
+          if (error) {
+            showNotification('Error updating data: ' + error.message, 'error');
+          } else {
+            showNotification('Payment updated successfully!', 'success');
+            resetForm();
+            loadFleetData(); // Refresh the table
+          }
+        } else {
+          // Insert new record
+          const { data, error } = await supabase
+            .from('admin-payment')
+            .insert([formData]);
+          
+          if (error) {
+            showNotification('Error saving data: ' + error.message, 'error');
+          } else {
+            showNotification('Payment saved successfully!', 'success');
+            resetForm();
+            loadFleetData(); // Refresh the table
+          }
+        }
+      } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+      }
+    });
+    
+    // Load fleet data from Supabase
+    async function loadFleetData() {
+      try {
+        const { data, error } = await supabase
+          .from('admin-payment')
+          .select('*')
+          .order('date', { ascending: false });
+        
+        if (error) {
+          showNotification('Error loading data: ' + error.message, 'error');
+          return;
+        }
+        
+        const tbody = document.querySelector('#fleet-table tbody');
+        tbody.innerHTML = '';
+        
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No data available</td></tr>';
+          return;
+        }
+        
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          
+          row.innerHTML = `
+            <td>${item.id || '-'}</td>
+            <td>${item.user_id || '-'}</td>
+            <td>${item.name || '-'}</td>
+            <td>${item.date || '-'}</td>
+            <td>${item.time || '-'}</td>
+            <td>${item.custom_day || '-'}</td>
+            <td class="amount">₹${item.amount || '0.00'}</td>
+            <td>${item.notes || '-'}</td>
+            <td class="actions">
+                <button class="btn btn-edit btn-sm" onclick="openEditModal('${item.id}')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-delete btn-sm" onclick="openDeleteModal('${item.id}')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+      }
+    }
+    
+    // Open Edit Modal
+    window.openEditModal = async function(id) {
+      try {
+        const { data, error } = await supabase
+          .from('admin-payment')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error) {
+          showNotification('Error loading item: ' + error.message, 'error');
+          return;
+        }
+        
+        // Populate edit form with item data
+        document.getElementById('edit-id').value = data.id;
+        document.getElementById('edit-user_id').value = data.user_id || '';
+        document.getElementById('edit-name').value = data.name || '';
+        document.getElementById('edit-time').value = data.time || '';
+        document.getElementById('edit-date').value = data.date || '';
+        document.getElementById('edit-custom-day').value = data.custom_day || '';
+        document.getElementById('edit-amount').value = data.amount || '';
+        document.getElementById('edit-notes').value = data.notes || '';
+        
+        // Show the modal
+        document.getElementById('edit-modal').style.display = 'flex';
+        
+      } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+      }
+    };
+    
+    // Update payment from modal
+    document.getElementById('update-payment-btn').addEventListener('click', async () => {
+      // Get and validate amount
+      const amountInput = document.getElementById('edit-amount').value;
+      const amount = parseFloat(amountInput);
+      
+      if (isNaN(amount) || amount <= 0) {
+        showNotification('Please enter a valid amount greater than 0', 'error');
+        return;
+      }
+      
+      const formData = {
+        id: document.getElementById('edit-id').value,
+        user_id: document.getElementById('edit-user_id').value,
+        name: document.getElementById('edit-name').value,
+        time: document.getElementById('edit-time').value,
+        date: document.getElementById('edit-date').value,
+        custom_day: document.getElementById('edit-custom-day').value,
+        amount: amount,
+        notes: document.getElementById('edit-notes').value
+      };
+      
+      try {
+        const { data, error } = await supabase
+          .from('admin-payment')
+          .update(formData)
+          .eq('id', formData.id);
+        
+        if (error) {
+          showNotification('Error updating data: ' + error.message, 'error');
+        } else {
+          showNotification('Payment updated successfully!', 'success');
+          document.getElementById('edit-modal').style.display = 'none';
+          loadFleetData(); // Refresh the table
+        }
+      } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+      }
+    });
+    
+    // Open Delete Modal
+    window.openDeleteModal = function(id) {
+      document.getElementById('delete-id-text').textContent = id;
+      document.getElementById('delete-modal').style.display = 'flex';
+      // Store the ID to delete
+      document.getElementById('delete-modal').dataset.idToDelete = id;
+    };
+    
+    // Confirm Delete
+    document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+      const id = document.getElementById('delete-modal').dataset.idToDelete;
+      
+      try {
+        const { error } = await supabase
+          .from('admin-payment')
+          .delete()
+          .eq('id', id);
+        
+        if (error) {
+          showNotification('Error deleting item: ' + error.message, 'error');
+        } else {
+          showNotification('Item deleted successfully', 'success');
+          document.getElementById('delete-modal').style.display = 'none';
+          loadFleetData(); // Refresh the table
+        }
+      } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+      }
+    });
+    
+    // Modal close handlers
+    document.getElementById('close-edit-modal').addEventListener('click', () => {
+      document.getElementById('edit-modal').style.display = 'none';
+    });
+    
+    document.getElementById('cancel-edit-modal').addEventListener('click', () => {
+      document.getElementById('edit-modal').style.display = 'none';
+    });
+    
+    document.getElementById('close-delete-modal').addEventListener('click', () => {
+      document.getElementById('delete-modal').style.display = 'none';
+    });
+    
+    document.getElementById('cancel-delete-modal').addEventListener('click', () => {
+      document.getElementById('delete-modal').style.display = 'none';
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('edit-modal')) {
+        document.getElementById('edit-modal').style.display = 'none';
+      }
+      if (e.target === document.getElementById('delete-modal')) {
+        document.getElementById('delete-modal').style.display = 'none';
+      }
+    });
+    
+    // Fetch and display payments
+    async function fetchPayments() {
+      const { data, error } = await supabase
+        .from("admin-singePay")
+        .select("*")
+        .order("id", { ascending: false });
+      
+      if (error) {
+        console.error(error.message);
+        showNotification('Error loading payment data: ' + error.message, 'error');
+        return;
+      }
+      
+      const paymentBody = document.getElementById("payment-body");
+      paymentBody.innerHTML = "";
+      
+      if (data.length === 0) {
+        paymentBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No payment data available</td></tr>';
+        return;
+      }
+      
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.id || ''}</td>
+          <td>${item.user_id || ''}</td>
+          <td>${item.name || ''}</td>
+          <td>${item.date || ''}</td>
+          <td>${item.day || ''}</td>
+          <td>₹${item.paid_amount || 0}</td>
+          <td>₹${item.remain || 0}</td>
+          <td>₹${item.total_amount || 0}</td>
+        `;
+        paymentBody.appendChild(row);
+      });
+    }
+
+    // Load all IDs from admin-singePay table
+    async function loadPaymentIDs() {
+      const { data, error } = await supabase
+        .from("admin-singePay")
+        .select("*")
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error("Error loading IDs:", error);
+        showNotification('Error loading payment IDs: ' + error.message, 'error');
+        return;
+      }
+
+      const select = document.getElementById("id");
+      select.innerHTML = `<option value="">Select ID</option>`;
+
+      data.forEach(item => {
+        // Use the correct column names from your table structure
+        const totalAmount = item.total_amount || 0;
+        const paidAmount = item.paid_amount || 0;
+        const remainAmount = item.remain || 0;
+
+        const opt = document.createElement("option");
+        opt.value = item.id;
+        opt.textContent = `${item.id} — ${item.name || 'N/A'}`;
+
+        // Dataset for autofill
+        opt.dataset.name = item.name || '';
+        opt.dataset.userid = item.user_id || '';
+        opt.dataset.total = totalAmount;
+        opt.dataset.paid = paidAmount;
+        opt.dataset.remain = remainAmount;
+
+        select.appendChild(opt);
+      });
+    }
+
+    // Auto-fill when user selects ID
+    document.getElementById("id").addEventListener("change", function () {
+      const sel = this.options[this.selectedIndex];
+      if (!sel || !sel.dataset || this.value === "") return;
+
+      const name = sel.dataset.name || '';
+      const uid = sel.dataset.userid || '';
+      const total = parseFloat(sel.dataset.total) || 0;
+      const paid = parseFloat(sel.dataset.paid) || 0;
+      const remain = parseFloat(sel.dataset.remain) || 0;
+
+      document.getElementById("name").value = name;
+      document.getElementById("user_id").value = uid;
+
+      // Amount field - show remaining amount for payment
+      document.getElementById("amount").value = remain > 0 ? remain : 0;
+
+      // Notes field - show payment summary
+      document.getElementById("notes").value =
+        `Total Amount: ₹${total}\n` +
+        `Paid Amount: ₹${paid}\n` +
+        `Remaining Amount: ₹${remain}`;
+    });
+    
+    // Initial data load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFleetData();
+      fetchPayments();
+      loadPaymentIDs();
+    });
+  </script>
+</body>
+
+</html>

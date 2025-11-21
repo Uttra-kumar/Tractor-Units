@@ -941,6 +941,7 @@
         custom_day: document.getElementById('custom-day').value,
         amount: amount,
         notes: document.getElementById('notes').value
+        created_at: new Date().toISOString() 
       };
       
       const isEditMode = document.getElementById('edit-mode').value === 'true';

@@ -1178,7 +1178,7 @@
     }
 async function loadPaymentIDs() {
   const { data, error } = await supabase
-    .from("admin-trollysingpay")
+    .from("admin-singepay")
     .select("*")
     .order("id", { ascending: true });
 

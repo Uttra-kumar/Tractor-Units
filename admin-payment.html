@@ -1080,7 +1080,8 @@
         date: document.getElementById('edit-date').value,
         custom_day: document.getElementById('edit-custom-day').value,
         amount: amount,
-        notes: document.getElementById('edit-notes').value
+        notes: document.getElementById('edit-notes').value,
+        created_at: new Date().toISOString()
       };
       
       try {

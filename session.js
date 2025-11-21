@@ -28,7 +28,6 @@ if (performance.navigation.type === performance.navigation.TYPE_BACK_FORWARD) {
     if (!expiryTime) {
         showMessage('Session not found. Please login again.', 'error');
         localStorage.removeItem("isLoggedIn");
-        location.reload();
         window.location.replace("admin-login.html");
         return;
     }
@@ -72,7 +71,7 @@ if (performance.navigation.type === performance.navigation.TYPE_BACK_FORWARD) {
             localStorage.removeItem("session");
             showMessage('Logout successful! Redirecting to login page...', 'success');
             setTimeout(() => {
-                location.reload()!
+                location.reload();
                 window.location.href = "admin-login.html";
             }, 1500);
         });

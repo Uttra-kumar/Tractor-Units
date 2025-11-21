@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    alert('update');
 // Prevent Back Button After Logout
 window.history.pushState(null, "", window.location.href);
 window.addEventListener("popstate", function () {

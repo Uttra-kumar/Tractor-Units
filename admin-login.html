@@ -250,15 +250,9 @@
         }
         
         .modal-title {
-            font-weight: bold;
+            font-weight: 800;
             color: #E3E4EF;
         }
-
-        .btn-close {
-         filter: invert(1) brightness(200%);
-         opacity: 1;
-         }
-
         
         .modal-body {
             padding: 2rem;
@@ -511,7 +505,7 @@
                 const { data, error } = await supabase
                     .from('admin')
                     .select('*')
-                    .eq('id', adminId)
+                    .eq('email', adminId)
                     .eq('password', password)
                     .single();
                 

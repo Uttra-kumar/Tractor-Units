@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const counter = document.getElementById("counter");
     let sessionInterval;
 
+    // ✅ FIRST: Check page protection
+    setupPageProtection();
+
     // Check if user is logged in
     const isLoggedIn = localStorage.getItem(SESSION_KEYS.LOGIN_STATUS);
     
@@ -37,6 +40,38 @@ document.addEventListener('DOMContentLoaded', function() {
     // -------------------------------
     // ✅ Helper Functions
     // -------------------------------
+
+    function setupPageProtection() {
+        // Prevent page from being cached
+        window.onbeforeunload = function() {
+            if (!localStorage.getItem(SESSION_KEYS.LOGIN_STATUS)) {
+                return "Your session has expired. Please login again.";
+            }
+        };
+
+        // Check if user is trying to access via back button after logout
+        window.onpageshow = function(event) {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                // Page is loaded from cache (back button)
+                if (!localStorage.getItem(SESSION_KEYS.LOGIN_STATUS)) {
+                    showMessage('Session expired. Please login again.', 'error');
+                    setTimeout(() => {
+                        window.location.replace(REDIRECT_URL);
+                    }, 1500);
+                }
+            }
+        };
+
+        // Clear cache on logout/session expiry
+        if (!localStorage.getItem(SESSION_KEYS.LOGIN_STATUS)) {
+            // Clear any cached data
+            clearAllCache();
+            
+            // Redirect immediately if no session
+            window.location.replace(REDIRECT_URL);
+            return;
+        }
+    }
 
     function initializeSessionCountdown() {
         updateCountdown(); // Initial call
@@ -77,9 +112,10 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(sessionInterval);
         showMessage('⏳ Session expired! Please login again to continue.', 'info');
         clearSessionData();
+        clearAllCache();
         setTimeout(() => {
-            redirectToLogin();
-        }, 2000); // Give user time to read the message
+            window.location.replace(REDIRECT_URL);
+        }, 2000);
     }
 
     function setupLogoutHandler() {
@@ -93,106 +129,123 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(sessionInterval);
         showMessage('Logout successful! Redirecting to login page...', 'success');
         clearSessionData();
+        clearAllCache();
         
         setTimeout(() => {
-            redirectToLogin();
+            window.location.replace(REDIRECT_URL);
         }, 1500);
     }
 
     function clearSessionData() {
         localStorage.removeItem(SESSION_KEYS.LOGIN_STATUS);
         localStorage.removeItem(SESSION_KEYS.EXPIRY_TIME);
+        localStorage.removeItem('userData');
+        localStorage.removeItem('adminData');
+        sessionStorage.clear();
+    }
+
+    function clearAllCache() {
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Clear browser cache for this page
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                for (let name of names) {
+                    caches.delete(name);
+                }
+            });
+        }
     }
 
     function redirectToLogin() {
-        window.location.href = REDIRECT_URL;
+        window.location.replace(REDIRECT_URL);
     }
 
-    const messageTypes = {
-    success: { 
-        icon: 'fas fa-check-circle', 
-        color: '#27ae60',
-        bgColor: 'linear-gradient(135deg, #27ae60, #2ecc71)'
-    },
-    error: { 
-        icon: 'fas fa-times-circle', 
-        color: '#e74c3c',
-        bgColor: 'linear-gradient(135deg, #e74c3c, #c0392b)'
-    },
-    warning: { 
-        icon: 'fas fa-exclamation-triangle', 
-        color: '#f39c12',
-        bgColor: 'linear-gradient(135deg, #f39c12, #e67e22)'
-    },
-    info: { 
-        icon: 'fas fa-info-circle', 
-        color: '#3498db',
-        bgColor: 'linear-gradient(135deg, #3498db, #2980b9)'
-    }
-};
+    function showMessage(message, type = 'info') {
+        const messageTypes = {
+            success: { 
+                icon: 'fas fa-check-circle', 
+                color: '#27ae60',
+                bgColor: 'linear-gradient(135deg, #27ae60, #2ecc71)'
+            },
+            error: { 
+                icon: 'fas fa-times-circle', 
+                color: '#e74c3c',
+                bgColor: 'linear-gradient(135deg, #e74c3c, #c0392b)'
+            },
+            warning: { 
+                icon: 'fas fa-exclamation-triangle', 
+                color: '#f39c12',
+                bgColor: 'linear-gradient(135deg, #f39c12, #e67e22)'
+            },
+            info: { 
+                icon: 'fas fa-info-circle', 
+                color: '#3498db',
+                bgColor: 'linear-gradient(135deg, #3498db, #2980b9)'
+            }
+        };
 
-function showMessage(message, type = 'info') {
-    const config = messageTypes[type] || messageTypes.info;
-    
-    // Remove existing notification if any
-    const existingNotification = document.getElementById('session-notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    // Create new notification
-    const notification = document.createElement('div');
-    notification.id = 'session-notification';
-    notification.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 20px 30px;
-        border-radius: 10px;
-        color: white;
-        font-weight: 600;
-        z-index: 10000;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        width: 350px;
-        height: auto;
-        min-height: 80px;
-        text-align: center;
-        animation: fadeIn 0.3s ease-out;
-        font-size: 16px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: ${config.bgColor};
-        border: 2px solid rgba(255,255,255,0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.5;
-    `;
-    
-    notification.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
-            <i class="${config.icon}" style="font-size: 22px; color: white;"></i>
-            <span style="font-weight: 600; font-size: 16px; line-height: 1.4;">${message}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.animation = 'fadeOut 0.3s ease-in';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
+        const config = messageTypes[type] || messageTypes.info;
+        
+        // Remove existing notification if any
+        const existingNotification = document.getElementById('session-notification');
+        if (existingNotification) {
+            existingNotification.remove();
         }
-    }, 3000);
-}
+        
+        // Create new notification
+        const notification = document.createElement('div');
+        notification.id = 'session-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            width: 350px;
+            height: auto;
+            min-height: 80px;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: ${config.bgColor};
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
+                <i class="${config.icon}" style="font-size: 22px; color: white;"></i>
+                <span style="font-weight: 600; font-size: 16px; line-height: 1.4;">${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
 
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'fadeOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
 
-
+    // Add CSS animations
     if (!document.getElementById('session-styles')) {
         const style = document.createElement('style');
         style.id = 'session-styles';

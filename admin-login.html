@@ -394,27 +394,6 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
     
-    <!-- Welcome Modal -->
-    <div class="modal fade" id="welcomeModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Welcome, Administrator!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="welcome-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h4 class="mb-3">Login Successful</h4>
-                    <p>You are being redirected to the admin dashboard. Please wait...</p>
-                    <div class="spinner-border text-primary mt-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <!-- Footer -->
     <div class="footer">
@@ -434,7 +413,6 @@
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
         const toastContainer = document.getElementById('toastContainer');
-        const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
         const currentTimeElement = document.getElementById('current-time');
         const currentDateElement = document.getElementById('current-date');
         
@@ -537,9 +515,7 @@
                     showToast('Login successful! Welcome back.', 'success');
                     
                     // Show welcome modal
-                    setTimeout(() => {
-                        welcomeModal.show();
-                    }, 1000);
+                
                     
                     // Set session and redirect to admin dashboard after delay
                     setTimeout(() => {

@@ -898,25 +898,12 @@
             </div>
         </footer>
     </div>
-    
+<script src="session.js"></script>
     <script>
         // Initialize Supabase with your project details
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        
-        // Initialize session counter
-        let sessionCounter = 0;
-        const counterElement = document.getElementById('counter');
-        
-        // Update session counter
-        function updateSessionCounter() {
-            sessionCounter++;
-            counterElement.textContent = sessionCounter + 's';
-        }
-        
-        // Start session counter
-        setInterval(updateSessionCounter, 1000);
         
         // Update datetime
         function updateDateTime() {

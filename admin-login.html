@@ -517,7 +517,7 @@
                 
                 if (data) {
                     loginForm.reset();
-                    location.reload();
+                    
                     // Show success toast
                     showToast('Login successful! Welcome back.', 'success');
                     
@@ -537,6 +537,7 @@
                 } else {
                     showToast('Invalid credentials. Please try again.', 'error');
                 }
+                location.reload();
             } catch (error) {
                 console.error('Login error:', error);
                 showToast('An error occurred during login.', 'error');

@@ -992,7 +992,7 @@
                 const { data: dieselData, error: dieselError } = await supabase
                     .from('admin-diseal')
                     .select('amount, category')
-                    .eq('category', 'fleet');
+                    .eq('category', 'Fleet');
                 
                 if (!dieselError && dieselData) {
                     const totalDiesel = dieselData.reduce(
@@ -1032,7 +1032,7 @@
             try {
                 // Active Users Count (same as fleet for now)
                 const { count: activeUsersCount, error: usersError } = await supabase
-                    .from('userRegistration-T')
+                    .from('userReg_T')
                     .select('*', { count: 'exact', head: true });
                 
                 if (!usersError) {
@@ -1062,7 +1062,7 @@
                 const { data: dieselData, error: dieselError } = await supabase
                     .from('admin-diseal')
                     .select('amount, category')
-                    .eq('category', 'trolley');
+                    .eq('category', 'Trolley');
                 
                 if (!dieselError && dieselData) {
                     const totalDiesel = dieselData.reduce(
@@ -1147,7 +1147,7 @@
                 const { data: fleetDieselData, error: fleetDieselError } = await supabase
                     .from('admin-diseal')
                     .select('*')
-                    .eq('category', 'fleet')
+                    .eq('category', 'Fleet')
                     .order('created_at', { ascending: false })
                     .limit(1);
                 
@@ -1166,7 +1166,7 @@
                 
                 // Fetch recent payments for fleet
                 const { data: paymentData, error: paymentError } = await supabase
-                    .from('admin-singePay')
+                    .from('admin-payment')
                     .select('*')
                     .order('created_at', { ascending: false })
                     .limit(1);
@@ -1208,7 +1208,7 @@
                 const { data: trolleyDieselData, error: trolleyDieselError } = await supabase
                     .from('admin-diseal')
                     .select('*')
-                    .eq('category', 'trolley')
+                    .eq('category', 'Trolley')
                     .order('created_at', { ascending: false })
                     .limit(1);
                 

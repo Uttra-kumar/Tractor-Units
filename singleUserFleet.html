@@ -1454,19 +1454,19 @@ Last Updated: ${new Date().toLocaleString()}`;
                     const value = parseInt(item[runningTimeColumn]) || 0;
                     
                     if (dataType === 'Trolley') {
-                        breakup += `${index + 1}️⃣  ${date} - ${value} trolleys\n`;
+                        breakup += `${index + 1}️⃣  ${date} - ${value} ट्राली \n`;
                     } else {
-                        breakup += `${index + 1}️⃣  ${date} - ${value} min\n`;
+                        breakup += `${index + 1}️⃣  ${date} - ${value} मिनट \n`;
                     }
                     
                     currentSentEntries.push(item.id.toString());
                 });
                 
                 if (dataType === 'Trolley') {
-                    message = `Fleet Summary for ${userName}:
+                    message = `Trolley Summary for ${userName}:
 --------------------------------
 ${breakup}--------------------------------
-Total Trolley Count: ${totalRunningTime}
+कुल : ${totalRunningTime}
 ----------------------------------------
 Last Updated: ${new Date().toLocaleString()}
 `;
@@ -1474,7 +1474,7 @@ Last Updated: ${new Date().toLocaleString()}
                     message = `Fleet Summary for ${userName}:
 --------------------------------
 ${breakup}--------------------------------
-Total Running Time: ${totalRunningTime} minutes
+कुल समय: ${totalRunningTime} मिनट 
 ----------------------------------------
 Last Updated: ${new Date().toLocaleString()}
 `;
@@ -1491,9 +1491,9 @@ Last Updated: ${new Date().toLocaleString()}
                         const value = parseInt(item[runningTimeColumn]) || 0;
                         
                         if (dataType === 'Trolley') {
-                            breakup += `${unsentCount + 1}️⃣  ${date} - ${value} trolleys\n`;
+                            breakup += `${unsentCount + 1}️⃣  ${date} - ${value} ट्राली \n`;
                         } else {
-                            breakup += `${unsentCount + 1}️⃣  ${date} - ${value} min\n`;
+                            breakup += `${unsentCount + 1}️⃣  ${date} - ${value} मिनट \n`;
                         }
                         
                         unsentTotalValue += value;
@@ -1508,20 +1508,18 @@ All data has already been sent previously.`;
                     currentSentEntries = [];
                 } else {
                     if (dataType === 'Trolley') {
-                        message = `New Fleet Data for ${userName}:
+                        message = `New Remain Trolley Data for ${userName}:
 --------------------------------
 ${breakup}--------------------------------
-New Trolley Count: ${unsentTotalValue}
-New Entries: ${unsentCount}
+कुल : ${unsentTotalValue}
 ----------------------------------------
 Last Updated: ${new Date().toLocaleString()}
 `;
                     } else {
-                        message = `New Fleet Data for ${userName}:
+                        message = `New Remain Fleet Data for ${userName}:
 --------------------------------
 ${breakup}--------------------------------
-New Running Time: ${unsentTotalValue} minutes
-New Entries: ${unsentCount}
+कुल समय : ${unsentTotalValue} मिनट 
 ----------------------------------------
 Last Updated: ${new Date().toLocaleString()}
 `;

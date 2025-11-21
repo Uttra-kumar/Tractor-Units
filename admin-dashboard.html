@@ -1167,7 +1167,7 @@
                 // 🟦 1) Latest User Registrations
                 // ----------------------------------------------
                 const { data: usersData, error: usersError } = await supabase
-                    .from('userReg_T')
+                    .from('userRegistration-T')
                     .select('name, created_at')
                     .order('created_at', { ascending: false })
                     .limit(2);

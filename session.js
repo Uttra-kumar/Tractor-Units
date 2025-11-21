@@ -1,112 +1,192 @@
 document.addEventListener('DOMContentLoaded', function() {
-
-    // ----------------------------------
-    // 🔒 BACK BUTTON COMPLETELY DISABLED
-    // ----------------------------------
+// Prevent Back Button After Logout
+window.history.pushState(null, "", window.location.href);
+window.addEventListener("popstate", function () {
     window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", function () {
-        window.history.pushState(null, "", window.location.href);
-        // Force reload so session check runs again
-        location.reload();
-    });
+});
+    
 
-    // Prevent page loading from cache
-    if (performance.getEntriesByType("navigation")[0].type === "back_forward") {
-        location.reload();
-    }
-
-    // Session management variables
-    const SESSION_KEYS = {
-        LOGIN_STATUS: 'isLoggedIn',
-        EXPIRY_TIME: 'session'
-    };
-
-    const REDIRECT_URL = 'admin-login.html';
-    const counter = document.getElementById("counter");
-    let sessionInterval;
-
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem(SESSION_KEYS.LOGIN_STATUS);
+    // Disable browser caching
+if (performance.navigation.type === performance.navigation.TYPE_BACK_FORWARD) {
+    location.reload(true);
+}
+    
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
 
     if (!isLoggedIn || isLoggedIn !== 'true') {
-        showMessage('Please log in to access this page.', 'warning');
         clearSessionData();
-        redirectToLogin();
+         redirectToLogin();
+        showMessage('Please log in to access this page.', 'warning');
+        window.location.replace('admin-login.html');
         return;
     }
 
-    // Check session expiry
-    const expiryTime = localStorage.getItem(SESSION_KEYS.EXPIRY_TIME);
-
+    // -------------------------------
+    // ✅ Login ok, ab session check
+    // -------------------------------
+    const expiryTime = localStorage.getItem("session");
     if (!expiryTime) {
         showMessage('Session not found. Please login again.', 'error');
-        clearSessionData();
-        redirectToLogin();
+        localStorage.removeItem("isLoggedIn");
+        window.location.replace("admin-login.html");
         return;
     }
 
-    // Initialize session countdown
-    initializeSessionCountdown();
-
-    // Setup logout functionality
-    setupLogoutHandler();
-
-    // -------------------------------
-    // Helper Functions
-    // -------------------------------
-
-    function initializeSessionCountdown() {
-        updateCountdown();
-        sessionInterval = setInterval(updateCountdown, 1000);
-    }
+    const counter = document.getElementById("counter");
+    let intervalId;
 
     function updateCountdown() {
-        const remainingTime = parseInt(expiryTime, 10) - Date.now();
+        const remaining = parseInt(expiryTime, 10) - Date.now();
 
-        if (remainingTime <= 0) {
-            handleSessionExpiry();
+        if (remaining <= 0) {
+            clearInterval(intervalId);
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("session");
+            showMessage('⏳ Session expired! Please login again.', 'info');
+            setTimeout(() => {
+                window.location.href = "admin-login.html";
+            }, 2000);
             return;
         }
 
-        updateCounterDisplay(remainingTime);
-    }
-
-    function updateCounterDisplay(remainingTime) {
-        const totalSeconds = Math.floor(remainingTime / 1000);
+        const totalSeconds = Math.floor(remaining / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-        if (counter) {
-            counter.textContent = formattedTime;
+        const formatted = `${minutes}:${seconds.toString().padStart(2,'0')}`;
+        if (counter) counter.textContent = formatted;
+    }
 
-            if (minutes < 2) {
-                counter.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
-                counter.style.animation = 'pulse 1s infinite';
-            } else if (minutes < 5) {
-                counter.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)';
+    updateCountdown();
+    intervalId = setInterval(updateCountdown, 1000);
+
+    // -------------------------------
+    // ✅ Logout button
+    // -------------------------------
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            clearInterval(intervalId);
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("session");
+            showMessage('Logout successful! Redirecting to login page...', 'success');
+            setTimeout(() => {
+                window.location.href = "admin-login.html";
+            }, 1500);
+        });
+    }
+
+    // -------------------------------
+    // ✅ Beautiful Centered Notifications
+    // -------------------------------
+    function showMessage(message, type = 'info') {
+        const messageTypes = {
+            success: { 
+                icon: 'fas fa-check-circle', 
+                bgColor: 'linear-gradient(135deg, #27ae60, #2ecc71)'
+            },
+            error: { 
+                icon: 'fas fa-times-circle', 
+                bgColor: 'linear-gradient(135deg, #e74c3c, #c0392b)'
+            },
+            warning: { 
+                icon: 'fas fa-exclamation-triangle', 
+                bgColor: 'linear-gradient(135deg, #f39c12, #e67e22)'
+            },
+            info: { 
+                icon: 'fas fa-info-circle', 
+                bgColor: 'linear-gradient(135deg, #3498db, #2980b9)'
             }
-        }
-    }
+        };
 
-    function handleSessionExpiry() {
-        clearInterval(sessionInterval);
-        showMessage('⏳ Session expired! Please login again.', 'info');
-        clearSessionData();
+        const config = messageTypes[type] || messageTypes.info;
+        
+        // Remove existing notification if any
+        const existingNotification = document.getElementById('session-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        // Create new notification
+        const notification = document.createElement('div');
+        notification.id = 'session-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            width: 350px;
+            height: auto;
+            min-height: 80px;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: ${config.bgColor};
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
+                <i class="${config.icon}" style="font-size: 22px; color: white;"></i>
+                <span style="font-weight: 600; font-size: 16px; line-height: 1.4;">${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+
+        // Auto remove after 3 seconds
         setTimeout(() => {
-            window.location.href = REDIRECT_URL;
-        }, 2000);
+            if (notification.parentNode) {
+                notification.style.animation = 'fadeOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }, 3000);
     }
 
-    function setupLogoutHandler() {
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", handleLogout);
-        }
+    // Add CSS animations
+    if (!document.getElementById('session-styles')) {
+        const style = document.createElement('style');
+        style.id = 'session-styles';
+        style.textContent = `
+            @keyframes fadeIn {
+                from { 
+                    opacity: 0; 
+                    transform: translate(-50%, -60%); 
+                }
+                to { 
+                    opacity: 1; 
+                    transform: translate(-50%, -50%); 
+                }
+            }
+            @keyframes fadeOut {
+                from { 
+                    opacity: 1; 
+                    transform: translate(-50%, -50%); 
+                }
+                to { 
+                    opacity: 0; 
+                    transform: translate(-50%, -60%); 
+                }
+            }
+        `;
+        document.head.appendChild(style);
     }
-
-    function handleLogout() {
-        clearInterval(sessionInterval);
+});        clearInterval(sessionInterval);
         showMessage('Logout successful! Redirecting...', 'success');
         clearSessionData();
 

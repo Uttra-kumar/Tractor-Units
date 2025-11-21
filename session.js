@@ -1,45 +1,42 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    
-    // Back se page agar cache se aaye to force reload hoga
-    window.addEventListener("pageshow", function (event) {
-        if (event.persisted) {
-            window.location.reload();
-        }
+    /* ------------------------------------------
+       🔥 BACK BUTTON FIX + CACHE DISABLE
+       ------------------------------------------ */
+
+    // Back se cache load ho to reload force
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) window.location.reload();
     });
 
-    // User back dabaye to page me rukne na do
+    // Back button block
     window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", function() {
         window.history.pushState(null, "", window.location.href);
         location.reload();
     });
 
-    /* ---------------------------------------
-       🔐 SESSION SECURITY CHECK (Very Top)
-       --------------------------------------- */
-
+    /* ------------------------------------------
+       🔐 SESSION CHECK (TOP)
+       ------------------------------------------ */
     const SESSION_KEYS = {
         LOGIN_STATUS: 'isLoggedIn',
         EXPIRY_TIME: 'session'
     };
 
-    const REDIRECT_URL = 'admin-login.html';
+    const REDIRECT_URL = "admin-login.html";
 
     const isLoggedIn = localStorage.getItem(SESSION_KEYS.LOGIN_STATUS);
 
-    // Agar login nahi to direct redirect
     if (!isLoggedIn || isLoggedIn !== "true") {
-        localStorage.removeItem(SESSION_KEYS.LOGIN_STATUS);
-        localStorage.removeItem(SESSION_KEYS.EXPIRY_TIME);
+        clearSessionData();
         window.location.href = REDIRECT_URL;
         return;
     }
 
-    /* ---------------------------------------
-       ⏳ TIMER + SESSION EXPIRY SYSTEM
-       --------------------------------------- */
-
+    /* ------------------------------------------
+       ⏳ SESSION TIMER
+       ------------------------------------------ */
     const counter = document.getElementById("counter");
     let sessionInterval;
 
@@ -60,9 +57,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateCountdown() {
-        const remainingTime = parseInt(expiryTime) - Date.now();
+        const remaining = parseInt(expiryTime) - Date.now();
 
-        if (remainingTime <= 0) {
+        if (remaining <= 0) {
             clearInterval(sessionInterval);
             clearSessionData();
             showMessage("⏳ Session expired! Please login again.", "error");
@@ -70,22 +67,21 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        updateCounterDisplay(remainingTime);
+        updateCounter(remaining);
     }
 
-    function updateCounterDisplay(remainingTime) {
-        const totalSeconds = Math.floor(remainingTime / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
+    function updateCounter(ms) {
+        const total = Math.floor(ms / 1000);
+        const m = Math.floor(total / 60);
+        const s = total % 60;
 
-        const formatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-        if (counter) counter.textContent = formatted;
+        if (counter)
+            counter.textContent = `${m}:${s.toString().padStart(2, "0")}`;
     }
 
-    /* ---------------------------------------
-       🚪 LOGOUT SYSTEM
-       --------------------------------------- */
-    
+    /* ------------------------------------------
+       🚪 LOGOUT FUNCTION
+       ------------------------------------------ */
     function setupLogoutHandler() {
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
@@ -94,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleLogout() {
         clearInterval(sessionInterval);
         clearSessionData();
-        showMessage("Logout successful!", "success");
+        showMessage("✔ Logout successful!", "success");
         setTimeout(() => window.location.href = REDIRECT_URL, 1500);
     }
 
@@ -103,20 +99,34 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem(SESSION_KEYS.EXPIRY_TIME);
     }
 
-    /* ---------------------------------------
-       🔔 BEAUTIFUL NOTIFICATION SYSTEM
-       --------------------------------------- */
+    /* ------------------------------------------
+       🔔 NOTIFICATION UI (ICON + CENTER BOX)
+       ------------------------------------------ */
+    function showMessage(message, type = "info") {
 
-    function showMessage(message, type = 'info') {
-        const colors = {
-            success: "linear-gradient(135deg, #27ae60, #2ecc71)",
-            error: "linear-gradient(135deg, #e74c3c, #c0392b)",
-            warning: "linear-gradient(135deg, #f39c12, #e67e22)",
-            info: "linear-gradient(135deg, #3498db, #2980b9)"
+        const styles = {
+            success: {
+                icon: "fas fa-check-circle",
+                bg: "linear-gradient(135deg, #27ae60, #2ecc71)"
+            },
+            error: {
+                icon: "fas fa-times-circle",
+                bg: "linear-gradient(135deg, #e74c3c, #c0392b)"
+            },
+            warning: {
+                icon: "fas fa-exclamation-triangle",
+                bg: "linear-gradient(135deg, #f39c12, #e67e22)"
+            },
+            info: {
+                icon: "fas fa-info-circle",
+                bg: "linear-gradient(135deg, #3498db, #2980b9)"
+            }
         };
 
-        const existing = document.getElementById("session-notification");
-        if (existing) existing.remove();
+        const cfg = styles[type] || styles.info;
+
+        const old = document.getElementById("session-notification");
+        if (old) old.remove();
 
         const box = document.createElement("div");
         box.id = "session-notification";
@@ -125,20 +135,48 @@ document.addEventListener('DOMContentLoaded', function() {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 20px 30px;
-            background: ${colors[type]};
+            padding: 22px 32px;
+            border-radius: 12px;
             color: white;
             z-index: 9999;
-            font-size: 16px;
-            border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            animation: fadeIn 0.3s ease-out;
+            background: ${cfg.bg};
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
+            animation: fadeIn 0.25s ease-out;
+            font-family: 'Poppins', sans-serif;
         `;
-        box.textContent = message;
+
+        box.innerHTML = `
+            <i class="${cfg.icon}" style="font-size: 22px;"></i>
+            <span>${message}</span>
+        `;
 
         document.body.appendChild(box);
 
-        setTimeout(() => box.remove(), 2000);
+        setTimeout(() => {
+            box.style.animation = "fadeOut 0.25s ease-in";
+            setTimeout(() => box.remove(), 250);
+        }, 2200);
     }
+
+    /* ------------------------------------------
+       ✨ CSS Animations (Auto Inject)
+       ------------------------------------------ */
+    const anim = document.createElement("style");
+    anim.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to   { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translate(-50%, -50%); }
+            to   { opacity: 0; transform: translate(-50%, -60%); }
+        }
+    `;
+    document.head.appendChild(anim);
 
 });

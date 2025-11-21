@@ -516,6 +516,7 @@
                 }
                 
                 if (data) {
+                    loginForm.reset();
                     // Show success toast
                     showToast('Login successful! Welcome back.', 'success');
                     
@@ -540,6 +541,14 @@
                 showToast('An error occurred during login.', 'error');
             }
         });
+    
+// Prevent Back Navigation Cache
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        location.reload();
+    }
+}};
+    
     </script>
 </body>
 

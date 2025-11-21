@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diesel Management | Tractor Fleet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #2a7f62;
+            --primary-dark: #236c53;
+            --secondary: #3a86ff;
+            --secondary-dark: #2a75e6;
+            --accent: #ff9e00;
+            --accent-dark: #e68e00;
+            --light: #f8f9fa;
+            --dark: #2b2d42;
+            --gray: #8d99ae;
+            --danger: #e63946;
+            --danger-dark: #c1121f;
+            --warning: #ffd166;
+            --card-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, #38a37f 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, #5a9cff 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #ffb347 100%);
+            --gradient-danger: linear-gradient(135deg, var(--danger) 0%, #ff6b8b 100%);
+            --fleet-color: #4361ee;
+            --trolley-color: #ff5722;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .website-name {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .website-name i {
+            margin-right: 10px;
+            font-size: 32px;
+        }
+        
+        .datetime {
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Navigation */
+        nav {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .menu {
+            display: flex;
+            list-style: none;
+        }
+        
+        .menu li {
+            flex: 1;
+        }
+        
+        .menu a {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .menu a.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+        
+        .menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            width: 60%;
+            height: 3px;
+            background-color: white;
+            border-radius: 3px;
+        }
+        
+        /* Dashboard Stats */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-7px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+        
+        .stat-card.primary::before {
+            background: var(--gradient-primary);
+        }
+        
+        .stat-card.secondary::before {
+            background: var(--gradient-secondary);
+        }
+        
+        .stat-card.accent::before {
+            background: var(--gradient-accent);
+        }
+        
+        .stat-card.danger::before {
+            background: var(--gradient-danger);
+        }
+        
+        .stat-card.fleet::before {
+            background: var(--fleet-color);
+        }
+        
+        .stat-card.trolley::before {
+            background: var(--trolley-color);
+        }
+        
+        .stat-card i {
+            font-size: 42px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .stat-card.primary i {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-card.secondary i {
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+        }
+        
+        .stat-card.accent i {
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+        }
+        
+        .stat-card.danger i {
+            background: var(--gradient-danger);
+            -webkit-background-clip: text;
+        }
+        
+        .stat-card.fleet i {
+            color: var(--fleet-color);
+        }
+        
+        .stat-card.trolley i {
+            color: var(--trolley-color);
+        }
+        
+        .stat-card h3 {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .stat-card .amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .trend {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .trend.up {
+            color: var(--secondary);
+        }
+        
+        .trend.down {
+            color: var(--danger);
+        }
+        
+        /* Form Styles */
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-section h2 i {
+            color: var(--secondary);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e1e5eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(42, 127, 98, 0.2);
+        }
+        
+        .id-display {
+            background: #f8f9fa;
+            padding: 14px 16px;
+            border: 1px solid #e1e5eb;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        button {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(42, 127, 98, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(42, 127, 98, 0.4);
+        }
+        
+        button.secondary {
+            background: var(--gradient-secondary);
+            box-shadow: 0 4px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        button.secondary:hover {
+            box-shadow: 0 6px 15px rgba(58, 134, 255, 0.4);
+        }
+        
+        button.accent {
+            background: var(--gradient-accent);
+            box-shadow: 0 4px 10px rgba(255, 158, 0, 0.3);
+        }
+        
+        button.accent:hover {
+            box-shadow: 0 6px 15px rgba(255, 158, 0, 0.4);
+        }
+        
+        button.danger {
+            background: var(--gradient-danger);
+            box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
+        }
+        
+        button.danger:hover {
+            box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
+        }
+        
+        /* Table Styles */
+        .table-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        .table-section h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .table-section h2 i {
+            color: var(--secondary);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th,
+        td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--gray);
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background-color: #f9fcff;
+        }
+        
+        .category-fleet {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .category-trolley {
+            background-color: rgba(255, 87, 34, 0.05);
+        }
+        
+        .category-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .category-fleet .category-badge {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--fleet-color);
+        }
+        
+        .category-trolley .category-badge {
+            background-color: rgba(255, 87, 34, 0.1);
+            color: var(--trolley-color);
+        }
+        
+        .payment-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .payment-cash {
+            background-color: rgba(42, 127, 98, 0.1);
+            color: var(--primary);
+        }
+        
+        .payment-digital {
+            background-color: rgba(58, 134, 255, 0.1);
+            color: var(--secondary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-edit {
+            background: var(--primary);
+            padding: 8px 14px;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+        
+        .btn-delete {
+            background: var(--danger);
+            padding: 8px 14px;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+        
+        p {
+            line-height: 1rem;
+            color: #34495e;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: 30px;
+        }
+        
+        .contain {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        footer p {
+            color: #ecf0f1;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer span {
+            color: #FF8200;
+            font-weight: 600;
+        }
+        
+        /* Session counter specific styling */
+        #counter {
+            display: inline-block;
+            text-align: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            animation: pulse 2s infinite;
+            margin-left: 0.25rem;
+        }
+        
+       p1 {
+            font-size: 1.2rem;
+            color: #ecf0f1 !important;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .menu {
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h2 {
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s ease;
+        }
+        
+        .close:hover {
+            color: var(--dark);
+        }
+        
+        /* Alert Modal Styles */
+        .alert-modal .modal-content {
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .alert-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success .alert-icon {
+            color: var(--secondary);
+        }
+        
+        .alert-warning .alert-icon {
+            color: var(--accent);
+        }
+        
+        .alert-danger .alert-icon {
+            color: var(--danger);
+        }
+        
+        .alert-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        /* Supabase Connection Status */
+        .connection-status {
+            padding: 12px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .connected {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .disconnected {
+            background-color: #ffebee;
+            color: #c62828;
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Search and Filter Section */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1px solid #e1e5eb;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-options select {
+            padding: 14px 15px;
+            border: 1px solid #e1e5eb;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 70px;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="website-name">
+                    <i class="fas fa-tractor"></i>
+                    Tractor 
+                </div>
+                <div class="datetime">
+                    <span id="real-time"></span>
+                </div>
+            </div>
+            
+            <nav>
+                <ul class="menu">
+                    <li><a href="admin-dashboard.html">Dashboard</a></li>
+                    <li><a href="admin-fleet.html">Fleet</a></li>
+                    <li><a href="#" class="active">Diesel</a></li>
+                    <li><a href="admin-alluser.html">Users</a></li>
+                    <li><a href="admin-payment.html">Payments</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div id="connection-status" class="connection-status"></div>
+        
+        <div class="dashboard">
+            <div class="stat-card primary">
+                <i class="fas fa-rupee-sign"></i>
+                <h3>Total Diesel Amount</h3>
+                <div class="amount" id="total-amount">₹0</div>
+                <div class="trend up">All Categories</div>
+            </div>
+            <div class="stat-card fleet">
+                <i class="fas fa-truck"></i>
+                <h3>Fleet Amount</h3>
+                <div class="amount" id="fleet-amount">₹0</div>
+                <div class="trend up">Fleet Category</div>
+            </div>
+            <div class="stat-card trolley">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>Trolley Amount</h3>
+                <div class="amount" id="trolley-amount">₹0</div>
+                <div class="trend up">Trolley Category</div>
+            </div>
+            <div class="stat-card secondary">
+                <i class="fas fa-list"></i>
+                <h3>Total Entries</h3>
+                <div class="amount" id="total-entries">0</div>
+                <div class="trend up">All Records</div>
+            </div>
+        </div>
+        
+        <section class="form-section">
+            <h2><i class="fas fa-plus-circle"></i> Add New Diesel Entry</h2>
+            <form id="diesel-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id-display">Entry #</label>
+                        <div class="id-display" id="id-display">Generating...</div>
+                        <input type="hidden" id="id" name="id">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Fleet">Fleet</option>
+                            <option value="Trolley">Trolley</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="text" id="time" name="time" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="custom-day">Day</label>
+                        <select id="custom-day" name="custom-day">
+                            <option value="">Select Day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount">Amount (₹)</label>
+                        <input type="number" id="amount" name="amount" required placeholder="Enter amount">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Payment Method</label>
+                        <select id="notes" name="notes" required>
+                            <option value="">Select Payment</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Digital Wallet">Digital Wallet</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit"><i class="fas fa-save"></i> Save Entry</button>
+            </form>
+        </section>
+        
+        <section class="table-section">
+            <h2><i class="fas fa-table"></i> Diesel Entries</h2>
+            
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search entries...">
+                </div>
+                <div class="filter-options">
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Fleet">Fleet</option>
+                        <option value="Trolley">Trolley</option>
+                    </select>
+                    <select id="payment-filter">
+                        <option value="">All Payments</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Digital Wallet">Digital Wallet</option>
+                    </select>
+                    <select id="date-filter">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                    <select id="sort-by">
+                        <option value="date-desc">Newest First</option>
+                        <option value="date-asc">Oldest First</option>
+                        <option value="amount-desc">Highest Amount</option>
+                        <option value="amount-asc">Lowest Amount</option>
+                    </select>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Time</th>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Data will be populated dynamically -->
+                </tbody>
+            </table>
+            
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h3>No Diesel Entries Found</h3>
+                <p>Add your first diesel entry using the form above.</p>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Diesel Entry</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-name">Name</label>
+                    <input type="text" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-category">Category</label>
+                    <select id="edit-category" required>
+                        <option value="Fleet">Fleet</option>
+                        <option value="Trolley">Trolley</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-date">Date</label>
+                    <input type="date" id="edit-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-custom-day">Day</label>
+                    <select id="edit-custom-day">
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-amount">Amount (₹)</label>
+                    <input type="number" id="edit-amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-notes">Payment Method</label>
+                    <select id="edit-notes" required>
+                        <option value="Cash">Cash</option>
+                        <option value="Digital Wallet">Digital Wallet</option>
+                    </select>
+                </div>
+                <button type="submit"><i class="fas fa-edit"></i> Update Entry</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Alert/Confirmation Modal -->
+    <div id="alert-modal" class="modal alert-modal">
+        <div class="modal-content">
+            <div id="alert-icon" class="alert-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 id="alert-title">Confirm Action</h2>
+            <p id="alert-message">Are you sure you want to proceed with this action?</p>
+            <div class="alert-buttons">
+                <button id="alert-cancel" class="secondary">Cancel</button>
+                <button id="alert-confirm" class="danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="contain">
+            <p>&copy; 2025 Tractor Fleet Management || Designed By <span>Uttra Patel</span><br />
+                <p1>session expired is <span id="counter">0s</span></p1>
+            </p>
+        </div>
+    </footer>
+<script src="session.js"></script>
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Global variable to store entries
+        let allEntries = [];
+        
+        // Generate 4-digit unique ID
+        function generateUniqueId() {
+            const timestamp = Date.now().toString();
+            return timestamp.substr(timestamp.length - 4);
+        }
+        
+        // Real-time clock function
+        function updateClock() {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const time = now.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            
+            document.getElementById('real-time').textContent = `${date} | ${time}`;
+            document.getElementById('time').value = time;
+            
+            // Set today's date as default for the date input
+            const today = now.toISOString().substr(0, 10);
+            if (!document.getElementById('date').value) {
+                document.getElementById('date').value = today;
+            }
+            
+            // Generate and display unique ID
+            const uniqueId = generateUniqueId();
+            document.getElementById('id-display').textContent = `#${uniqueId}`;
+            document.getElementById('id').value = uniqueId;
+            
+            setTimeout(updateClock, 1000);
+        }
+        
+        // Format currency in Indian style
+        function formatCurrency(amount) {
+            return '₹' + parseInt(amount).toLocaleString('en-IN');
+        }
+        
+        // Calculate and display totals
+        function calculateTotals(entries) {
+            const totalAmount = entries.reduce((sum, entry) => sum + parseInt(entry.amount || 0), 0);
+            const totalEntries = entries.length;
+            
+            // Calculate fleet and trolley amounts
+            const fleetAmount = entries
+                .filter(entry => entry.category === 'Fleet')
+                .reduce((sum, entry) => sum + parseInt(entry.amount || 0), 0);
+                
+            const trolleyAmount = entries
+                .filter(entry => entry.category === 'Trolley')
+                .reduce((sum, entry) => sum + parseInt(entry.amount || 0), 0);
+            
+            // Calculate this month's total
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const monthAmount = entries.reduce((sum, entry) => {
+                const entryDate = new Date(entry.date);
+                if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
+                    return sum + parseInt(entry.amount || 0);
+                }
+                return sum;
+            }, 0);
+            
+            document.getElementById('total-amount').textContent = formatCurrency(totalAmount);
+            document.getElementById('fleet-amount').textContent = formatCurrency(fleetAmount);
+            document.getElementById('trolley-amount').textContent = formatCurrency(trolleyAmount);
+            document.getElementById('total-entries').textContent = totalEntries;
+        }
+        
+        // Load data from Supabase
+        async function loadTableData() {
+            try {
+                const { data, error } = await supabase
+                    .from('admin-diseal')
+                    .select('*')
+                    .order('date', { ascending: false });
+                
+                if (error) {
+                    console.error('Error fetching data:', error);
+                    showConnectionStatus('Error loading data: ' + error.message, false);
+                    return;
+                }
+                
+                allEntries = data || [];
+                renderTable(allEntries);
+                calculateTotals(allEntries);
+                showConnectionStatus('Connected to Supabase. Data loaded successfully.', true);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showConnectionStatus('Connection error: ' + error.message, false);
+            }
+        }
+        
+        // Render table with data
+        function renderTable(entries) {
+            const tableBody = document.getElementById('data-table-body');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (entries.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            tableBody.innerHTML = '';
+            
+            entries.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                
+                // Add category class for styling
+                if (entry.category === 'Fleet') {
+                    row.classList.add('category-fleet');
+                } else if (entry.category === 'Trolley') {
+                    row.classList.add('category-trolley');
+                }
+                
+                // Format date for display
+                const entryDate = new Date(entry.date);
+                const formattedDate = entryDate.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                row.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td><strong>${entry.name}</strong></td>
+                    <td><span class="category-badge">${entry.category || ''}</span></td>
+                    <td><strong>${entry.time}</strong></td>
+                    <td><strong>${formattedDate}</strong></td>
+                    <td><strong>${entry.day || ''}</strong></td>
+                    <td><strong>${formatCurrency(entry.amount)}</strong></td>
+                    <td><span class="payment-badge ${entry.notes === 'Cash' ? 'payment-cash' : 'payment-digital'}">${entry.notes || ''}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn-edit" data-id="${entry.id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" data-id="${entry.id}"><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').getAttribute('data-id');
+                    editEntry(id);
+                });
+            });
+            
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').getAttribute('data-id');
+                    showAlert(
+                        'Delete Entry', 
+                        'Are you sure you want to delete this diesel entry? This action cannot be undone.',
+                        'warning',
+                        () => deleteEntry(id)
+                    );
+                });
+            });
+        }
+        
+        // Show connection status
+        function showConnectionStatus(message, isSuccess) {
+            const statusElement = document.getElementById('connection-status');
+            statusElement.textContent = message;
+            statusElement.className = isSuccess ? 'connection-status connected' : 'connection-status disconnected';
+            statusElement.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Edit entry
+        async function editEntry(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('admin-diseal')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                if (error) {
+                    console.error('Error fetching entry:', error);
+                    showAlert('Error', 'Error loading entry: ' + error.message, 'danger');
+                    return;
+                }
+                
+                if (data) {
+                    document.getElementById('edit-id').value = data.id;
+                    document.getElementById('edit-name').value = data.name;
+                    document.getElementById('edit-category').value = data.category || 'Fleet';
+                    document.getElementById('edit-date').value = data.date;
+                    document.getElementById('edit-custom-day').value = data.day || '';
+                    document.getElementById('edit-amount').value = data.amount;
+                    document.getElementById('edit-notes').value = data.notes || 'Cash';
+                    
+                    // Show modal
+                    document.getElementById('edit-modal').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error', 'Error: ' + error.message, 'danger');
+            }
+        }
+        
+        // Delete entry
+        async function deleteEntry(id) {
+            try {
+                const { error } = await supabase
+                    .from('admin-diseal')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    console.error('Error deleting entry:', error);
+                    showAlert('Error', 'Error deleting entry: ' + error.message, 'danger');
+                    return;
+                }
+                
+                // Reload table data
+                loadTableData();
+                showAlert('Success', 'Entry deleted successfully!', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error', 'Error: ' + error.message, 'danger');
+            }
+        }
+        
+        // Show alert/confirmation modal
+        function showAlert(title, message, type, confirmCallback) {
+            const alertModal = document.getElementById('alert-modal');
+            const alertTitle = document.getElementById('alert-title');
+            const alertMessage = document.getElementById('alert-message');
+            const alertIcon = document.getElementById('alert-icon');
+            const alertCancel = document.getElementById('alert-cancel');
+            const alertConfirm = document.getElementById('alert-confirm');
+            
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            
+            // Set icon based on type
+            alertIcon.className = 'alert-icon';
+            if (type === 'success') {
+                alertIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                alertIcon.classList.add('alert-success');
+            } else if (type === 'warning') {
+                alertIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                alertIcon.classList.add('alert-warning');
+            } else {
+                alertIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                alertIcon.classList.add('alert-danger');
+            }
+            
+            // Set up event listeners
+            alertCancel.onclick = () => {
+                alertModal.style.display = 'none';
+            };
+            
+            alertConfirm.onclick = () => {
+                alertModal.style.display = 'none';
+                if (confirmCallback) {
+                    confirmCallback();
+                }
+            };
+            
+            alertModal.style.display = 'flex';
+        }
+        
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            const categoryFilter = document.getElementById('category-filter');
+            const paymentFilter = document.getElementById('payment-filter');
+            const dateFilter = document.getElementById('date-filter');
+            const sortBy = document.getElementById('sort-by');
+            
+            function filterAndSortData() {
+                let filteredEntries = [...allEntries];
+                
+                // Apply search filter
+                const searchTerm = searchInput.value.toLowerCase();
+                if (searchTerm) {
+                    filteredEntries = filteredEntries.filter(entry => 
+                        entry.id.toLowerCase().includes(searchTerm) ||
+                        entry.name.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Apply category filter
+                const categoryFilterValue = categoryFilter.value;
+                if (categoryFilterValue) {
+                    filteredEntries = filteredEntries.filter(entry => entry.category === categoryFilterValue);
+                }
+                
+                // Apply payment filter
+                const paymentFilterValue = paymentFilter.value;
+                if (paymentFilterValue) {
+                    filteredEntries = filteredEntries.filter(entry => entry.notes === paymentFilterValue);
+                }
+                
+                // Apply date filter
+                const dateFilterValue = dateFilter.value;
+                if (dateFilterValue) {
+                    const now = new Date();
+                    
+                    if (dateFilterValue === 'today') {
+                        const today = now.toISOString().substr(0, 10);
+                        filteredEntries = filteredEntries.filter(entry => entry.date === today);
+                    } else if (dateFilterValue === 'week') {
+                        const startOfWeek = new Date(now);
+                        startOfWeek.setDate(now.getDate() - now.getDay());
+                        startOfWeek.setHours(0, 0, 0, 0);
+                        
+                        filteredEntries = filteredEntries.filter(entry => {
+                            const entryDate = new Date(entry.date);
+                            return entryDate >= startOfWeek;
+                        });
+                    } else if (dateFilterValue === 'month') {
+                        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                        
+                        filteredEntries = filteredEntries.filter(entry => {
+                            const entryDate = new Date(entry.date);
+                            return entryDate >= startOfMonth;
+                        });
+                    }
+                }
+                
+                // Apply sorting
+                const sortValue = sortBy.value;
+                filteredEntries.sort((a, b) => {
+                    if (sortValue === 'date-desc') {
+                        return new Date(b.date) - new Date(a.date);
+                    } else if (sortValue === 'date-asc') {
+                        return new Date(a.date) - new Date(b.date);
+                    } else if (sortValue === 'amount-desc') {
+                        return b.amount - a.amount;
+                    } else if (sortValue === 'amount-asc') {
+                        return a.amount - b.amount;
+                    }
+                    return 0;
+                });
+                
+                renderTable(filteredEntries);
+                calculateTotals(filteredEntries);
+            }
+            
+            searchInput.addEventListener('input', filterAndSortData);
+            categoryFilter.addEventListener('change', filterAndSortData);
+            paymentFilter.addEventListener('change', filterAndSortData);
+            dateFilter.addEventListener('change', filterAndSortData);
+            sortBy.addEventListener('change', filterAndSortData);
+        }
+
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start real-time clock
+            updateClock();
+            
+            // Load table data
+            loadTableData();
+            
+            // Setup search and filters
+            setupSearch();
+        
+            
+            // Form submission
+            document.getElementById('diesel-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const entry = {
+                    id: formData.get('id'),
+                    name: formData.get('name'),
+                    category: formData.get('category'),
+                    time: formData.get('time'),
+                    date: formData.get('date'),
+                    day: formData.get('custom-day'),
+                    amount: formData.get('amount'),
+                    notes: formData.get('notes'),
+                    created_at: new Date().toISOString()
+                };
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('admin-diseal')
+                        .insert([entry]);
+                    
+                    if (error) {
+                        console.error('Error adding entry:', error);
+                        showAlert('Error', 'Error adding entry: ' + error.message, 'danger');
+                        return;
+                    }
+                    
+                    // Reset form
+                    this.reset();
+                    
+                    // Set current time and date again
+                    const now = new Date();
+                    const time = now.toLocaleTimeString('en-IN', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                    document.getElementById('time').value = time;
+                    document.getElementById('date').value = now.toISOString().substr(0, 10);
+                    
+                    // Generate new ID
+                    const uniqueId = generateUniqueId();
+                    document.getElementById('id-display').textContent = `#${uniqueId}`;
+                    document.getElementById('id').value = uniqueId;
+                    
+                    // Reload table data
+                    loadTableData();
+                    showAlert('Success', 'Diesel entry added successfully!', 'success');
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('Error', 'Error: ' + error.message, 'danger');
+                }
+            });
+            
+            // Edit form submission
+            document.getElementById('edit-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const entry = {
+                    id: document.getElementById('edit-id').value,
+                    name: document.getElementById('edit-name').value,
+                    category: document.getElementById('edit-category').value,
+                    date: document.getElementById('edit-date').value,
+                    day: document.getElementById('edit-custom-day').value,
+                    amount: document.getElementById('edit-amount').value,
+                    notes: document.getElementById('edit-notes').value
+                };
+                
+                try {
+                    const { error } = await supabase
+                        .from('admin-diseal')
+                        .update(entry)
+                        .eq('id', entry.id);
+                    
+                    if (error) {
+                        console.error('Error updating entry:', error);
+                        showAlert('Error', 'Error updating entry: ' + error.message, 'danger');
+                        return;
+                    }
+                    
+                    // Close modal
+                    document.getElementById('edit-modal').style.display = 'none';
+                    
+                    // Reload table data
+                    loadTableData();
+                    showAlert('Success', 'Entry updated successfully!', 'success');
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('Error', 'Error: ' + error.message, 'danger');
+                }
+            });
+            
+            // Modal close buttons
+            document.querySelectorAll('.close').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Auto-set day based on date selection
+            document.getElementById('date').addEventListener('change', function() {
+                const date = new Date(this.value);
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const dayName = days[date.getDay()];
+                document.getElementById('custom-day').value = dayName;
+            });
+            
+            document.getElementById('edit-date').addEventListener('change', function() {
+                const date = new Date(this.value);
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const dayName = days[date.getDay()];
+                document.getElementById('edit-custom-day').value = dayName;
+            });
+        });
+    </script>
+</body>
+
+</html>

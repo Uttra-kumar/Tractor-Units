@@ -615,7 +615,9 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="id"><i class="fas fa-fingerprint"></i> ID</label>
-            <input type="text" id="id" name="id" required>
+            <select id="id" name="id" required>
+    <option value="">Select ID</option>
+</select>
           </div>
        
           <div class="form-group">
@@ -1174,11 +1176,57 @@
         paymentBody.appendChild(row);
       });
     }
+async function loadPaymentIDs() {
+  const { data, error } = await supabase
+    .from("admin-trollysingpay")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const select = document.getElementById("id");
+  select.innerHTML = `<option value="">Select ID</option>`;
+
+  data.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.id;
+    opt.textContent = `${item.id} — ${item.name}`;
+    opt.dataset.name = item.name;
+    opt.dataset.userid = item.user_id;
+    opt.dataset.total = item.total_amount;
+    opt.dataset.paid = item.paid_amount;
+    opt.dataset.remain = item.remain;
+    select.appendChild(opt);
+  });
+}
+
+// Auto fill all fields when ID selected
+document.getElementById("id").addEventListener("change", function () {
+  const sel = this.options[this.selectedIndex];
+
+  document.getElementById("name").value = sel.dataset.name || "";
+  document.getElementById("user_id").value = sel.dataset.userid || "";
+  document.getElementById("amount").value =
+    sel.dataset.total ? `Total Amount: ₹${sel.dataset.total}` : "";
+
+
+  const paid = sel.dataset.paid || 0;
+  const remain = sel.dataset.remain || 0;
+  const total = sel.dataset.total || 0;
+
+  document.getElementById("notes").value =
+    `Paid Amount: ₹${paid}\nRemaining Amount: ₹${remain}`;
+});
+
     
     // Initial data load
     document.addEventListener('DOMContentLoaded', () => {
       loadFleetData();
       fetchPayments();
+      loadPaymentIDs();
     });
   </script>
 </body>

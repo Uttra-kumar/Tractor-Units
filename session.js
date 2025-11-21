@@ -9,9 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const counter = document.getElementById("counter");
     let sessionInterval;
 
-    // ✅ FIRST: Check page protection
-    setupPageProtection();
-
     // Check if user is logged in
     const isLoggedIn = localStorage.getItem(SESSION_KEYS.LOGIN_STATUS);
     
@@ -40,38 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // -------------------------------
     // ✅ Helper Functions
     // -------------------------------
-
-    function setupPageProtection() {
-        // Prevent page from being cached
-        window.onbeforeunload = function() {
-            if (!localStorage.getItem(SESSION_KEYS.LOGIN_STATUS)) {
-                return "Your session has expired. Please login again.";
-            }
-        };
-
-        // Check if user is trying to access via back button after logout
-        window.onpageshow = function(event) {
-            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-                // Page is loaded from cache (back button)
-                if (!localStorage.getItem(SESSION_KEYS.LOGIN_STATUS)) {
-                    showMessage('Session expired. Please login again.', 'error');
-                    setTimeout(() => {
-                        window.location.replace(REDIRECT_URL);
-                    }, 1500);
-                }
-            }
-        };
-
-        // Clear cache on logout/session expiry
-        if (!localStorage.getItem(SESSION_KEYS.LOGIN_STATUS)) {
-            // Clear any cached data
-            clearAllCache();
-            
-            // Redirect immediately if no session
-            window.location.replace(REDIRECT_URL);
-            return;
-        }
-    }
 
     function initializeSessionCountdown() {
         updateCountdown(); // Initial call
@@ -112,9 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(sessionInterval);
         showMessage('⏳ Session expired! Please login again to continue.', 'info');
         clearSessionData();
-        clearAllCache();
         setTimeout(() => {
-            window.location.replace(REDIRECT_URL);
+            window.location.href = REDIRECT_URL; // Simple redirect
         }, 2000);
     }
 
@@ -129,37 +93,19 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(sessionInterval);
         showMessage('Logout successful! Redirecting to login page...', 'success');
         clearSessionData();
-        clearAllCache();
         
         setTimeout(() => {
-            window.location.replace(REDIRECT_URL);
+            window.location.href = REDIRECT_URL; // Simple redirect
         }, 1500);
     }
 
     function clearSessionData() {
         localStorage.removeItem(SESSION_KEYS.LOGIN_STATUS);
         localStorage.removeItem(SESSION_KEYS.EXPIRY_TIME);
-        localStorage.removeItem('userData');
-        localStorage.removeItem('adminData');
-        sessionStorage.clear();
-    }
-
-    function clearAllCache() {
-        localStorage.clear();
-        sessionStorage.clear();
-        
-        // Clear browser cache for this page
-        if ('caches' in window) {
-            caches.keys().then(function(names) {
-                for (let name of names) {
-                    caches.delete(name);
-                }
-            });
-        }
     }
 
     function redirectToLogin() {
-        window.location.replace(REDIRECT_URL);
+        window.location.href = REDIRECT_URL; // Simple redirect
     }
 
     function showMessage(message, type = 'info') {

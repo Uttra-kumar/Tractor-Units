@@ -1240,7 +1240,7 @@
                 // 🟦 4) Fleet Payments
                 // ----------------------------------------------
                 const { data: paymentData } = await supabase
-                    .from('admin-payment')
+                    .from('admin-signePay')
                     .select('*')
                     .order('created_at', { ascending: false })
                     .limit(1);

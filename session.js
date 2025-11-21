@@ -1,26 +1,43 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    // ----------------------------------
+    // 🔒 BACK BUTTON COMPLETELY DISABLED
+    // ----------------------------------
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", function () {
+        window.history.pushState(null, "", window.location.href);
+        // Force reload so session check runs again
+        location.reload();
+    });
+
+    // Prevent page loading from cache
+    if (performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        location.reload();
+    }
+
     // Session management variables
     const SESSION_KEYS = {
         LOGIN_STATUS: 'isLoggedIn',
         EXPIRY_TIME: 'session'
     };
-    
+
     const REDIRECT_URL = 'admin-login.html';
     const counter = document.getElementById("counter");
     let sessionInterval;
 
     // Check if user is logged in
     const isLoggedIn = localStorage.getItem(SESSION_KEYS.LOGIN_STATUS);
-    
+
     if (!isLoggedIn || isLoggedIn !== 'true') {
         showMessage('Please log in to access this page.', 'warning');
+        clearSessionData();
         redirectToLogin();
         return;
     }
 
     // Check session expiry
     const expiryTime = localStorage.getItem(SESSION_KEYS.EXPIRY_TIME);
-    
+
     if (!expiryTime) {
         showMessage('Session not found. Please login again.', 'error');
         clearSessionData();
@@ -35,11 +52,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setupLogoutHandler();
 
     // -------------------------------
-    // ✅ Helper Functions
+    // Helper Functions
     // -------------------------------
 
     function initializeSessionCountdown() {
-        updateCountdown(); // Initial call
+        updateCountdown();
         sessionInterval = setInterval(updateCountdown, 1000);
     }
 
@@ -59,11 +76,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
         const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
+
         if (counter) {
             counter.textContent = formattedTime;
-            
-            // Visual warning when less than 2 minutes remaining
+
             if (minutes < 2) {
                 counter.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
                 counter.style.animation = 'pulse 1s infinite';
@@ -75,10 +91,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleSessionExpiry() {
         clearInterval(sessionInterval);
-        showMessage('⏳ Session expired! Please login again to continue.', 'info');
+        showMessage('⏳ Session expired! Please login again.', 'info');
         clearSessionData();
         setTimeout(() => {
-            window.location.href = REDIRECT_URL; // Simple redirect
+            window.location.href = REDIRECT_URL;
         }, 2000);
     }
 
@@ -91,11 +107,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleLogout() {
         clearInterval(sessionInterval);
-        showMessage('Logout successful! Redirecting to login page...', 'success');
+        showMessage('Logout successful! Redirecting...', 'success');
         clearSessionData();
-        
+
         setTimeout(() => {
-            window.location.href = REDIRECT_URL; // Simple redirect
+            window.location.href = REDIRECT_URL;
         }, 1500);
     }
 
@@ -105,42 +121,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function redirectToLogin() {
-        window.location.href = REDIRECT_URL; // Simple redirect
+        window.location.href = REDIRECT_URL;
     }
 
     function showMessage(message, type = 'info') {
         const messageTypes = {
-            success: { 
-                icon: 'fas fa-check-circle', 
-                color: '#27ae60',
-                bgColor: 'linear-gradient(135deg, #27ae60, #2ecc71)'
-            },
-            error: { 
-                icon: 'fas fa-times-circle', 
-                color: '#e74c3c',
-                bgColor: 'linear-gradient(135deg, #e74c3c, #c0392b)'
-            },
-            warning: { 
-                icon: 'fas fa-exclamation-triangle', 
-                color: '#f39c12',
-                bgColor: 'linear-gradient(135deg, #f39c12, #e67e22)'
-            },
-            info: { 
-                icon: 'fas fa-info-circle', 
-                color: '#3498db',
-                bgColor: 'linear-gradient(135deg, #3498db, #2980b9)'
-            }
+            success: { icon: 'fas fa-check-circle', bgColor: 'linear-gradient(135deg, #27ae60, #2ecc71)' },
+            error: { icon: 'fas fa-times-circle', bgColor: 'linear-gradient(135deg, #e74c3c, #c0392b)' },
+            warning: { icon: 'fas fa-exclamation-triangle', bgColor: 'linear-gradient(135deg, #f39c12, #e67e22)' },
+            info: { icon: 'fas fa-info-circle', bgColor: 'linear-gradient(135deg, #3498db, #2980b9)' }
         };
 
         const config = messageTypes[type] || messageTypes.info;
-        
-        // Remove existing notification if any
+
         const existingNotification = document.getElementById('session-notification');
-        if (existingNotification) {
-            existingNotification.remove();
-        }
-        
-        // Create new notification
+        if (existingNotification) existingNotification.remove();
+
         const notification = document.createElement('div');
         notification.id = 'session-notification';
         notification.style.cssText = `
@@ -151,87 +147,21 @@ document.addEventListener('DOMContentLoaded', function() {
             padding: 20px 30px;
             border-radius: 10px;
             color: white;
-            font-weight: 600;
             z-index: 10000;
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
             width: 350px;
-            height: auto;
-            min-height: 80px;
-            text-align: center;
-            animation: fadeIn 0.3s ease-out;
             font-size: 16px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: ${config.bgColor};
-            border: 2px solid rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.5;
         `;
-        
+
         notification.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
-                <i class="${config.icon}" style="font-size: 22px; color: white;"></i>
-                <span style="font-weight: 600; font-size: 16px; line-height: 1.4;">${message}</span>
-            </div>
+            <i class="${config.icon}" style="font-size: 22px; margin-right: 10px;"></i>
+            ${message}
         `;
-        
+
         document.body.appendChild(notification);
 
-        // Auto remove after 3 seconds
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.style.animation = 'fadeOut 0.3s ease-in';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }
-        }, 3000);
+        setTimeout(() => notification.remove(), 3000);
     }
 
-    // Add CSS animations
-    if (!document.getElementById('session-styles')) {
-        const style = document.createElement('style');
-        style.id = 'session-styles';
-        style.textContent = `
-            @keyframes fadeIn {
-                from { 
-                    opacity: 0; 
-                    transform: translate(-50%, -60%); 
-                }
-                to { 
-                    opacity: 1; 
-                    transform: translate(-50%, -50%); 
-                }
-            }
-            @keyframes fadeOut {
-                from { 
-                    opacity: 1; 
-                    transform: translate(-50%, -50%); 
-                }
-                to { 
-                    opacity: 0; 
-                    transform: translate(-50%, -60%); 
-                }
-            }
-            @keyframes pulse {
-                0% { 
-                    transform: scale(1); 
-                }
-                50% { 
-                    transform: scale(1.05); 
-                }
-                100% { 
-                    transform: scale(1); 
-                }
-            }
-            
-            #session-notification {
-                font-family: 'Poppins', sans-serif;
-            }
-        `;
-        document.head.appendChild(style);
-    }
 });

@@ -1860,29 +1860,52 @@ footer p {
             }
         });
         
-        userForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('userName').value;
-            
-            if (!name.trim()) {
-                await showAlert('Validation Error', 'Please enter a valid name!', 'warning');
-                return;
-            }
-            
-            const userData = {
-                id: generateUniqueId(),
-                user_id: generateUniqueId(),
-                name: name
-            };
-            
-            const success = await addUser(userData);
-            if (success) {
-                // Auto close modal on success
-                closeModal('userModal');
-                await populateUserDropdown();
-            }
-        });
+        userForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    let userName = document.getElementById("userName").value.trim().toLowerCase();
+
+    if (!userName) {
+        showAlert("warning", "Invalid Name", "Please enter a valid name.");
+        return;
+    }
+
+    // 🔍 CHECK IF USER ALREADY EXISTS (Ignore spaces + case)
+    const { data: existingUsers, error } = await supabase
+        .from("userRegistration-T")
+        .select("name");
+
+    if (error) {
+        showAlert("error", "Error", "Database error while checking name!");
+        return;
+    }
+
+    // Convert all DB names to lowercase & trim before comparison
+    let exists = existingUsers.some(
+        (u) => u.name.trim().toLowerCase() === userName
+    );
+
+    if (exists) {
+        showAlert("warning", "Name Already Exists", "This user name is already in the system.");
+        return;
+    }
+
+    // ✅ Insert New User (Safe)
+    const { data, error: insertError } = await supabase
+        .from("userRegistration-T")
+        .insert([{ name: userName }]);
+
+    if (insertError) {
+        showAlert("error", "Insert Failed", "User could not be added.");
+        return;
+    }
+
+    showAlert("success", "User Added", "New user registered successfully.");
+    userForm.reset();
+    userModal.style.display = "none";
+    loadUsers();
+});
+
         
         trolleyForm.addEventListener('submit', async (e) => {
             e.preventDefault();

@@ -1327,9 +1327,7 @@ const userForm = document.getElementById('userForm');
         // Generate a 6-digit unique ID
         // Generate a unique ID with timestamp to avoid conflicts
 function generateUniqueId() {
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.floor(100 + Math.random() * 900);
-    return parseInt(timestamp + random);
+    return Math.floor(100000 + Math.random() * 900000);
 }
 
 

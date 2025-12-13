@@ -1156,195 +1156,309 @@
         }
         
         // Load Recent Activities (Fixed Implementation)
-        async function loadRecentActivities() {
-            try {
-                const fleetActivitiesList = [];
-                const trollyActivitiesList = [];
-                
-                // ----------------------------------------------
-                // 🟦 1) Latest User Registrations
-                // ----------------------------------------------
-                const { data: usersData, error: usersError } = await supabase
-                    .from('userReg_T')
-                    .select('name, created_at')
-                    .order('created_at', { ascending: false })
-                    .limit(2);
-                
-                if (!usersError && Array.isArray(usersData)) {
-                    usersData.forEach(user => {
-                        fleetActivitiesList.push({
-                            type: 'user',
-                            title: 'New User Registration',
-                            description: `${user.name} registered as a new user`,
-                            timestamp: user.created_at,
-                            icon: 'user-plus',
-                            color: 'success'
-                        });
-                        
-                        trollyActivitiesList.push({
-                            type: 'user',
-                            title: 'New User Registration',
-                            description: `${user.name} registered as a new user`,
-                            timestamp: user.created_at,
-                            icon: 'user-plus',
-                            color: 'success'
-                        });
+       // Load Recent Activities (Fixed Implementation)
+async function loadRecentActivities() {
+    try {
+        const fleetActivitiesList = [];
+        const trollyActivitiesList = [];
+        
+        // ----------------------------------------------
+        // 🟦 1) Latest User Registrations (Tractor Users)
+        // ----------------------------------------------
+        try {
+            const { data: usersData, error: usersError } = await supabase
+                .from('userRegistration-T')
+                .select('name, created_at')
+                .order('created_at', { ascending: false })
+                .limit(2);
+            
+            if (!usersError && Array.isArray(usersData)) {
+                usersData.forEach(user => {
+                    fleetActivitiesList.push({
+                        type: 'user',
+                        title: 'New User Registration',
+                        description: `${user.name || 'Unknown'} registered as a new user`,
+                        timestamp: user.created_at || new Date().toISOString(),
+                        icon: 'user-plus',
+                        color: 'success'
                     });
-                }
-                
-                // ----------------------------------------------
-                // 🟦 2) Fleet Entries
-                // ----------------------------------------------
-                const { data: fleetData } = await supabase
-                    .from('userFleet')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(2);
-                
-                if (fleetData) {
-                    fleetData.forEach(fleet => {
-                        fleetActivitiesList.push({
-                            type: 'fleet',
-                            title: 'New Fleet Entry',
-                            description: `${fleet.runningtime} Minutes for ${fleet.user_id} ${fleet.name}`,
-                            timestamp: fleet.created_at,
-                            icon: 'tractor',
-                            color: 'primary'
-                        });
-                    });
-                }
-                
-                // ----------------------------------------------
-                // 🟦 3) Fleet Diesel
-                // ----------------------------------------------
-                const { data: fleetDieselData } = await supabase
-                    .from('admin-diseal')
-                    .select('*')
-                    .eq('category', 'Fleet')
-                    .order('created_at', { ascending: false })
-                    .limit(1);
-                
-                if (fleetDieselData) {
-                    fleetDieselData.forEach(diesel => {
-                        fleetActivitiesList.push({
-                            type: 'diesel',
-                            title: 'Fleet Diesel Refill',
-                            description: `₹${diesel.amount} diesel added by ${diesel.name}`,
-                            timestamp: diesel.created_at,
-                            icon: 'gas-pump',
-                            color: 'warning'
-                        });
-                    });
-                }
-                
-                // ----------------------------------------------
-                // 🟦 4) Fleet Payments
-                // ----------------------------------------------
-                const { data: paymentData } = await supabase
-                    .from('admin-signePay')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(1);
-                
-                if (paymentData) {
-                    paymentData.forEach(payment => {
-                        fleetActivitiesList.push({
-                            type: 'payment',
-                            title: 'Payment Received',
-                            description: `Payment of ₹${payment.paid_amount} of ${payment.total_amount} from ${payment.name}`,
-                            timestamp: payment.created_at,
-                            icon: 'money-bill-wave',
-                            color: 'info'
-                        });
-                    });
-                }
-                
-                // ----------------------------------------------
-                // 🟦 5) Trolley Entries
-                // ----------------------------------------------
-                const { data: trollyData } = await supabase
-                    .from('admin-trolly')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(2);
-                
-                if (trollyData) {
-                    trollyData.forEach(trolley => {
-                        trollyActivitiesList.push({
-                            type: 'trolley',
-                            title: 'New Trolley Entry',
-                            description: `${trolley.trolley} trolleys added`,
-                            timestamp: trolley.created_at,
-                            icon: 'truck-loading',
-                            color: 'success'
-                        });
-                    });
-                }
-                
-                // ----------------------------------------------
-                // 🟦 6) Trolley Diesel
-                // ----------------------------------------------
-                const { data: trollyDieselData } = await supabase
-                    .from('admin-diseal')
-                    .select('*')
-                    .eq('category', 'Trolley')
-                    .order('created_at', { ascending: false })
-                    .limit(1);
-                
-                if (trollyDieselData) {
-                    trollyDieselData.forEach(diesel => {
-                        trollyActivitiesList.push({
-                            type: 'diesel',
-                            title: 'Trolley Diesel Refill',
-                            description: `₹${diesel.amount} diesel added for trolley`,
-                            timestamp: diesel.created_at,
-                            icon: 'gas-pump',
-                            color: 'warning'
-                        });
-                    });
-                }
-                
-                // ----------------------------------------------
-                // 🟦 7) Trolley Payments
-                // ----------------------------------------------
-                const { data: trollyPaymentData } = await supabase
-                    .from('admin-trollypay')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(1);
-                
-                if (trollyPaymentData) {
-                    trollyPaymentData.forEach(payment => {
-                        trollyActivitiesList.push({
-                            type: 'payment',
-                            title: 'Trolley Payment',
-                            description: `Payment of ₹${payment.amount} received`,
-                            timestamp: payment.created_at,
-                            icon: 'money-bill-wave',
-                            color: 'info'
-                        });
-                    });
-                }
-                
-                // ----------------------------------------------
-                // 🟦 SORT + TRIM
-                // ----------------------------------------------
-                fleetActivitiesList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                trollyActivitiesList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                const displayFleetActivities = fleetActivitiesList.slice(0, 3);
-                const displayTrollyActivities = trollyActivitiesList.slice(0, 3);
-                
-                // ----------------------------------------------
-                // 🟦 UPDATE UI
-                // ----------------------------------------------
-                updateActivitiesDOM(displayFleetActivities, fleetActivities);
-                updateActivitiesDOM(displayTrollyActivities, trolleyActivities);
-                
-            } catch (error) {
-                console.error('Error loading recent activities:', error);
+                });
             }
+        } catch (userError) {
+            console.warn('Error fetching tractor users:', userError);
         }
+        
+        // ----------------------------------------------
+        // 🟦 2) Latest Trolley User Registrations
+        // ----------------------------------------------
+        try {
+            const { data: trolleyUsersData, error: trolleyUsersError } = await supabase
+                .from('userReg_T')
+                .select('name, created_at')
+                .order('created_at', { ascending: false })
+                .limit(2);
+            
+            if (!trolleyUsersError && Array.isArray(trolleyUsersData)) {
+                trolleyUsersData.forEach(user => {
+                    trollyActivitiesList.push({
+                        type: 'user',
+                        title: 'New User Registration',
+                        description: `${user.name || 'Unknown'} registered as a new user`,
+                        timestamp: user.created_at || new Date().toISOString(),
+                        icon: 'user-plus',
+                        color: 'success'
+                    });
+                });
+            }
+        } catch (trolleyUserError) {
+            console.warn('Error fetching trolley users:', trolleyUserError);
+        }
+        
+        // ----------------------------------------------
+        // 🟦 3) Fleet Entries
+        // ----------------------------------------------
+        try {
+            const { data: fleetData, error: fleetError } = await supabase
+                .from('userFleet')
+                .select('name, user_id, runningtime, created_at, timestamp')
+                .order('created_at', { ascending: false })
+                .limit(2);
+            
+            if (!fleetError && Array.isArray(fleetData)) {
+                fleetData.forEach(fleet => {
+                    // Use either created_at or timestamp field
+                    const timestamp = fleet.created_at || fleet.timestamp || new Date().toISOString();
+                    
+                    fleetActivitiesList.push({
+                        type: 'fleet',
+                        title: 'New Fleet Entry',
+                        description: `${fleet.runningtime || 0} Minutes for ${fleet.user_id || 'Unknown'} (${fleet.name || 'No Name'})`,
+                        timestamp: timestamp,
+                        icon: 'tractor',
+                        color: 'primary'
+                    });
+                });
+            }
+        } catch (fleetError) {
+            console.warn('Error fetching fleet entries:', fleetError);
+        }
+        
+        // ----------------------------------------------
+        // 🟦 4) Fleet Diesel
+        // ----------------------------------------------
+        try {
+            const { data: fleetDieselData, error: fleetDieselError } = await supabase
+                .from('admin-diseal')
+                .select('name, amount, created_at, date, category')
+                .eq('category', 'Fleet')
+                .order('created_at', { ascending: false })
+                .limit(1);
+            
+            if (!fleetDieselError && Array.isArray(fleetDieselData)) {
+                fleetDieselData.forEach(diesel => {
+                    const timestamp = diesel.created_at || diesel.date || new Date().toISOString();
+                    
+                    fleetActivitiesList.push({
+                        type: 'diesel',
+                        title: 'Fleet Diesel Refill',
+                        description: `₹${diesel.amount || 0} diesel added by ${diesel.name || 'Unknown'}`,
+                        timestamp: timestamp,
+                        icon: 'gas-pump',
+                        color: 'warning'
+                    });
+                });
+            }
+        } catch (dieselError) {
+            console.warn('Error fetching fleet diesel:', dieselError);
+        }
+        
+        // ----------------------------------------------
+        // 🟦 5) Fleet Payments
+        // ----------------------------------------------
+        try {
+            const { data: paymentData, error: paymentError } = await supabase
+                .from('admin-signePay')
+                .select('name, paid_amount, total_amount, created_at, date')
+                .order('created_at', { ascending: false })
+                .limit(1);
+            
+            if (!paymentError && Array.isArray(paymentData)) {
+                paymentData.forEach(payment => {
+                    const timestamp = payment.created_at || payment.date || new Date().toISOString();
+                    
+                    fleetActivitiesList.push({
+                        type: 'payment',
+                        title: 'Payment Received',
+                        description: `Payment of ₹${payment.paid_amount || 0} of ₹${payment.total_amount || 0} from ${payment.name || 'Unknown'}`,
+                        timestamp: timestamp,
+                        icon: 'money-bill-wave',
+                        color: 'info'
+                    });
+                });
+            }
+        } catch (paymentError) {
+            console.warn('Error fetching fleet payments:', paymentError);
+        }
+        
+        // ----------------------------------------------
+        // 🟦 6) Trolley Entries
+        // ----------------------------------------------
+        try {
+            const { data: trollyData, error: trollyError } = await supabase
+                .from('admin-trolly')
+                .select('trolley, created_at, timestamp')
+                .order('created_at', { ascending: false })
+                .limit(2);
+            
+            if (!trollyError && Array.isArray(trollyData)) {
+                trollyData.forEach(trolley => {
+                    const timestamp = trolley.created_at || trolley.timestamp || new Date().toISOString();
+                    
+                    trollyActivitiesList.push({
+                        type: 'trolley',
+                        title: 'New Trolley Entry',
+                        description: `${trolley.trolley || 0} trolleys added`,
+                        timestamp: timestamp,
+                        icon: 'truck-loading',
+                        color: 'success'
+                    });
+                });
+            }
+        } catch (trolleyError) {
+            console.warn('Error fetching trolley entries:', trolleyError);
+        }
+        
+        // ----------------------------------------------
+        // 🟦 7) Trolley Diesel
+        // ----------------------------------------------
+        try {
+            const { data: trollyDieselData, error: trollyDieselError } = await supabase
+                .from('admin-diseal')
+                .select('amount, created_at, date, category')
+                .eq('category', 'Trolley')
+                .order('created_at', { ascending: false })
+                .limit(1);
+            
+            if (!trollyDieselError && Array.isArray(trollyDieselData)) {
+                trollyDieselData.forEach(diesel => {
+                    const timestamp = diesel.created_at || diesel.date || new Date().toISOString();
+                    
+                    trollyActivitiesList.push({
+                        type: 'diesel',
+                        title: 'Trolley Diesel Refill',
+                        description: `₹${diesel.amount || 0} diesel added for trolley`,
+                        timestamp: timestamp,
+                        icon: 'gas-pump',
+                        color: 'warning'
+                    });
+                });
+            }
+        } catch (trolleyDieselError) {
+            console.warn('Error fetching trolley diesel:', trolleyDieselError);
+        }
+        
+        // ----------------------------------------------
+        // 🟦 8) Trolley Payments
+        // ----------------------------------------------
+        try {
+            const { data: trollyPaymentData, error: trollyPaymentError } = await supabase
+                .from('admin-trollypay')
+                .select('amount, created_at, date')
+                .order('created_at', { ascending: false })
+                .limit(1);
+            
+            if (!trollyPaymentError && Array.isArray(trollyPaymentData)) {
+                trollyPaymentData.forEach(payment => {
+                    const timestamp = payment.created_at || payment.date || new Date().toISOString();
+                    
+                    trollyActivitiesList.push({
+                        type: 'payment',
+                        title: 'Trolley Payment',
+                        description: `Payment of ₹${payment.amount || 0} received`,
+                        timestamp: timestamp,
+                        icon: 'money-bill-wave',
+                        color: 'info'
+                    });
+                });
+            }
+        } catch (trolleyPaymentError) {
+            console.warn('Error fetching trolley payments:', trolleyPaymentError);
+        }
+        
+        // ----------------------------------------------
+        // 🟦 FALLBACK ACTIVITIES (if no data found)
+        // ----------------------------------------------
+        if (fleetActivitiesList.length === 0) {
+            fleetActivitiesList.push({
+                type: 'info',
+                title: 'No Recent Fleet Activities',
+                description: 'Fleet activities will appear here once data is available',
+                timestamp: new Date().toISOString(),
+                icon: 'info-circle',
+                color: 'info'
+            });
+        }
+        
+        if (trollyActivitiesList.length === 0) {
+            trollyActivitiesList.push({
+                type: 'info',
+                title: 'No Recent Trolley Activities',
+                description: 'Trolley activities will appear here once data is available',
+                timestamp: new Date().toISOString(),
+                icon: 'info-circle',
+                color: 'info'
+            });
+        }
+        
+        // ----------------------------------------------
+        // 🟦 SORT BY TIMESTAMP
+        // ----------------------------------------------
+        fleetActivitiesList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        trollyActivitiesList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        const displayFleetActivities = fleetActivitiesList.slice(0, 3);
+        const displayTrollyActivities = trollyActivitiesList.slice(0, 3);
+        
+        // ----------------------------------------------
+        // 🟦 UPDATE UI
+        // ----------------------------------------------
+        updateActivitiesDOM(displayFleetActivities, fleetActivities);
+        updateActivitiesDOM(displayTrollyActivities, trolleyActivities);
+        
+        console.log('Fleet activities loaded:', displayFleetActivities.length);
+        console.log('Trolley activities loaded:', displayTrollyActivities.length);
+        
+    } catch (error) {
+        console.error('Error loading recent activities:', error);
+        
+        // Set fallback activities in case of complete failure
+        fleetActivities.innerHTML = `
+            <div class="activity-item">
+                <div class="activity-icon" style="background: var(--warning);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="activity-details">
+                    <h4>Unable to load activities</h4>
+                    <p>Check your internet connection and try refreshing the page</p>
+                </div>
+                <div class="activity-time">Just now</div>
+            </div>
+        `;
+        
+        trolleyActivities.innerHTML = `
+            <div class="activity-item">
+                <div class="activity-icon" style="background: var(--warning);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="activity-details">
+                    <h4>Unable to load activities</h4>
+                    <p>Check your internet connection and try refreshing the page</p>
+                </div>
+                <div class="activity-time">Just now</div>
+            </div>
+        `;
+    }
+}
         
         // Update Activities DOM
         function updateActivitiesDOM(activities, container) {

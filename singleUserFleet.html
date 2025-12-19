@@ -1111,7 +1111,7 @@
         // Supabase configuration
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // Get ID from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -1242,7 +1242,7 @@
                 let mobileColumn = 'mobile'; // Default column name
                 
                 // Fetch user data from the appropriate registration table
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from(userTableName)
                     .select('*')
                     .eq('user_id', user_id)
@@ -1287,7 +1287,7 @@
         async function saveUserPhone(phone) {
             try {
                 // First check if user already exists in user_phones table
-                const { data: existingData, error: checkError } = await supabase
+                const { data: existingData, error: checkError } = await client
                     .from('user_phones')
                     .select('id')
                     .eq('user_id', user_id)
@@ -1347,7 +1347,7 @@
                 updateUIForDataType();
                 
                 // Fetch data from Supabase
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from(tableName)
                     .select('*')
                     .eq('user_id', user_id);
@@ -1391,7 +1391,7 @@
         // Load SMS history
         async function loadSmsHistory() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('sms_history')
                     .select('*')
                     .eq('user_id', user_id)
@@ -1461,7 +1461,7 @@
             if (!confirmDelete) return;
 
             try {
-                const { error } = await supabase
+                const { error } = await client
                     .from('sms_history')
                     .delete()
                     .eq('id', id);
@@ -1760,7 +1760,7 @@ Last Updated: ${new Date().toLocaleString()}
                 };
                 
                 // Store SMS history in Supabase
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('sms_history')
                     .insert([smsData]);
                 

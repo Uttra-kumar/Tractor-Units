@@ -1193,7 +1193,7 @@
     // Initialize Supabase
     const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
     
     // DOM Elements
     const datetimeElement = document.getElementById('datetime');
@@ -1355,7 +1355,7 @@
     // Fetch only pending user IDs from userFleet table
     async function fetchUserIds() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('userFleet')
           .select('id, user_id, name, date, time, day, runningtime')
           .eq('status', 'pending') // Sirf pending wale
@@ -1433,7 +1433,7 @@
     // Fetch all fleet records from Supabase
     async function fetchFleetRecords() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('admin-fleet')
           .select('*')
           .order('id', { ascending: true });
@@ -1453,7 +1453,7 @@
     // Fetch user fleet records from Supabase
     async function fetchUserFleetRecords() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('userFleet')
           .select('*')
           .order('created_at', { ascending: false });
@@ -1672,7 +1672,7 @@
     // Approve user fleet record
     async function approveUserFleetRecord(id) {
       try {
-        const { error } = await supabase
+        const { error } = await client
           .from('userFleet')
           .update({ status: 'accepted' })
           .eq('id', id);
@@ -1693,7 +1693,7 @@
     // Reject user fleet record
     async function rejectUserFleetRecord(id) {
       try {
-        const { error } = await supabase
+        const { error } = await client
           .from('userFleet')
           .update({ status: 'pending' })
           .eq('id', id);
@@ -1714,7 +1714,7 @@
     // Edit record
     async function editRecord(id) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('admin-fleet')
           .select('*')
           .eq('id', id)
@@ -1753,7 +1753,7 @@
     // Delete record
     async function deleteRecord(id) {
       try {
-        const { error } = await supabase
+        const { error } = await client
           .from('admin-fleet')
           .delete()
           .eq('id', id);
@@ -1802,7 +1802,7 @@
       try {
         if (recordIdInput.value) {
           // Update existing record
-          const { error } = await supabase
+          const { error } = await client
             .from('admin-fleet')
             .update(recordData)
             .eq('id', id);
@@ -1813,8 +1813,8 @@
           
           showNotification(`Record with ID ${id} updated successfully`, 'success');
         } else {
-          // Insert new record
-          const { error } = await supabase
+          // Insert new recor
+          const { error } = await client
             .from('admin-fleet')
             .insert([recordData]);
           

@@ -1126,7 +1126,7 @@
         // Initialize Supabase
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // Variables to track current admin being edited/deleted
         let currentEditId = null;
@@ -1276,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', function() {
         async function loadAdminData(id) {
             try {
                 // Fetch admin data from Supabase
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin')
                     .select('*')
                     .eq('id', id)
@@ -1300,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', function() {
         async function loadDeleteData(id) {
             try {
                 // Fetch admin data from Supabase
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin')
                     .select('*')
                     .eq('id', id)
@@ -1372,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 
                 // Fetch data from Supabase
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin')
                     .select('*')
                     .order('id', { ascending: true });
@@ -1416,7 +1416,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         async function createAdmin(adminData) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin')
                     .insert([adminData])
                     .select();
@@ -1434,7 +1434,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         async function updateAdmin(id, adminData) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin')
                     .update(adminData)
                     .eq('id', id)
@@ -1453,7 +1453,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         async function deleteAdmin(id) {
             try {
-                const { error } = await supabase
+                const { error } = await client
                     .from('admin')
                     .delete()
                     .eq('id', id);

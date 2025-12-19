@@ -944,7 +944,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
         
         // Initialize Supabase
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         // DOM Elements
         const currentTime = document.getElementById('current-time');
@@ -1011,7 +1011,7 @@
         async function loadFleetStats() {
             try {
                 // Active Users Count
-                const { count: activeUsersCount, error: usersError } = await supabase
+                const { count: activeUsersCount, error: usersError } = await client
                     .from('userRegistration-T')
                     .select('*', { count: 'exact', head: true });
                 
@@ -1023,7 +1023,7 @@
                 }
                 
                 // Active Fleet (total running time)
-                const { data: fleetData, error: fleetError } = await supabase
+                const { data: fleetData, error: fleetError } = await client
                     .from('admin-fleet')
                     .select('running_time');
                 
@@ -1039,7 +1039,7 @@
                 }
                 
                 // Diesel for Fleet (category = 'fleet')
-                const { data: dieselData, error: dieselError } = await supabase
+                const { data: dieselData, error: dieselError } = await client
                     .from('admin-diseal')
                     .select('amount, category')
                     .eq('category', 'Fleet'); // 🔍 Check spelling
@@ -1064,7 +1064,7 @@
                 }
                 
                 // Total Fleet Revenue
-                const { data: paymentData, error: paymentError } = await supabase
+                const { data: paymentData, error: paymentError } = await client
                     .from('admin-payment')
                     .select('amount');
                 
@@ -1089,7 +1089,7 @@
         async function loadTrolleyStats() {
             try {
                 // Active Users Count (same as fleet for now)
-                const { count: activeUsersCount, error: usersError } = await supabase
+                const { count: activeUsersCount, error: usersError } = await client
                     .from('userReg_T')
                     .select('*', { count: 'exact', head: true });
                 
@@ -1101,7 +1101,7 @@
                 }
                 
                 // Active Trolley (total trolley count)
-                const { data: trollyData, error: trollyError } = await supabase
+                const { data: trollyData, error: trollyError } = await client
                     .from('admin-trolly')
                     .select('trolley');
                 
@@ -1117,7 +1117,7 @@
                 }
                 
                 // Diesel for Trolley (category = 'trolley')
-                const { data: dieselData, error: dieselError } = await supabase
+                const { data: dieselData, error: dieselError } = await client
                     .from('admin-diseal')
                     .select('amount, category')
                     .eq('category', 'Trolley');
@@ -1134,7 +1134,7 @@
                 }
                 
                 // Total Trolley Revenue
-                const { data: trollyPaymentData, error: trollyPaymentError } = await supabase
+                const { data: trollyPaymentData, error: trollyPaymentError } = await client
                     .from('admin-trollypay')
                     .select('amount');
                 
@@ -1166,7 +1166,7 @@ async function loadRecentActivities() {
         // 🟦 1) Latest User Registrations (Tractor Users)
         // ----------------------------------------------
         try {
-            const { data: usersData, error: usersError } = await supabase
+            const { data: usersData, error: usersError } = await client
                 .from('userRegistration-T')
                 .select('name, created_at')
                 .order('created_at', { ascending: false })
@@ -1192,7 +1192,7 @@ async function loadRecentActivities() {
         // 🟦 2) Latest Trolley User Registrations
         // ----------------------------------------------
         try {
-            const { data: trolleyUsersData, error: trolleyUsersError } = await supabase
+            const { data: trolleyUsersData, error: trolleyUsersError } = await client
                 .from('userReg_T')
                 .select('name, created_at')
                 .order('created_at', { ascending: false })
@@ -1218,7 +1218,7 @@ async function loadRecentActivities() {
         // 🟦 3) Fleet Entries
         // ----------------------------------------------
         try {
-            const { data: fleetData, error: fleetError } = await supabase
+            const { data: fleetData, error: fleetError } = await client
                 .from('userFleet')
                 .select('name, user_id, runningtime, created_at, timestamp')
                 .order('created_at', { ascending: false })
@@ -1247,7 +1247,7 @@ async function loadRecentActivities() {
         // 🟦 4) Fleet Diesel
         // ----------------------------------------------
         try {
-            const { data: fleetDieselData, error: fleetDieselError } = await supabase
+            const { data: fleetDieselData, error: fleetDieselError } = await client
                 .from('admin-diseal')
                 .select('name, amount, created_at, date, category')
                 .eq('category', 'Fleet')
@@ -1276,7 +1276,7 @@ async function loadRecentActivities() {
         // 🟦 5) Fleet Payments
         // ----------------------------------------------
         try {
-            const { data: paymentData, error: paymentError } = await supabase
+            const { data: paymentData, error: paymentError } = await client
                 .from('admin-signePay')
                 .select('name, paid_amount, total_amount, created_at, date')
                 .order('created_at', { ascending: false })
@@ -1304,7 +1304,7 @@ async function loadRecentActivities() {
         // 🟦 6) Trolley Entries
         // ----------------------------------------------
         try {
-            const { data: trollyData, error: trollyError } = await supabase
+            const { data: trollyData, error: trollyError } = await client
                 .from('admin-trolly')
                 .select('trolley, created_at, timestamp')
                 .order('created_at', { ascending: false })
@@ -1332,7 +1332,7 @@ async function loadRecentActivities() {
         // 🟦 7) Trolley Diesel
         // ----------------------------------------------
         try {
-            const { data: trollyDieselData, error: trollyDieselError } = await supabase
+            const { data: trollyDieselData, error: trollyDieselError } = await client
                 .from('admin-diseal')
                 .select('amount, created_at, date, category')
                 .eq('category', 'Trolley')
@@ -1361,7 +1361,7 @@ async function loadRecentActivities() {
         // 🟦 8) Trolley Payments
         // ----------------------------------------------
         try {
-            const { data: trollyPaymentData, error: trollyPaymentError } = await supabase
+            const { data: trollyPaymentData, error: trollyPaymentError } = await client
                 .from('admin-trollypay')
                 .select('amount, created_at, date')
                 .order('created_at', { ascending: false })

@@ -881,7 +881,7 @@
     // Supabase initialization
     const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
     
     // Show notification
     function showNotification(message, type) {
@@ -949,7 +949,7 @@
       try {
         if (isEditMode) {
           // Update existing record
-          const { data, error } = await supabase
+          const { data, error } = await client
             .from('admin-payment')
             .update(formData)
             .eq('id', originalId);
@@ -963,7 +963,7 @@
           }
         } else {
           // Insert new record
-          const { data, error } = await supabase
+          const { data, error } = await client
             .from('admin-payment')
             .insert([formData]);
           
@@ -983,7 +983,7 @@
     // Load fleet data from Supabase
     async function loadFleetData() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('admin-payment')
           .select('*')
           .order('date', { ascending: false });
@@ -1032,7 +1032,7 @@
     // Open Edit Modal
     window.openEditModal = async function(id) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('admin-payment')
           .select('*')
           .eq('id', id)
@@ -1085,7 +1085,7 @@
       };
       
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('admin-payment')
           .update(formData)
           .eq('id', formData.id);
@@ -1115,7 +1115,7 @@
       const id = document.getElementById('delete-modal').dataset.idToDelete;
       
       try {
-        const { error } = await supabase
+        const { error } = await client
           .from('admin-payment')
           .delete()
           .eq('id', id);
@@ -1161,7 +1161,7 @@
     
     // Fetch and display payments
     async function fetchPayments() {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from("admin-singePay")
         .select("*")
         .order("id", { ascending: false });
@@ -1198,7 +1198,7 @@
 
     // Load all IDs from admin-singePay table
     async function loadPaymentIDs() {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from("admin-singePay")
         .select("*")
         .order("id", { ascending: true });

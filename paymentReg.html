@@ -1010,7 +1010,7 @@
         // Supabase configuration
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // DOM elements
         const loadingElement = document.getElementById('loading');
@@ -1097,7 +1097,7 @@
         async function fetchAdminName() {
             try {
                 // This is a placeholder - you would need to adjust based on your actual table structure
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin') // Adjust table name as needed
                     .select('name')
                     .eq('id', 716900) // Adjust ID as needed
@@ -1154,7 +1154,7 @@ async function fetchPayData() {
         
         const tableName = currentDataType === 'payment' ? 'admin-singePay' : 'admin-trollysingpay';
         
-        const { data, error } = await supabase
+        const { data, error } = await client
             .from(tableName)
             .select('*')
             .order('date', { ascending: false });
@@ -1300,7 +1300,7 @@ function updateStatistics(data) {
             
             const tableName = currentDataType === 'payment' ? 'admin-singePay' : 'admin-trollysingpay';
             
-            const { error } = await supabase
+            const { error } = await client
                 .from(tableName)
                 .delete()
                 .eq("id", id);
@@ -1318,7 +1318,7 @@ function updateStatistics(data) {
             try {
                 const tableName = currentDataType === 'payment' ? 'admin-singePay' : 'admin-trollysingpay';
                 
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from(tableName)
                     .select('*')
                 
@@ -1338,7 +1338,7 @@ function updateStatistics(data) {
         // Export Trolley to PDF
         document.getElementById('exportTrolleyBtn').addEventListener('click', async function() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-trollysingpay')
                     .select('*')
                 
@@ -1360,7 +1360,7 @@ function updateStatistics(data) {
             try {
                 const tableName = currentDataType === 'payment' ? 'admin-singePay' : 'admin-trollysingpay';
                 
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from(tableName)
                     .select('*')
                     .eq('id', id)
@@ -1597,7 +1597,7 @@ function updateStatistics(data) {
                 const month = document.getElementById('report-month').value;
                 const tableName = currentDataType === 'payment' ? 'admin-singePay' : 'admin-trollysingpay';
                 
-                let query = supabase
+                let query = client
                     .from(tableName)
                     .select('*');
                 

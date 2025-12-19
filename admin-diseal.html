@@ -1009,7 +1009,7 @@
         // Initialize Supabase client
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // Global variable to store entries
         let allEntries = [];
@@ -1093,7 +1093,7 @@
         // Load data from Supabase
         async function loadTableData() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-diseal')
                     .select('*')
                     .order('date', { ascending: false });
@@ -1201,7 +1201,7 @@
         // Edit entry
         async function editEntry(id) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-diseal')
                     .select('*')
                     .eq('id', id)
@@ -1234,7 +1234,7 @@
         // Delete entry
         async function deleteEntry(id) {
             try {
-                const { error } = await supabase
+                const { error } = await client
                     .from('admin-diseal')
                     .delete()
                     .eq('id', id);
@@ -1463,7 +1463,7 @@
                 };
                 
                 try {
-                    const { error } = await supabase
+                    const { error } = await client
                         .from('admin-diseal')
                         .update(entry)
                         .eq('id', entry.id);

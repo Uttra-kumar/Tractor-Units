@@ -903,7 +903,7 @@
         // Initialize Supabase with your project details
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // Update datetime
         function updateDateTime() {
@@ -1095,7 +1095,7 @@
                 `;
                 
                 // Fetch users from selected table
-                const { data: users, error: usersError } = await supabase
+                const { data: users, error: usersError } = await client
                     .from(tableName)
                     .select('*');
                 
@@ -1107,7 +1107,7 @@
                     fleetTable = 'admin-trolly'; // Assuming trolley fleet table name
                 }
                 
-                const { data: fleetData, error: fleetError } = await supabase
+                const { data: fleetData, error: fleetError } = await client
                     .from(fleetTable)
                     .select('*');
                 
@@ -1119,7 +1119,7 @@
                     paymentTable = 'admin-trollypay'; // Trolley payment table
                 }
                 
-                const { data: paymentData, error: paymentError } = await supabase
+                const { data: paymentData, error: paymentError } = await client
                     .from(paymentTable)
                     .select('*');
                 

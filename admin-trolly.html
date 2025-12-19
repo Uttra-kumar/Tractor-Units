@@ -1203,7 +1203,7 @@
     // Initialize Supabase
     const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
     
     // DOM Elements
     const datetimeElement = document.getElementById('datetime');
@@ -1365,7 +1365,7 @@
     // Fetch user IDs from userTrolly table
     async function fetchUserIds() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('usertrolly')
           .select('id, user_id, name, date, time, day, trolley, amount')
           .eq('status', 'pending') // Sirf pending wale
@@ -1445,7 +1445,7 @@
     // Fetch all trolley records from Supabase
     async function fetchTrolleyRecords() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('admin-trolly')
           .select('*')
           .order('id', { ascending: true });
@@ -1465,7 +1465,7 @@
     // Fetch user trolley records from Supabase
     async function fetchUserTrolleyRecords() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('usertrolly')
           .select('*')
           .order('created_at', { ascending: false });
@@ -1686,7 +1686,7 @@
     // Approve user trolley record
     async function approveUserTrolleyRecord(id) {
       try {
-        const { error } = await supabase
+        const { error } = await client
           .from('usertrolly')
           .update({ status: 'accepted' })
           .eq('id', id);
@@ -1707,7 +1707,7 @@
     // Reject user trolley record
     async function rejectUserTrolleyRecord(id) {
       try {
-        const { error } = await supabase
+        const { error } = await client
           .from('usertrolly')
           .update({ status: 'pending' })
           .eq('id', id);
@@ -1728,7 +1728,7 @@
     // Edit record
     async function editRecord(id) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from('admin-trolly')
           .select('*')
           .eq('id', id)
@@ -1768,7 +1768,7 @@
     // Delete record
     async function deleteRecord(id) {
       try {
-        const { error } = await supabase
+        const { error } = await client
           .from('admin-trolly')
           .delete()
           .eq('id', id);
@@ -1819,7 +1819,7 @@
       try {
         if (recordIdInput.value) {
           // Update existing record
-          const { error } = await supabase
+          const { error } = await client
             .from('admin-trolly')
             .update(recordData)
             .eq('id', id);
@@ -1831,7 +1831,7 @@
           showNotification(`Record with ID ${id} updated successfully`, 'success');
         } else {
           // Insert new record
-          const { error } = await supabase
+          const { error } = await client
             .from('admin-trolly')
             .insert([recordData]);
           

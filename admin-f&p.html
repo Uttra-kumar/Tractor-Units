@@ -625,7 +625,7 @@
         const SUPABASE_URL = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Store the fetched data
         let fleetData = [];
@@ -935,7 +935,7 @@
         // Fetch data from Supabase
         async function fetchFleetData() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-fleet')
                     .select('*');
                 
@@ -953,7 +953,7 @@
         
         async function fetchPaymentData() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-singePay')
                     .select('*');
                 

@@ -695,7 +695,7 @@
         // Initialize Supabase
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // DOM Elements
         const connectionStatus = document.getElementById('connectionStatus');
@@ -780,7 +780,7 @@
         async function initializeDashboard() {
             try {
                 // Test connection
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userRegistration-T')
                     .select('id')
                     .limit(1);
@@ -810,7 +810,7 @@
         async function loadStats() {
             try {
                 // Get total users count
-                const { count: usersCount, error: usersError } = await supabase
+                const { count: usersCount, error: usersError } = await client
                     .from('userRegistration-T')
                     .select('*', { count: 'exact', head: true });
                 
@@ -819,7 +819,7 @@
                 }
                 
                 // Get fleet data for stats
-                const { data: fleetData, error: fleetError } = await supabase
+                const { data: fleetData, error: fleetError } = await client
                     .from('admin-fleet')
                     .select('*');
                 
@@ -828,7 +828,7 @@
                 }
                 
                 // Get payment data for stats
-                const { data: paymentData, error: paymentError } = await supabase
+                const { data: paymentData, error: paymentError } = await client
                     .from('admin-singePay')
                     .select('*');
                 
@@ -854,7 +854,7 @@
                 usersLoading.style.display = 'flex';
                 usersGrid.innerHTML = '';
                 
-                const { data: users, error } = await supabase
+                const { data: users, error } = await client
                     .from('userRegistration-T')
                     .select('*');
                 
@@ -936,7 +936,7 @@
             
             try {
                 // Load fleet data
-                const { data: fleetDataResult, error: fleetError } = await supabase
+                const { data: fleetDataResult, error: fleetError } = await client
                     .from('admin-fleet')
                     .select('*')
                     .eq('user_id', user.user_id);
@@ -946,7 +946,7 @@
                 }
                 
                 // Load payment data
-                const { data: paymentDataResult, error: paymentError } = await supabase
+                const { data: paymentDataResult, error: paymentError } = await client
                     .from('admin-singePay')
                     .select('*')
                     .eq('user_id', user.user_id);

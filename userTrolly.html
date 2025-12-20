@@ -1088,7 +1088,7 @@ footer p {
         // Initialize Supabase
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // DOM Elements
         const currentDateTimeElement = document.getElementById('currentDateTime');
@@ -1404,7 +1404,7 @@ async function checkUserExists(name) {
     try {
         const trimmedName = name.trim().toLowerCase();
         
-        const { data, error } = await supabase
+        const { data, error } = await client
             .from('userReg_T')
             .select('name');
         
@@ -1430,7 +1430,7 @@ async function checkUserExists(name) {
         // Fetch all users from userRegistration-T
         async function fetchUsers() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userReg_T')
                     .select('*')
                     .order('name', { ascending: true });
@@ -1468,7 +1468,7 @@ async function checkUserExists(name) {
         // Fetch all trolleys from Supabase
         async function fetchTrolleys() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('usertrolly')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -1647,7 +1647,7 @@ async function checkUserExists(name) {
                     name: trimmedName
                 };
                 
-                const { error } = await supabase
+                const { error } = await client
                     .from('userReg_T')
                     .insert([userToInsert]);
                 
@@ -1671,7 +1671,7 @@ async function checkUserExists(name) {
                 // Set status to 'pending' for new entries
                 trolleyData.status = 'pending';
                 
-                const { error } = await supabase
+                const { error } = await client
                     .from('usertrolly')
                     .insert([trolleyData]);
                 
@@ -1704,7 +1704,7 @@ async function checkUserExists(name) {
         // Edit trolley
         async function editTrolley(id) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('usertrolly')
                     .select('*')
                     .eq('id', id)
@@ -1739,7 +1739,7 @@ async function checkUserExists(name) {
         async function updateTrolley(id, trolleyData) {
             try {
                 // Keep the existing status when updating
-                const { data: existingData } = await supabase
+                const { data: existingData } = await client
                     .from('usertrolly')
                     .select('status')
                     .eq('id', id)
@@ -1750,7 +1750,7 @@ async function checkUserExists(name) {
                     trolleyData.date = existingData.date;
                 }
                 
-                const { error } = await supabase
+                const { error } = await client
                     .from('usertrolly')
                     .update(trolleyData)
                     .eq('id', id);
@@ -1784,7 +1784,7 @@ async function checkUserExists(name) {
             );
             
             try {
-                const { error } = await supabase
+                const { error } = await client
                     .from('usertrolly')
                     .delete()
                     .eq('id', id);
@@ -1916,7 +1916,7 @@ async function checkUserExists(name) {
         console.log("Data to insert:", userData);
         
         // Insert new user
-        const { data, error } = await supabase
+        const { data, error } = await client
             .from('userReg_T')
             .insert([userData]);
         

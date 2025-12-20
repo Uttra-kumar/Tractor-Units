@@ -790,7 +790,7 @@
         const registerPasswordToggle = document.getElementById('register-password-toggle');
         
         // Global Supabase variable
-        let supabase = null;
+        let client = null;
         
         // Theme Management
         function initTheme() {
@@ -893,7 +893,7 @@
                 
                 try {
                     // Check if this ID already exists in the database for both id and user_id columns
-                    const { data, error } = await supabase
+                    const { data, error } = await client
                         .from('userRegistration-T')
                         .select('id, user_id')
                         .or(`id.eq.${userId},user_id.eq.${userId}`)
@@ -932,7 +932,7 @@
         // Initialize Supabase
         function initializeSupabase() {
             try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
                 // Test the connection
                 supabase.from('userRegistration-T').select('count', { count: 'exact', head: true })
@@ -990,7 +990,7 @@
                 const { id, user_id } = await generateTwoUniqueIds();
                 
                 // Insert into Supabase
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userRegistration-T')
                     .insert([
                     {
@@ -1043,7 +1043,7 @@
             
             try {
                 // Check credentials against Supabase (check both id and user_id columns)
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userRegistration-T')
                     .select('*')
                     .or(`id.eq.${userId},user_id.eq.${userId}`)

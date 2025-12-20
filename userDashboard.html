@@ -537,7 +537,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
         
         // Initialize Supabase (replace with your actual Supabase URL and key)
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // DOM elements
         const profileBtn = document.getElementById('profile-btn');
@@ -600,7 +600,7 @@
         // Fetch user data from Supabase
         async function fetchUserData(user_id) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userRegistration-T')
                     .select('*')
                     .eq('user_id', user_id)
@@ -620,7 +620,7 @@
         // Fetch fleet data from Supabase
         async function fetchFleetData(user_id) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-fleet')
                     .select('*')
                     .eq('user_id', user_id);
@@ -640,7 +640,7 @@
         // Fetch payment data from Supabase
         async function fetchPaymentData(user_id) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-singePay')
                     .select('*')
                     .eq('user_id', user_id);

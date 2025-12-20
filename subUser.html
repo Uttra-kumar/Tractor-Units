@@ -437,7 +437,7 @@
         // Initialize Supabase (using the same credentials as admin login)
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
@@ -512,7 +512,7 @@
             
             try {
                 // Query the users table for matching credentials
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin')
                     .select('*')
                     .eq('id', userId)

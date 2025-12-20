@@ -450,7 +450,7 @@
         // Initialize Supabase with your actual credentials
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co'; // Replace with your Supabase URL
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w'; // Replace with your Supabase anon key
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // Get ID from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -486,7 +486,7 @@
             }
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('admin-singePay')
                     .select('*')
                     .eq('user_id', user_id);

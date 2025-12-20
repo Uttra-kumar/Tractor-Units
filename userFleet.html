@@ -1083,7 +1083,7 @@ footer p {
         // Initialize Supabase
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // DOM Elements
         const currentDateTimeElement = document.getElementById('currentDateTime');
@@ -1394,7 +1394,7 @@ footer p {
         async function checkUserExists(name) {
             try {
                 const trimmedName = name.trim().toLowerCase();
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userRegistration-T')
                     .select('name')
                     .ilike('name', trimmedName)
@@ -1409,7 +1409,7 @@ footer p {
         // Fetch all users from userRegistration-T
         async function fetchUsers() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userRegistration-T')
                     .select('*')
                     .order('name', { ascending: true });
@@ -1447,7 +1447,7 @@ footer p {
         // Fetch all tractors from Supabase
         async function fetchTractors() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userFleet')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -1622,7 +1622,7 @@ footer p {
                     name: trimmedName
                 };
                 
-                const { error } = await supabase
+                const { error } = await client
                     .from('userRegistration-T')
                     .insert([userToInsert]);
                 
@@ -1646,7 +1646,7 @@ footer p {
                 // Set status to 'pending' for new entries
                 tractorData.status = 'pending';
                 
-                const { error } = await supabase
+                const { error } = await client
                     .from('userFleet')
                     .insert([tractorData]);
                 
@@ -1679,7 +1679,7 @@ footer p {
         // Edit tractor
         async function editTractor(id) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('userFleet')
                     .select('*')
                     .eq('id', id)
@@ -1713,7 +1713,7 @@ footer p {
         async function updateTractor(id, tractorData) {
             try {
                 // Keep the existing status when updating
-                const { data: existingData } = await supabase
+                const { data: existingData } = await client
                     .from('userFleet')
                     .select('status')
                     .eq('id', id)
@@ -1724,7 +1724,7 @@ footer p {
                     tractorData.date = existingData.date;
                 }
                 
-                const { error } = await supabase
+                const { error } = await client
                     .from('userFleet')
                     .update(tractorData)
                     .eq('id', id);
@@ -1758,7 +1758,7 @@ footer p {
             );
             
             try {
-                const { error } = await supabase
+                const { error } = await client
                     .from('userFleet')
                     .delete()
                     .eq('id', id);

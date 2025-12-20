@@ -886,7 +886,7 @@
         // Supabase initialization
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         // DOM Elements
         const usersTableBody = document.getElementById('usersTableBody');
@@ -1004,7 +1004,7 @@
                 
                 try {
                     // Check if this ID already exists in the database
-                    const { data, error } = await supabase
+                    const { data, error } = await client
                         .from(tableName)
                         .select('id')
                         .eq('id', id)
@@ -1041,7 +1041,7 @@
                 
                 try {
                     // Check if this User ID already exists in the database
-                    const { data, error } = await supabase
+                    const { data, error } = await client
                         .from(tableName)
                         .select('user_id')
                         .eq('user_id', userId)
@@ -1233,7 +1233,7 @@
             usersTableBody.innerHTML = '';
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from(currentTable)
                     .select('*')
                     .order('id', { ascending: true });
@@ -1280,7 +1280,7 @@
     try {
         if (currentUser) {
             // Update existing user in the current table
-            const { error } = await supabase
+            const { error } = await client
                 .from(currentTable)
                 .update({ 
                     name, 
@@ -1296,7 +1296,7 @@
             showNotification('User updated successfully');
         } else {
             // Add new user to the selected table
-            const { error } = await supabase
+            const { error } = await client
                 .from(selectedTableForAdd)
                 .insert([{ 
                     id: id,
@@ -1333,7 +1333,7 @@
             if (!confirm('Are you sure you want to delete this user?')) return;
             
             try {
-                const { error } = await supabase
+                const { error } = await client
                     .from(currentTable)
                     .delete()
                     .eq('id', id);

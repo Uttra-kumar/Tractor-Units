@@ -935,7 +935,7 @@
                 client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
                 // Test the connection
-                supabase.from('userRegistration-T').select('count', { count: 'exact', head: true })
+                client.from('userRegistration-T').select('count', { count: 'exact', head: true })
                     .then(response => {
                         if (response.error) {
                             console.error('Supabase connection test failed:', response.error);

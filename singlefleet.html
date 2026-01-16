@@ -1115,7 +1115,7 @@ paymentForm.addEventListener("submit", async (e) => {
     const date = today.toISOString().split("T")[0]; // YYYY-MM-DD
     const day = today.toLocaleDateString("en-US", { weekday: "long" }); // e.g. Thursday
     
-    const { error } = await supabase
+    const { error } = await client
         .from(paymentTable)
         .upsert([{ id, user_id, name, paid_amount, remain, total_amount, date, day, created_at }]);
     

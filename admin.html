@@ -984,6 +984,7 @@
                                     <th>Name</th>
                                     <th>Role</th>
                                     <th>Email</th>
+                                    <th>Password</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -1479,6 +1480,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${admin.name}</td>
                     <td>${admin.role}</td>
                     <td>${admin.email}</td>
+                    <td>${admin.password}</td>
                     <td><span class="status-badge ${admin.status === 'Active' ? 'status-active' : 'status-inactive'}">${admin.status || 'Active'}</span></td>
                     <td class="actions">
                         <button class="btn btn-edit" onclick="openEditModal('${admin.id}')">

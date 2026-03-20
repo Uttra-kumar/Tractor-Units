@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Farmer Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            color: white;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .back-btn, .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 25px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .farmer-header {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 10px;
+        }
+
+        .farmer-header h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .farmer-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .summary-card i {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .summary-card p {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Section Styles */
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h3 {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-header .total {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-approved, .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            th, td {
+                font-size: 11px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="top-bar">
+                <a href="farmerList.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            <div class="farmer-header" id="farmerHeader">
+                <h2><i class="fas fa-user"></i> Loading...</h2>
+                <p><i class="fas fa-id-card"></i> Loading...</p>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Summary Cards -->
+            <div class="summary-cards" id="summaryCards">
+                <div class="summary-card">
+                    <i class="fas fa-truck"></i>
+                    <h3 id="totalTrips">0</h3>
+                    <p>Total Rows</p>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-clock"></i>
+                    <h3 id="totalTime">0 min</h3>
+                    <p>Total Time</p>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-rupee-sign"></i>
+                    <h3 id="totalPaid">₹0</h3>
+                    <p>Total Paid</p>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3 id="avgPerTrip">₹0</h3>
+                    <p>Avg per Row</p>
+                </div>
+            </div>
+            
+            <!-- Fleet Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h3><i class="fas fa-truck"></i> Fleet Records</h3>
+                    <span class="total" id="fleetTotal"></span>
+                </div>
+                <div class="table-container">
+                    <table id="fleetTable">
+                        <thead>
+                            <tr><th>#</th><th>Fleet ID</th><th>Time (min)</th><th>Status</th><th>Date</th></tr>
+                        </thead>
+                        <tbody id="fleetBody">
+                            <tr><td colspan="5" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Payment Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h3><i class="fas fa-rupee-sign"></i> Payment Records</h3>
+                    <span class="total" id="paymentTotal"></span>
+                </div>
+                <div class="table-container">
+                    <table id="paymentTable">
+                        <thead>
+                            <tr><th>#</th><th>Pay ID</th><th>Total Time</th><th>Total Balance</th><th>Paid</th><th>Due</th><th>Status</th><th>Date</th></tr>
+                        </thead>
+                        <tbody id="paymentBody">
+                            <tr><td colspan="8" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        const currentUser = sessionStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = '../index.html';
+        }
+        
+        // Get farmer ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const farmerId = urlParams.get('id');
+        
+        let farmerData = null;
+        let fleetRecords = [];
+        let paymentRecords = [];
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+        }
+        
+        // Format datetime
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+        
+        async function loadFarmerData() {
+            if (!farmerId) {
+                window.location.href = 'farmerList.html';
+                return;
+            }
+            
+            // Load farmer details
+            const { data: farmer } = await client
+                .from('farmers')
+                .select('*')
+                .eq('id', farmerId)
+                .single();
+            
+            if (farmer) {
+                farmerData = farmer;
+                document.getElementById('farmerHeader').innerHTML = `
+                    <h2><i class="fas fa-user-circle"></i> ${farmer.name}</h2>
+                    <p><i class="fas fa-id-card"></i> ${farmer.farmerid} | <i class="fas fa-map-marker-alt"></i> ${farmer.address || 'Address not provided'}</p>
+                `;
+            }
+            
+            // Load fleet records
+            const { data: fleet } = await client
+                .from('fleetentry')
+                .select('*')
+                .eq('farmer_id', farmerId)
+                .order('created_at', { ascending: false });
+            
+            fleetRecords = fleet || [];
+            
+            // Load payment records
+            const { data: payments } = await client
+                .from('payments')
+                .select('*')
+                .eq('farmer_id', farmerId)
+                .order('created_at', { ascending: false });
+            
+            paymentRecords = payments || [];
+            
+            // Calculate stats
+            const totalTrips = fleetRecords.length;
+            const totalTime = fleetRecords.reduce((sum, f) => sum + (f.time || 0), 0);
+            const totalPaid = paymentRecords
+                .filter(p => p.status === 'paid')
+                .reduce((sum, p) => sum + (p.paid || 0), 0);
+            const avgPerTrip = totalTrips > 0 ? totalPaid / totalTrips : 0;
+            
+            // Update summary cards
+            document.getElementById('totalTrips').textContent = totalTrips;
+            document.getElementById('totalTime').textContent = totalTime + ' min';
+            document.getElementById('totalPaid').textContent = '₹' + totalPaid.toLocaleString();
+            document.getElementById('avgPerTrip').textContent = '₹' + avgPerTrip.toFixed(2);
+            document.getElementById('fleetTotal').textContent = `${totalTrips} Rows | ${totalTime} min`;
+            document.getElementById('paymentTotal').textContent = `₹${totalPaid.toLocaleString()} paid`;
+            
+            // Display fleet table
+            const fleetBody = document.getElementById('fleetBody');
+            if (fleetRecords.length === 0) {
+                fleetBody.innerHTML = '<tr><td colspan="5" class="no-data">No fleet records found</td></tr>';
+            } else {
+                fleetBody.innerHTML = fleetRecords.map((f, idx) => `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${f.fleet_id}</td>
+                        <td>${f.time} min</td>
+                        <td><span class="status-badge status-${f.status}">${f.status || 'pending'}</span></td>
+                        <td>${formatDateTime(f.created_at)}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            // Display payment table
+            const paymentBody = document.getElementById('paymentBody');
+            if (paymentRecords.length === 0) {
+                paymentBody.innerHTML = '<tr><td colspan="8" class="no-data">No payment records found</td></tr>';
+            } else {
+                paymentBody.innerHTML = paymentRecords.map((p, idx) => `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td><strong>${p.pay_id}</strong></td>
+                        <td>${p.total_time} min</td>
+                        <td>₹${p.total_balance}</td>
+                        <td>₹${p.paid}</td>
+                        <td>₹${p.due}</td>
+                        <td><span class="status-badge status-${p.status}">${p.status}</span></td>
+                        <td>${formatDateTime(p.created_at)}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = '../index.html';
+        }
+        
+        loadFarmerData();
+    </script>
+</body>
+</html>

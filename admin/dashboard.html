@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Admin Dashboard</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Main Container */
+        .dashboard-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-welcome i {
+            font-size: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 50%;
+        }
+
+        .user-text h3 {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .user-text h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 50px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .logout-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* DateTime Section */
+        .datetime-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .date-box, .time-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .date-box i, .time-box i {
+            font-size: 18px;
+        }
+
+        .date-box span, .time-box span {
+            font-weight: 500;
+        }
+
+        .time-box span {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px 20px;
+        }
+
+        /* Welcome Card */
+        .welcome-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .welcome-card i {
+            font-size: 50px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .welcome-card h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Action Buttons Section */
+        .actions-section {
+            margin-top: 20px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-title i {
+            font-size: 22px;
+            color: #667eea;
+        }
+
+        .section-title h3 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Button Grid */
+        .button-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 18px 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+        }
+
+        .action-btn .btn-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .action-btn .btn-left i {
+            font-size: 24px;
+            width: 30px;
+        }
+
+        .action-btn .btn-left span {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .action-btn .btn-right i {
+            font-size: 18px;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        /* Individual Button Colors */
+        .fleet-btn {
+            border-left: 4px solid #4a90e2;
+        }
+
+        .fleet-btn .btn-left i {
+            color: #4a90e2;
+        }
+
+        .trolley-btn {
+            border-left: 4px solid #2ecc71;
+        }
+
+        .trolley-btn .btn-left i {
+            color: #2ecc71;
+        }
+
+        .record-btn {
+            border-left: 4px solid #f39c12;
+        }
+
+        .record-btn .btn-left i {
+            color: #f39c12;
+        }
+
+        /* Hover Effects */
+        .action-btn:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn:hover .btn-right i {
+            transform: translateX(5px);
+            color: #667eea;
+        }
+
+        .action-btn:active {
+            transform: translateX(2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer p {
+            color: #666;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .footer i {
+            color: #667eea;
+        }
+
+        /* Admin Badge */
+        .admin-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+            color: white;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .loading-spinner i {
+            font-size: 40px;
+            color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-spinner p {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .user-welcome i {
+                font-size: 32px;
+                padding: 10px;
+            }
+            
+            .user-text h2 {
+                font-size: 18px;
+            }
+            
+            .logout-btn {
+                padding: 8px 15px;
+                font-size: 12px;
+            }
+            
+            .datetime-section {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .action-btn {
+                padding: 15px 18px;
+            }
+            
+            .action-btn .btn-left i {
+                font-size: 20px;
+                width: 25px;
+            }
+            
+            .action-btn .btn-left span {
+                font-size: 14px;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 380px) {
+            .user-info {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .logout-btn {
+                align-self: flex-start;
+            }
+        }
+
+        /* Animation for buttons */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .action-btn:focus {
+            animation: pulse 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="user-info">
+                <div class="user-welcome">
+                    <i class="fas fa-user-shield"></i>
+                    <div class="user-text">
+                        <h3>Welcome back,</h3>
+                        <h2 id="adminName">Loading...</h2>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+            
+            <!-- Date and Time Section -->
+            <div class="datetime-section">
+                <div class="date-box">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="currentDate">Loading...</span>
+                </div>
+                <div class="time-box">
+                    <i class="fas fa-clock"></i>
+                    <span id="currentTime">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <i class="fas fa-crown"></i>
+                <h3 id="welcomeMessage">Welcome to Admin Dashboard!</h3>
+                <p>You have full administrative access to manage fleet, trolleys and records.</p>
+                <div class="admin-badge">
+                    <i class="fas fa-shield-alt"></i> Administrator Access
+                </div>
+            </div>
+            
+            <!-- Action Buttons Section -->
+            <div class="actions-section">
+                <div class="section-title">
+                    <i class="fas fa-cog"></i>
+                    <h3>Quick Actions</h3>
+                </div>
+                
+                <div class="button-grid">
+                    <!-- Fleet Button -->
+                    <button class="action-btn fleet-btn" onclick="handleFleet()">
+                        <div class="btn-left">
+                            <i class="fas fa-truck"></i>
+                            <span>Fleet Management</span>
+                        </div>
+                        <div class="btn-right">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </button>
+                    
+                    <!-- Trolley Button -->
+                    <button class="action-btn trolley-btn" onclick="handleTrolley()">
+                        <div class="btn-left">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Trolley Management</span>
+                        </div>
+                        <div class="btn-right">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </button>
+                    
+                    <!-- View Record Button -->
+                    <button class="action-btn record-btn" onclick="handleViewRecord()">
+                        <div class="btn-left">
+                            <i class="fas fa-crown"></i>
+                            <span>Admin User</span>
+                        </div>
+                        <div class="btn-right">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <i class="fas fa-shield-alt"></i>
+                Secure Admin Portal | Powered by Supabase
+            </p>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner"></i>
+            <p>Loading...</p>
+        </div>
+    </div>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co'; // Replace with your Supabase URL
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w'; // Replace with your Supabase anon key
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Check if user is logged in and has admin role
+        const currentUser = sessionStorage.getItem('currentUser');
+        
+        if (!currentUser) {
+            window.location.href = '../index.html';
+        } else {
+            try {
+                const user = JSON.parse(currentUser);
+                
+                // Check if user is admin
+                if (user.role !== 'admin') {
+                    alert('Access denied. Admin privileges required.');
+                    window.location.href = '../user/dashboard.html';
+                } else {
+                    const adminName = user.username || user.id || 'Admin';
+                    document.getElementById('adminName').textContent = adminName;
+                    
+                    // Update welcome message
+                    const welcomeMsg = document.getElementById('welcomeMessage');
+                    welcomeMsg.textContent = `Welcome back, ${adminName}!`;
+                }
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                document.getElementById('adminName').textContent = 'Admin';
+            }
+        }
+        
+        // Real-time date and time update
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format date: Monday, March 20, 2026
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', dateOptions);
+            
+            // Format time: 02:30:45 PM
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+        
+        // Update immediately and then every second
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        
+        // Show loading overlay
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        // Logout function
+        function logout() {
+            showLoading();
+            setTimeout(() => {
+                sessionStorage.removeItem('currentUser');
+                hideLoading();
+                alert('You have been logged out successfully!');
+                window.location.href = '../index.html';
+            }, 500);
+        }
+        
+        // Fleet button handler
+        function handleFleet() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                window.location.href="fleetDashboard.html";
+                // You can redirect to fleet page:
+                // window.location.href = 'fleet.html';
+            }, 500);
+        }
+        
+        // Trolley button handler
+        function handleTrolley() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                alert('Trolley Management section will open here\n\nThis feature is coming soon!');
+                // You can redirect to trolley page:
+                // window.location.href = 'trolley.html';
+            }, 500);
+        }
+        
+        // View Record button handler
+        function handleViewRecord() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                window.location.href = 'adminUsers.html';
+            }, 500);
+        }
+        
+        // Add touch feedback for mobile
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            btn.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+        
+        // Test Supabase connection
+        async function testConnection() {
+            try {
+                const { data, error } = await client.from('admin').select('count');
+                if (error) {
+                    console.warn('Supabase connection test:', error.message);
+                } else {
+                    console.log('Supabase connected successfully');
+                }
+            } catch (error) {
+                console.warn('Supabase connection error:', error.message);
+            }
+        }
+        
+        // Test connection on load
+        testConnection();
+    </script>
+</body>
+</html>

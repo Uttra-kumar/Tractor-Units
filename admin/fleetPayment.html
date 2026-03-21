@@ -581,7 +581,7 @@
             const total = data.length;
             const pending = data.filter(p => p.status === 'pending').length;
             const paid = data.filter(p => p.status === 'paid').length;
-            const totalAmount = data.reduce((sum, p) => sum + (p.total_balance || 0), 0);
+            const totalAmount = data.reduce((sum, p) => sum + (p.paid || 0), 0);
             
             document.getElementById('totalPayments').textContent = total;
             document.getElementById('pendingPayments').textContent = pending;

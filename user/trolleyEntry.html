@@ -462,7 +462,7 @@
                                 <th>Date</th>
                                 <th>Farmer</th>
                                 <th>Trolley Count</th>
-                                <th>Actions</th>
+            
                             </tr>
                         </thead>
                         <tbody id="recordsTableBody">
@@ -707,14 +707,6 @@
                         <td>${formattedDate}</td>
                         <td>${record.farmers?.name || record.name || 'Unknown'}</td>
                         <td>${record.trolley_count} trolleys</td>
-                        <td class="action-buttons">
-                            <button class="edit-btn" onclick="openEditModal(${record.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="delete-btn" onclick="deleteRecord(${record.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
                     </tr>
                 `;
             }).join('');

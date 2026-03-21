@@ -62,7 +62,7 @@
         <div class="main-content">
             <!-- Summary Cards -->
             <div class="summary-cards" id="summaryCards">
-                <div class="summary-card"><i class="fas fa-truck"></i><h3 id="totalTrips">0</h3><p>Total Trips</p></div>
+                <div class="summary-card"><i class="fas fa-truck"></i><h3 id="totalTrips">0</h3><p>Total Rows</p></div>
                 <div class="summary-card"><i class="fas fa-clock"></i><h3 id="totalTime">0 min</h3><p>Total Time</p></div>
                 <div class="summary-card"><i class="fas fa-rupee-sign"></i><h3 id="totalPaid">₹0</h3><p>Total Paid</p></div>
                 <div class="summary-card"><i class="fas fa-exclamation-triangle"></i><h3 id="totalDueAmount">₹0</h3><p>Outstanding Due</p></div>
@@ -183,7 +183,7 @@
                 }
                 
                 // Update section headers
-                document.getElementById('fleetTotal').textContent = `${totalTrips} Trips | ${Math.round(totalTime)} min`;
+                document.getElementById('fleetTotal').textContent = `${totalTrips} Rows | ${Math.round(totalTime)} min`;
                 document.getElementById('paymentTotal').innerHTML = `₹${totalPaid.toLocaleString()} paid | Due: ₹${finalDue.toLocaleString()}`;
                 
                 // Display fleet table

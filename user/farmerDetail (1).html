@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Farmer Details - Total Due Overview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 12px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; color: white; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .back-btn, .logout-btn { background: rgba(255, 255, 255, 0.2); border: none; padding: 8px 15px; border-radius: 25px; color: white; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+        .farmer-header { background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 15px; margin-top: 10px; }
+        .farmer-header h2 { font-size: 20px; margin-bottom: 5px; }
+        .farmer-header p { font-size: 13px; opacity: 0.9; }
+        .main-content { padding: 20px; }
+        
+        /* Summary Cards */
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .summary-card { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 15px; border-radius: 12px; text-align: center; transition: transform 0.2s; }
+        .summary-card:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
+        .summary-card i { font-size: 28px; margin-bottom: 8px; color: #4a5568; }
+        .summary-card h3 { font-size: 24px; font-weight: 700; color: #333; margin: 6px 0 4px; }
+        .summary-card p { font-size: 11px; color: #666; font-weight: 500; }
+        
+        /* Section Styles */
+        .section { background: white; border: 1px solid #e0e0e0; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .section-header { background: #f8f9fa; padding: 12px 15px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h3 { font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        .section-header .total { font-size: 14px; font-weight: 600; color: #667eea; background: #e9ecef; padding: 4px 12px; border-radius: 30px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f8f9fa; padding: 12px 10px; text-align: left; font-weight: 600; border-bottom: 1px solid #e0e0e0; color: #2d3748; }
+        td { padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #4a5568; font-weight: 500; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: capitalize; }
+        .status-approved, .status-paid { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-partial { background: #ffe0b5; color: #b45f06; }
+        .no-data { text-align: center; padding: 35px; color: #999; font-style: italic; }
+        .loading { text-align: center; padding: 40px; color: #667eea; }
+        .highlight-due { font-weight: 700; color: #dc3545; }
+        .zero-due { color: #28a745; }
+        @media (max-width: 768px) { th, td { font-size: 11px; padding: 8px 6px; } .summary-card h3 { font-size: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="top-bar">
+                <a href="farmerList.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to List</a>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+            <div class="farmer-header" id="farmerHeader">
+                <h2><i class="fas fa-user"></i> Loading...</h2>
+                <p><i class="fas fa-id-card"></i> Loading...</p>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Summary Cards -->
+            <div class="summary-cards" id="summaryCards">
+                <div class="summary-card"><i class="fas fa-truck"></i><h3 id="totalTrips">0</h3><p>Total Trips</p></div>
+                <div class="summary-card"><i class="fas fa-clock"></i><h3 id="totalTime">0 min</h3><p>Total Time</p></div>
+                <div class="summary-card"><i class="fas fa-rupee-sign"></i><h3 id="totalPaid">₹0</h3><p>Total Paid</p></div>
+                <div class="summary-card"><i class="fas fa-exclamation-triangle"></i><h3 id="totalDueAmount">₹0</h3><p>Outstanding Due</p></div>
+            </div>
+            
+            <!-- Fleet Section -->
+            <div class="section">
+                <div class="section-header"><h3><i class="fas fa-truck"></i> Fleet Records</h3><span class="total" id="fleetTotal"></span></div>
+                <div class="table-container"><table id="fleetTable"><thead><tr><th>#</th><th>Fleet ID</th><th>Time (min)</th><th>Status</th><th>Date</th></tr></thead><tbody id="fleetBody"><tr><td colspan="5" class="loading">Loading...<i class="fas fa-spinner fa-pulse"></i></td></tr></tbody></table></div>
+            </div>
+            
+            <!-- Payment Section -->
+            <div class="section">
+                <div class="section-header"><h3><i class="fas fa-rupee-sign"></i> Payment Records</h3><span class="total" id="paymentTotal"></span></div>
+                <div class="table-container"><table id="paymentTable"><thead><tr><th>#</th><th>Pay ID</th><th>Total Time</th><th>Total Balance</th><th>Paid</th><th>Due</th><th>Status</th><th>Date</th></tr></thead><tbody id="paymentBody"><tr><td colspan="8" class="loading">Loading...<i class="fas fa-spinner fa-pulse"></i></td></tr></tbody></table></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        const currentUser = sessionStorage.getItem('currentUser');
+        if (!currentUser) window.location.href = '../index.html';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const farmerId = urlParams.get('id');
+        
+        let fleetRecords = [];
+        let paymentRecords = [];
+        
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+        }
+        
+        // SMART DUE CALCULATION: Total Balance - Total Paid
+        // Yeh method sahi due calculate karega regardless of payment history
+        async function calculateSmartDue() {
+            // Get all trips (approved ones)
+            const { data: trips } = await client
+                .from('fleetentry')
+                .select('time')
+                .eq('farmer_id', farmerId)
+                .eq('status', 'approved');
+            
+            const totalTripTime = (trips || []).reduce((sum, t) => sum + (t.time || 0), 0);
+            const ratePerMinute = 10; // Default rate, aap change kar sakte ho
+            const totalTripValue = totalTripTime * ratePerMinute;
+            
+            // Get total paid
+            const { data: payments } = await client
+                .from('payments')
+                .select('paid')
+                .eq('farmer_id', farmerId);
+            
+            const totalPaid = (payments || []).reduce((sum, p) => sum + (p.paid || 0), 0);
+            
+            // Smart Due = Total Trip Value - Total Paid
+            const smartDue = totalTripValue - totalPaid;
+            
+            return { totalTripTime, totalTripValue, totalPaid, smartDue };
+        }
+        
+        async function loadFarmerData() {
+            if (!farmerId) { window.location.href = 'farmerList.html'; return; }
+            
+            try {
+                // Load farmer details
+                const { data: farmer } = await client.from('farmers').select('*').eq('id', farmerId).single();
+                if (farmer) {
+                    document.getElementById('farmerHeader').innerHTML = `
+                        <h2><i class="fas fa-user-circle"></i> ${escapeHtml(farmer.name)}</h2>
+                        <p><i class="fas fa-id-card"></i> ${escapeHtml(farmer.farmerid)} | <i class="fas fa-map-marker-alt"></i> ${escapeHtml(farmer.address || 'Address not provided')}</p>
+                    `;
+                }
+                
+                // Load fleet records
+                const { data: fleet } = await client
+                    .from('fleetentry')
+                    .select('*')
+                    .eq('farmer_id', farmerId)
+                    .order('created_at', { ascending: false });
+                fleetRecords = fleet || [];
+                
+                // Load payment records
+                const { data: payments } = await client
+                    .from('payments')
+                    .select('*')
+                    .eq('farmer_id', farmerId)
+                    .order('created_at', { ascending: false });
+                paymentRecords = payments || [];
+                
+                // Calculate SMART DUE
+                const { totalTripTime, totalTripValue, totalPaid, smartDue } = await calculateSmartDue();
+                
+                // Stats
+                const totalTrips = fleetRecords.length;
+                const totalTime = fleetRecords.reduce((sum, f) => sum + (f.time || 0), 0);
+                
+                // Update summary cards with SMART DUE
+                document.getElementById('totalTrips').textContent = totalTrips;
+                document.getElementById('totalTime').textContent = Math.round(totalTime) + ' min';
+                document.getElementById('totalPaid').innerHTML = '₹' + totalPaid.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+                
+                // SMART DUE - yehi real due hai
+                const finalDue = Math.max(0, smartDue);
+                document.getElementById('totalDueAmount').innerHTML = '₹' + finalDue.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+                
+                if (finalDue > 0) {
+                    document.getElementById('totalDueAmount').style.color = '#dc3545';
+                } else {
+                    document.getElementById('totalDueAmount').style.color = '#28a745';
+                }
+                
+                // Update section headers
+                document.getElementById('fleetTotal').textContent = `${totalTrips} Trips | ${Math.round(totalTime)} min`;
+                document.getElementById('paymentTotal').innerHTML = `₹${totalPaid.toLocaleString()} paid | Due: ₹${finalDue.toLocaleString()}`;
+                
+                // Display fleet table
+                const fleetBody = document.getElementById('fleetBody');
+                if (fleetRecords.length === 0) {
+                    fleetBody.innerHTML = '<tr><td colspan="5" class="no-data">No fleet records found</td></tr>';
+                } else {
+                    fleetBody.innerHTML = fleetRecords.map((f, idx) => `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td><strong>${escapeHtml(f.fleet_id) || '—'}</strong></td>
+                            <td>${f.time != null ? f.time + ' min' : '—'}</td>
+                            <td><span class="status-badge status-${(f.status || 'pending').toLowerCase()}">${escapeHtml(f.status || 'pending')}</span></td>
+                            <td>${formatDateTime(f.created_at)}</td>
+                        </tr>
+                    `).join('');
+                }
+                
+                // Display payment table
+                const paymentBody = document.getElementById('paymentBody');
+                if (paymentRecords.length === 0) {
+                    paymentBody.innerHTML = '<tr><td colspan="8" class="no-data">No payment records found</td></tr>';
+                } else {
+                    paymentBody.innerHTML = paymentRecords.map((p, idx) => {
+                        const dueAmount = parseFloat(p.due) || 0;
+                        return `
+                            <tr>
+                                <td>${idx + 1}</td>
+                                <td><strong>${escapeHtml(p.pay_id) || '—'}</strong></td>
+                                <td>${p.total_time != null ? p.total_time + ' min' : '—'}</td>
+                                <td>₹${(parseFloat(p.total_balance) || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                                <td>₹${(parseFloat(p.paid) || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                                <td>₹${dueAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                                <td><span class="status-badge status-${(p.status || 'pending').toLowerCase()}">${escapeHtml(p.status || 'pending')}</span></td>
+                                <td>${formatDateTime(p.created_at)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+                
+            } catch (err) {
+                console.error("Error:", err);
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = '../index.html';
+        }
+        
+        loadFarmerData();
+    </script>
+</body>
+</html>

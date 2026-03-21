@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Farmer Details</title>
+    <title>Farmer Details - Total Due Overview</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -90,22 +90,32 @@
             padding: 15px;
             border-radius: 12px;
             text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
         }
 
         .summary-card i {
             font-size: 28px;
             margin-bottom: 8px;
+            color: #4a5568;
         }
 
         .summary-card h3 {
             font-size: 24px;
             font-weight: 700;
             color: #333;
+            margin: 6px 0 4px;
         }
 
         .summary-card p {
             font-size: 11px;
             color: #666;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         /* Section Styles */
@@ -115,6 +125,7 @@
             border-radius: 16px;
             overflow: hidden;
             margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
         }
 
         .section-header {
@@ -137,6 +148,9 @@
             font-size: 14px;
             font-weight: 600;
             color: #667eea;
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 30px;
         }
 
         .table-container {
@@ -151,16 +165,18 @@
 
         th {
             background: #f8f9fa;
-            padding: 10px;
+            padding: 12px 10px;
             text-align: left;
             font-weight: 600;
             border-bottom: 1px solid #e0e0e0;
+            color: #2d3748;
         }
 
         td {
-            padding: 10px;
+            padding: 12px 10px;
             border-bottom: 1px solid #f0f0f0;
-            color: #666;
+            color: #4a5568;
+            font-weight: 500;
         }
 
         .status-badge {
@@ -169,6 +185,7 @@
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
+            text-transform: capitalize;
         }
 
         .status-approved, .status-paid {
@@ -180,23 +197,42 @@
             background: #fff3cd;
             color: #856404;
         }
+        
+        .status-partial {
+            background: #ffe0b5;
+            color: #b45f06;
+        }
 
         .no-data {
             text-align: center;
-            padding: 30px;
+            padding: 35px;
             color: #999;
+            font-style: italic;
         }
 
         .loading {
             text-align: center;
             padding: 40px;
+            color: #667eea;
         }
 
         @media (max-width: 768px) {
             th, td {
                 font-size: 11px;
-                padding: 8px;
+                padding: 8px 6px;
             }
+            .summary-card h3 {
+                font-size: 20px;
+            }
+            .section-header .total {
+                font-size: 11px;
+                padding: 3px 8px;
+            }
+        }
+        
+        .highlight-due {
+            font-weight: 700;
+            color: #dc3545;
         }
     </style>
 </head>
@@ -218,12 +254,12 @@
         </div>
         
         <div class="main-content">
-            <!-- Summary Cards -->
+            <!-- Summary Cards: Total Trips | Total Time | Total Paid | TOTAL DUE (replaced avg per trip) -->
             <div class="summary-cards" id="summaryCards">
                 <div class="summary-card">
                     <i class="fas fa-truck"></i>
                     <h3 id="totalTrips">0</h3>
-                    <p>Total Rows</p>
+                    <p>Total Rows (Trips)</p>
                 </div>
                 <div class="summary-card">
                     <i class="fas fa-clock"></i>
@@ -236,9 +272,9 @@
                     <p>Total Paid</p>
                 </div>
                 <div class="summary-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h3 id="avgPerTrip">₹0</h3>
-                    <p>Avg per Row</p>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3 id="totalDueAmount">₹0</h3>
+                    <p>Total Due</p>
                 </div>
             </div>
             
@@ -254,7 +290,7 @@
                             <tr><th>#</th><th>Fleet ID</th><th>Time (min)</th><th>Status</th><th>Date</th></tr>
                         </thead>
                         <tbody id="fleetBody">
-                            <tr><td colspan="5" class="loading">Loading...</td></tr>
+                            <tr><td colspan="5" class="loading">Loading...<i class="fas fa-spinner fa-pulse"></i></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -272,7 +308,7 @@
                             <tr><th>#</th><th>Pay ID</th><th>Total Time</th><th>Total Balance</th><th>Paid</th><th>Due</th><th>Status</th><th>Date</th></tr>
                         </thead>
                         <tbody id="paymentBody">
-                            <tr><td colspan="8" class="loading">Loading...</td></tr>
+                            <tr><td colspan="8" class="loading">Loading...<i class="fas fa-spinner fa-pulse"></i></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -282,6 +318,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Supabase configuration
         const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
         const client = supabase.createClient(supabaseUrl, supabaseKey);
@@ -299,109 +336,171 @@
         let fleetRecords = [];
         let paymentRecords = [];
         
-        // Format date
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
-        }
-        
-        // Format datetime
+        // Format date for display (DD/MM/YYYY HH:MM)
         function formatDateTime(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
             return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
         }
         
+        // Simple date only if needed (keeping consistency)
+        function formatDateOnly(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+        }
+        
+        // Calculate total due from payment records (sum of due amounts where status not fully paid? but due field is reliable)
+        // According to schema: payments table has 'due' column. Total due = sum of all 'due' values from all payment records.
+        // Even if a payment is fully paid, due will be 0, so summing is safe and reflects current pending amount.
+        // Also we can cross-check with total_balance minus total_paid if needed, but due column is authoritative.
+        function calculateTotalDue(payments) {
+            if (!payments || payments.length === 0) return 0;
+            return payments.reduce((totalDue, payment) => {
+                const dueAmount = parseFloat(payment.due) || 0;
+                return totalDue + dueAmount;
+            }, 0);
+        }
+        
+        // Enhanced stats: also compute overall due directly
         async function loadFarmerData() {
             if (!farmerId) {
                 window.location.href = 'farmerList.html';
                 return;
             }
             
-            // Load farmer details
-            const { data: farmer } = await client
-                .from('farmers')
-                .select('*')
-                .eq('id', farmerId)
-                .single();
-            
-            if (farmer) {
-                farmerData = farmer;
-                document.getElementById('farmerHeader').innerHTML = `
-                    <h2><i class="fas fa-user-circle"></i> ${farmer.name}</h2>
-                    <p><i class="fas fa-id-card"></i> ${farmer.farmerid} | <i class="fas fa-map-marker-alt"></i> ${farmer.address || 'Address not provided'}</p>
-                `;
+            try {
+                // Load farmer details
+                const { data: farmer, error: farmerError } = await client
+                    .from('farmers')
+                    .select('*')
+                    .eq('id', farmerId)
+                    .single();
+                
+                if (farmerError) throw farmerError;
+                
+                if (farmer) {
+                    farmerData = farmer;
+                    document.getElementById('farmerHeader').innerHTML = `
+                        <h2><i class="fas fa-user-circle"></i> ${escapeHtml(farmer.name)}</h2>
+                        <p><i class="fas fa-id-card"></i> ${escapeHtml(farmer.farmerid)} | <i class="fas fa-map-marker-alt"></i> ${escapeHtml(farmer.address || 'Address not provided')}</p>
+                    `;
+                }
+                
+                // Load fleet records (trips)
+                const { data: fleet, error: fleetError } = await client
+                    .from('fleetentry')
+                    .select('*')
+                    .eq('farmer_id', farmerId)
+                    .order('created_at', { ascending: false });
+                
+                if (fleetError) throw fleetError;
+                fleetRecords = fleet || [];
+                
+                // Load payment records
+                const { data: payments, error: paymentError } = await client
+                    .from('payments')
+                    .select('*')
+                    .eq('farmer_id', farmerId)
+                    .order('created_at', { ascending: false });
+                
+                if (paymentError) throw paymentError;
+                paymentRecords = payments || [];
+                
+                // ========== STATISTICS ==========
+                // 1. Total Trips (fleet rows)
+                const totalTrips = fleetRecords.length;
+                
+                // 2. Total Time (sum of 'time' from fleet records)
+                const totalTime = fleetRecords.reduce((sum, f) => sum + (parseFloat(f.time) || 0), 0);
+                
+                // 3. Total Paid (sum of paid amount from payments where status = paid OR sum of all paid column)
+                // Best practice: sum 'paid' column from all payment records regardless of status (since paid column holds actual amount paid)
+                const totalPaid = paymentRecords.reduce((sum, p) => sum + (parseFloat(p.paid) || 0), 0);
+                
+                // 4. TOTAL DUE: sum of 'due' column from all payment records (this is the key change vs average per trip)
+                const totalDue = calculateTotalDue(paymentRecords);
+                
+                // Also compute total outstanding due from total_balance perspective for extra clarity (optional consistency)
+                // But we stick to "due" field as per requirement.
+                
+                // Update summary cards
+                document.getElementById('totalTrips').textContent = totalTrips;
+                document.getElementById('totalTime').textContent = Math.round(totalTime) + ' min';
+                document.getElementById('totalPaid').innerHTML = '₹' + totalPaid.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+                document.getElementById('totalDueAmount').innerHTML = '₹' + totalDue.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+                
+                // Style total due card if large amount
+                if (totalDue > 0) {
+                    const dueCard = document.getElementById('totalDueAmount');
+                    dueCard.style.color = '#dc3545';
+                } else {
+                    document.getElementById('totalDueAmount').style.color = '#2c7a4d';
+                }
+                
+                // Update section headers with additional insights
+                document.getElementById('fleetTotal').textContent = `${totalTrips} Rows | ${Math.round(totalTime)} min`;
+                document.getElementById('paymentTotal').innerHTML = `₹${totalPaid.toLocaleString()} paid | Due: ₹${totalDue.toLocaleString()}`;
+                
+                // Display fleet table
+                const fleetBody = document.getElementById('fleetBody');
+                if (fleetRecords.length === 0) {
+                    fleetBody.innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-info-circle"></i> No fleet records found</td></tr>';
+                } else {
+                    fleetBody.innerHTML = fleetRecords.map((f, idx) => `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td><strong>${escapeHtml(f.fleet_id) || '—'}</strong></td>
+                            <td>${f.time != null ? f.time + ' min' : '—'}</td>
+                            <td><span class="status-badge status-${(f.status || 'pending').toLowerCase()}">${escapeHtml(f.status || 'pending')}</span></td>
+                            <td>${formatDateTime(f.created_at)}</td>
+                        </tr>
+                    `).join('');
+                }
+                
+                // Display payment table - highlight due if positive
+                const paymentBody = document.getElementById('paymentBody');
+                if (paymentRecords.length === 0) {
+                    paymentBody.innerHTML = '<tr><td colspan="8" class="no-data"><i class="fas fa-receipt"></i> No payment records found</td></tr>';
+                } else {
+                    paymentBody.innerHTML = paymentRecords.map((p, idx) => {
+                        const dueAmount = parseFloat(p.due) || 0;
+                        const dueClass = dueAmount > 0 ? 'highlight-due' : '';
+                        return `
+                            <tr>
+                                <td>${idx + 1}</td>
+                                <td><strong>${escapeHtml(p.pay_id) || '—'}</strong></td>
+                                <td>${p.total_time != null ? p.total_time + ' min' : '—'}</td>
+                                <td>₹${(parseFloat(p.total_balance) || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                                <td>₹${(parseFloat(p.paid) || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                                <td class="${dueClass}">₹${dueAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                                <td><span class="status-badge status-${(p.status || 'pending').toLowerCase()}">${escapeHtml(p.status || 'pending')}</span></td>
+                                <td>${formatDateTime(p.created_at)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+                
+            } catch (err) {
+                console.error("Error loading farmer data:", err);
+                // Show user-friendly error inside containers
+                document.getElementById('farmerHeader').innerHTML = `<h2><i class="fas fa-exclamation-triangle"></i> Error</h2><p>Failed to load farmer details. Please try again.</p>`;
+                document.getElementById('fleetBody').innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-database"></i> Could not fetch fleet data</td></tr>';
+                document.getElementById('paymentBody').innerHTML = '<tr><td colspan="8" class="no-data"><i class="fas fa-database"></i> Could not fetch payment data</td></tr>';
             }
-            
-            // Load fleet records
-            const { data: fleet } = await client
-                .from('fleetentry')
-                .select('*')
-                .eq('farmer_id', farmerId)
-                .order('created_at', { ascending: false });
-            
-            fleetRecords = fleet || [];
-            
-            // Load payment records
-            const { data: payments } = await client
-                .from('payments')
-                .select('*')
-                .eq('farmer_id', farmerId)
-                .order('created_at', { ascending: false });
-            
-            paymentRecords = payments || [];
-            
-            // Calculate stats
-            const totalTrips = fleetRecords.length;
-            const totalTime = fleetRecords.reduce((sum, f) => sum + (f.time || 0), 0);
-            const totalPaid = paymentRecords
-                .filter(p => p.status === 'paid')
-                .reduce((sum, p) => sum + (p.paid || 0), 0);
-            const avgPerTrip = totalTrips > 0 ? totalPaid / totalTrips : 0;
-            
-            // Update summary cards
-            document.getElementById('totalTrips').textContent = totalTrips;
-            document.getElementById('totalTime').textContent = totalTime + ' min';
-            document.getElementById('totalPaid').textContent = '₹' + totalPaid.toLocaleString();
-            document.getElementById('avgPerTrip').textContent = '₹' + avgPerTrip.toFixed(2);
-            document.getElementById('fleetTotal').textContent = `${totalTrips} Rows | ${totalTime} min`;
-            document.getElementById('paymentTotal').textContent = `₹${totalPaid.toLocaleString()} paid`;
-            
-            // Display fleet table
-            const fleetBody = document.getElementById('fleetBody');
-            if (fleetRecords.length === 0) {
-                fleetBody.innerHTML = '<tr><td colspan="5" class="no-data">No fleet records found</td></tr>';
-            } else {
-                fleetBody.innerHTML = fleetRecords.map((f, idx) => `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td>${f.fleet_id}</td>
-                        <td>${f.time} min</td>
-                        <td><span class="status-badge status-${f.status}">${f.status || 'pending'}</span></td>
-                        <td>${formatDateTime(f.created_at)}</td>
-                    </tr>
-                `).join('');
-            }
-            
-            // Display payment table
-            const paymentBody = document.getElementById('paymentBody');
-            if (paymentRecords.length === 0) {
-                paymentBody.innerHTML = '<tr><td colspan="8" class="no-data">No payment records found</td></tr>';
-            } else {
-                paymentBody.innerHTML = paymentRecords.map((p, idx) => `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td><strong>${p.pay_id}</strong></td>
-                        <td>${p.total_time} min</td>
-                        <td>₹${p.total_balance}</td>
-                        <td>₹${p.paid}</td>
-                        <td>₹${p.due}</td>
-                        <td><span class="status-badge status-${p.status}">${p.status}</span></td>
-                        <td>${formatDateTime(p.created_at)}</td>
-                    </tr>
-                `).join('');
-            }
+        }
+        
+        // Helper to prevent XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+                return c;
+            });
         }
         
         function logout() {
@@ -409,6 +508,8 @@
             window.location.href = '../index.html';
         }
         
+        // Add tiny manual refresh feature? but not needed, loads on page load.
+        // Additionally, if user wants to see realtime, but we keep it simple.
         loadFarmerData();
     </script>
 </body>

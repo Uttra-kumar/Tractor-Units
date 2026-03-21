@@ -495,7 +495,16 @@
                     <button class="action-btn record-btn" onclick="handleViewRecord()">
                         <div class="btn-left">
                             <i class="fas fa-history"></i>
-                            <span>View Record</span>
+                            <span>View Fleet Record</span>
+                        </div>
+                        <div class="btn-right">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </button>
+                    <button class="action-btn record-btn" onclick="handleTViewRecord()">
+                        <div class="btn-left">
+                            <i class="fas fa-history"></i>
+                            <span>View Trolley Record</span>
                         </div>
                         <div class="btn-right">
                             <i class="fas fa-arrow-right"></i>
@@ -617,9 +626,8 @@
             showLoading();
             setTimeout(() => {
                 hideLoading();
-                alert('Trolley Management section will open here\n\nThis feature is coming soon!');
                 // You can redirect to trolley page:
-                // window.location.href = 'trolley.html';
+             window.location.href = 'trolleyEntry.html';
             }, 500);
         }
         
@@ -632,7 +640,14 @@
                  window.location.href = 'farmerList.html';
             }, 500);
         }
-        
+        function handleTViewRecord() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                // You can redirect to records page:
+                 window.location.href = 'trolleyFarmersList.html';
+            }, 500);
+        }
         // Add touch feedback for mobile
         document.querySelectorAll('.action-btn').forEach(btn => {
             btn.addEventListener('touchstart', function() {

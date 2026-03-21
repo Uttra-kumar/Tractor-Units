@@ -223,7 +223,7 @@
                 <div class="summary-card">
                     <i class="fas fa-truck"></i>
                     <h3 id="totalTrips">0</h3>
-                    <p>Total Trips</p>
+                    <p>Total Rows</p>
                 </div>
                 <div class="summary-card">
                     <i class="fas fa-clock"></i>
@@ -238,7 +238,7 @@
                 <div class="summary-card">
                     <i class="fas fa-chart-line"></i>
                     <h3 id="avgPerTrip">₹0</h3>
-                    <p>Avg per Trip</p>
+                    <p>Avg per Row</p>
                 </div>
             </div>
             
@@ -365,7 +365,7 @@
             document.getElementById('totalTime').textContent = totalTime + ' min';
             document.getElementById('totalPaid').textContent = '₹' + totalPaid.toLocaleString();
             document.getElementById('avgPerTrip').textContent = '₹' + avgPerTrip.toFixed(2);
-            document.getElementById('fleetTotal').textContent = `${totalTrips} trips | ${totalTime} min`;
+            document.getElementById('fleetTotal').textContent = `${totalTrips} Rows | ${totalTime} min`;
             document.getElementById('paymentTotal').textContent = `₹${totalPaid.toLocaleString()} paid`;
             
             // Display fleet table

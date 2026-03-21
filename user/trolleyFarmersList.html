@@ -310,7 +310,7 @@
     <div class="container">
         <div class="header">
             <div class="top-bar">
-                <a href="trolleyDashboard.html" class="back-btn">
+                <a href="dashboard.html" class="back-btn">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
                 <button class="logout-btn" onclick="logout()">
@@ -367,7 +367,7 @@
         
         const currentUser = sessionStorage.getItem('currentUser');
         if (!currentUser) {
-            window.location.href = '../../index.html';
+            window.location.href = '../index.html';
         } else {
             const user = JSON.parse(currentUser);
             document.getElementById('userName').textContent = user.username || user.id || 'Admin';
@@ -533,7 +533,7 @@
         
         function logout() {
             sessionStorage.removeItem('currentUser');
-            window.location.href = '../../index.html';
+            window.location.href = '../index.html';
         }
         
         loadFarmers();

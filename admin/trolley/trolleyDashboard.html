@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>F Dashboard - Admin</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            color: white;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .back-btn, .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 25px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover, .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.98);
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 12px;
+            border-radius: 15px;
+        }
+
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-welcome i {
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px;
+            border-radius: 50%;
+        }
+
+        .user-text h4 {
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .user-text h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .datetime-center {
+            text-align: center;
+        }
+
+        .date {
+            font-size: 10px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .time {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .main-content {
+            padding: 20px 15px;
+        }
+
+        /* Button Grid Layout */
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .button-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .button-row-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .dashboard-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .dashboard-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-content i {
+            font-size: 24px;
+            width: 32px;
+        }
+
+        .btn-content span {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn-arrow {
+            color: #999;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-btn:hover .btn-arrow {
+            transform: translateX(5px);
+            color: #667eea;
+        }
+
+        /* Row 1 - trolley Entry & Farmer */
+        .row1 .fleet-entry {
+            border-left: 4px solid #4a90e2;
+        }
+        .row1 .fleet-entry i { color: #4a90e2; }
+        
+        .row1 .farmer {
+            border-left: 4px solid #2ecc71;
+        }
+        .row1 .farmer i { color: #2ecc71; }
+
+        /* Row 2 - Data Entry & Payment */
+        .row2 .data-entry {
+            border-left: 4px solid #f39c12;
+        }
+        .row2 .data-entry i { color: #f39c12; }
+        
+        .row2 .payment {
+            border-left: 4px solid #e74c3c;
+        }
+        .row2 .payment i { color: #e74c3c; }
+
+        /* Row 3 - Collection & Filter */
+        .row3 .collection {
+            border-left: 4px solid #9b59b6;
+        }
+        .row3 .collection i { color: #9b59b6; }
+        
+        .row3 .filter {
+            border-left: 4px solid #3498db;
+        }
+        .row3 .filter i { color: #3498db; }
+
+        /* Row 4 - Diesel & View */
+        .row4 .diesel {
+            border-left: 4px solid #1abc9c;
+        }
+        .row4 .diesel i { color: #1abc9c; }
+        
+        .row4 .view {
+            border-left: 4px solid #e67e22;
+        }
+        .row4 .view i { color: #e67e22; }
+
+        /* Row 5 - MIS (2 column span) */
+        .row5 {
+            grid-template-columns: 1fr;
+        }
+        .mis {
+            border-left: 4px solid #34495e;
+            
+        }
+    
+        .mis i { color: #34495e; }
+
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer p {
+            color: #666;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .footer i {
+            color: #667eea;
+        }
+
+        @media (max-width: 500px) {
+            .button-row {
+                gap: 10px;
+            }
+            
+            .dashboard-btn {
+                padding: 12px 14px;
+            }
+            
+            .btn-content i {
+                font-size: 20px;
+                width: 28px;
+            }
+            
+            .btn-content span {
+                font-size: 13px;
+            }
+            
+            .info-bar {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="top-bar">
+                <a href="../dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+            
+            <div class="info-bar">
+                <div class="user-welcome">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <div class="user-text">
+                        <h4>Trolley Dashboard</h4>
+                        <h3 id="userName">Loading...</h3>
+                    </div>
+                </div>
+                
+                <div class="datetime-center">
+                    <div class="date">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span id="currentDate">Loading...</span>
+                    </div>
+                    <div class="time">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTime">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="dashboard-grid">
+                <!-- Row 1: Fleet Entry & Farmer -->
+                <div class="button-row row1">
+                    <a href="trolleyEntry.html" class="dashboard-btn fleet-entry">
+                        <div class="btn-content">
+                            <i class="fas fa-truck"></i>
+                            <span>Trolley Entry</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="trolleyFarmers.html" class="dashboard-btn farmer">
+                        <div class="btn-content">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Farmer</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Row 2: Data Entry & Payment -->
+                <div class="button-row row2">
+                    <a href="trolleyDataEntry.html" class="dashboard-btn data-entry">
+                        <div class="btn-content">
+                            <i class="fas fa-database"></i>
+                            <span>Data Entry</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="trolleyPayment.html" class="dashboard-btn payment">
+                        <div class="btn-content">
+                            <i class="fas fa-rupee-sign"></i>
+                            <span>Payment</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Row 3: Collection & Filter -->
+                <div class="button-row row3">
+                    <a href="trolleyFarmerCards.html" class="dashboard-btn collection">
+                        <div class="btn-content">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span>Collection</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="trolleyFilter.html" class="dashboard-btn filter">
+                        <div class="btn-content">
+                            <i class="fas fa-filter"></i>
+                            <span>Filter</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Row 4: Diesel & View -->
+                <div class="button-row row4">
+                    <a href="trolleyDiesal.html" class="dashboard-btn diesel">
+                        <div class="btn-content">
+                            <i class="fas fa-gas-pump"></i>
+                            <span>Diesel</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="trolleyFarmersList.html" class="dashboard-btn view">
+                        <div class="btn-content">
+                            <i class="fas fa-eye"></i>
+                            <span>View</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Row 5: MIS (Full Width) -->
+                <div class="button-row row4">
+                    <a href="trolleyMIS.html" class="dashboard-btn mis">
+                        <div class="btn-content">
+                            <i class="fas fa-chart-line"></i>
+                            <span>MIS Report</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    <a href="trolleyMaintain.html" class="dashboard-btn maintain">
+                        <div class="btn-content">
+                            <i class="fas fa-tools"></i>
+                            <span>Maintenance</span>
+                        </div>
+                        <div class="btn-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>
+                <i class="fas fa-shield-alt"></i>
+                Trolley Management System | Admin Access
+            </p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Check auth
+        const currentUser = sessionStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = '../../index.html';
+        } else {
+            const user = JSON.parse(currentUser);
+            document.getElementById('userName').textContent = user.username || user.id || 'Admin';
+            
+            // Check if admin
+            if (user.role !== 'admin') {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = '../user/dashboard.html';
+            }
+        }
+        
+        // Date time
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' 
+            });
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+            });
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                alert('Logged out successfully!');
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>

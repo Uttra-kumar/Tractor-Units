@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Farmer Payment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 12px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; color: white; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .back-btn, .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 15px; border-radius: 25px; color: white; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; font-size: 13px; }
+        .info-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.15); padding: 10px 12px; border-radius: 15px; }
+        .user-welcome { display: flex; align-items: center; gap: 8px; }
+        .datetime-center { text-align: center; }
+        .main-content { padding: 20px; }
+        
+        /* Cards */
+        .card { background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
+        .card-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #333; display: flex; align-items: center; gap: 8px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-size: 12px; font-weight: 500; color: #666; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
+        .form-group input[readonly] { background: #e9ecef; }
+        .save-btn { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; font-size: 16px; }
+        
+        /* Due Alert */
+        .due-alert { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 15px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .due-alert i { color: #856404; font-size: 18px; }
+        .due-alert p { color: #856404; font-size: 13px; flex: 1; }
+        .due-alert button { background: #ffc107; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; }
+        
+        /* Table */
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid #e0e0e0; max-height: 400px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #f8f9fa; position: sticky; top: 0; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; }
+        .status-paid { background: #d4edda; color: #155724; }
+        .status-partial { background: #fff3cd; color: #856404; }
+        .status-pending { background: #f8d7da; color: #721c24; }
+        .section-title { display: flex; align-items: center; gap: 8px; margin: 20px 0 10px; }
+        @media (max-width: 768px) { .info-bar { flex-direction: column; gap: 8px; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="top-bar">
+                <a href="farmerCard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+            <div class="info-bar">
+                <div class="user-welcome"><i class="fas fa-user"></i><div><h4>Payment</h4><h3 id="userName">Loading...</h3></div></div>
+                <div class="datetime-center"><div class="date"><i class="fas fa-calendar-alt"></i><span id="currentDate"></span></div><div class="time"><i class="fas fa-clock"></i><span id="currentTime"></span></div></div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Due Alert -->
+            <div id="dueAlert" class="due-alert" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p id="dueMessage"></p>
+                <button onclick="fillDue()">Use Due Amount</button>
+            </div>
+            
+            <!-- Card 1: Time & Rate Calculation -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-clock"></i> Time & Rate Calculation</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Total Time (Minutes)</label><input type="text" id="totalTime" readonly></div>
+                    <div class="form-group"><label>Rate per Minute (₹)</label><input type="number" id="ratePerMinute" value="10" step="0.5" oninput="calculateTotal()"></div>
+                    <div class="form-group"><label>Calculated Amount (₹)</label><input type="text" id="calculatedAmount" readonly></div>
+                </div>
+                <div class="form-group"><label><i class="fas fa-info-circle"></i> Note: This is from approved trips (unpaid)</label></div>
+            </div>
+            
+            <!-- Card 2: Payment Entry -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-rupee-sign"></i> Payment Entry</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Total Balance (₹)</label><input type="number" id="totalBalance" placeholder="Enter total balance" oninput="calculateDue()"></div>
+                    <div class="form-group"><label>Paid Amount (₹)</label><input type="number" id="paidAmount" placeholder="Enter paid amount" oninput="calculateDue()"></div>
+                    <div class="form-group"><label>Discount (₹)</label><input type="number" id="discount" value="0" oninput="calculateDue()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Due Amount (₹)</label><input type="text" id="dueAmount" readonly></div>
+                    <div class="form-group"><label>Payment Mode</label><select id="paymentMode"><option value="cash">Cash</option><option value="upi">UPI</option></select></div>
+                </div>
+                <button class="save-btn" onclick="savePayment()"><i class="fas fa-save"></i> Save Payment</button>
+            </div>
+            
+            <!-- Payment History -->
+            <div class="section-title"><i class="fas fa-history"></i> Payment History</div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>#</th><th>Pay ID</th><th>Total Balance</th><th>Paid</th><th>Discount</th><th>Due</th><th>Mode</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody id="paymentHistory"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const farmerId = urlParams.get('farmerId');
+        let farmerData = null;
+        let lastDue = 0;
+        
+        // Date time
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        }
+        updateDateTime(); setInterval(updateDateTime, 1000);
+        
+        // Get pending time from approved & unpaid trips
+        async function getPendingTime() {
+            const { data } = await client.from('fleetentry').select('time').eq('farmer_id', farmerId).eq('status', 'approved').eq('payment_status', 'unpaid');
+            const totalTime = (data || []).reduce((sum, t) => sum + t.time, 0);
+            document.getElementById('totalTime').value = totalTime;
+            return totalTime;
+        }
+        
+        // Get last due from payments
+        async function getLastDue() {
+            const { data } = await client.from('payments').select('due').eq('farmer_id', farmerId).order('created_at', { ascending: false }).limit(1);
+            if (data && data.length > 0 && data[0].due > 0) {
+                lastDue = data[0].due;
+                document.getElementById('dueAlert').style.display = 'flex';
+                document.getElementById('dueMessage').innerHTML = `Last payment has due of ₹${lastDue}. Click "Use Due Amount" to add to total balance.`;
+            } else {
+                document.getElementById('dueAlert').style.display = 'none';
+                lastDue = 0;
+            }
+            return lastDue;
+        }
+        
+        // Calculate total amount
+        function calculateTotal() {
+            const time = parseFloat(document.getElementById('totalTime').value) || 0;
+            const rate = parseFloat(document.getElementById('ratePerMinute').value) || 0;
+            const calculated = time * rate;
+            document.getElementById('calculatedAmount').value = '₹' + calculated.toFixed(2);
+        }
+        
+        // Calculate due
+        function calculateDue() {
+            const totalBalance = parseFloat(document.getElementById('totalBalance').value) || 0;
+            const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const due = totalBalance - paid - discount;
+            document.getElementById('dueAmount').value = due.toFixed(2);
+        }
+        
+        // Fill due amount to total balance
+        function fillDue() {
+            document.getElementById('totalBalance').value = lastDue;
+            calculateDue();
+        }
+        
+        // Generate Pay ID
+        async function generatePayId() {
+            const { data } = await client.from('payments').select('pay_id').order('id', { ascending: false }).limit(1);
+            if (data && data.length > 0) {
+                const lastNum = parseInt(data[0].pay_id.replace('PAY', ''));
+                return `PAY${String(lastNum + 1).padStart(5, '0')}`;
+            }
+            return 'PAY00001';
+        }
+        
+        // Save payment
+        async function savePayment() {
+            const totalBalance = parseFloat(document.getElementById('totalBalance').value);
+            const paid = parseFloat(document.getElementById('paidAmount').value);
+            const discount = parseFloat(document.getElementById('discount').value);
+            const mode = document.getElementById('paymentMode').value;
+            
+            if (!totalBalance || totalBalance <= 0) {
+                alert('Please enter total balance');
+                return;
+            }
+            if (!paid || paid <= 0) {
+                alert('Please enter paid amount');
+                return;
+            }
+            if (paid > totalBalance) {
+                alert('Paid amount cannot exceed total balance');
+                return;
+            }
+            
+            const due = totalBalance - paid - discount;
+            const status = due === 0 ? 'paid' : (due < totalBalance ? 'partial' : 'pending');
+            const payId = await generatePayId();
+            
+            const { error } = await client.from('payments').insert([{
+                pay_id: payId,
+                farmer_id: parseInt(farmerId),
+                name: farmerData?.name || 'Unknown',
+                total_time: parseFloat(document.getElementById('totalTime').value) || 0,
+                total_balance: totalBalance,
+                paid: paid,
+                discount: discount,
+                due: due,
+                mode: mode,
+                status: status,
+                created_at: new Date().toISOString()
+            }]);
+            
+            if (error) {
+                alert('Error: ' + error.message);
+                return;
+            }
+            
+            // If full payment, mark trips as paid
+            if (due === 0) {
+                const { data: trips } = await client.from('fleetentry').select('id').eq('farmer_id', farmerId).eq('status', 'approved').eq('payment_status', 'unpaid');
+                for (let trip of trips || []) {
+                    await client.from('fleetentry').update({ payment_status: 'paid' }).eq('id', trip.id);
+                }
+            }
+            
+            alert('Payment saved successfully!');
+            document.getElementById('totalBalance').value = '';
+            document.getElementById('paidAmount').value = '';
+            document.getElementById('discount').value = '0';
+            document.getElementById('dueAmount').value = '';
+            
+            await loadData();
+            await loadPaymentHistory();
+        }
+        
+        // Load payment history
+        async function loadPaymentHistory() {
+            const { data } = await client.from('payments').select('*').eq('farmer_id', farmerId).order('created_at', { ascending: false });
+            const tbody = document.getElementById('paymentHistory');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '.<td colspan="9" style="text-align:center">No payment records</td>';
+                return;
+            }
+            tbody.innerHTML = data.map((p, idx) => `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><strong>${p.pay_id}</strong></td>
+                    <td>₹${p.total_balance}</td>
+                    <td>₹${p.paid}</td>
+                    <td>₹${p.discount}</td>
+                    <td>₹${p.due}</td>
+                    <td>${p.mode?.toUpperCase() || 'CASH'}</td>
+                    <td><span class="status-badge status-${p.status}">${p.status}</span></td>
+                    <td>${new Date(p.created_at).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load farmer
+        async function loadFarmer() {
+            const { data } = await client.from('farmers').select('*').eq('id', farmerId).single();
+            if (data) {
+                farmerData = data;
+                document.getElementById('userName').textContent = data.name;
+            }
+        }
+        
+        async function loadData() {
+            await getPendingTime();
+            calculateTotal();
+            await getLastDue();
+        }
+        
+        function logout() { sessionStorage.removeItem('currentUser'); window.location.href = '../index.html'; }
+        
+        loadFarmer();
+        loadData();
+        loadPaymentHistory();
+    </script>
+</body>
+</html>

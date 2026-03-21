@@ -200,7 +200,7 @@
             }
             
             const due = totalBalance - paid - discount;
-            const status = due === 0 ? 'paid' : (due < totalBalance ? 'partial' : 'pending');
+            const status = due === 0 ? 'paid' : (due < totalBalance ? 'due' : 'pending');
             const payId = await generatePayId();
             
             const { error } = await client.from('payments').insert([{

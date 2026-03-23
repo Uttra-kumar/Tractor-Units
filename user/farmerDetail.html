@@ -114,7 +114,7 @@
                 .eq('status', 'approved');
             
             const totalTripTime = (trips || []).reduce((sum, t) => sum + (t.time || 0), 0);
-            const ratePerMinute = 10; // Default rate, aap change kar sakte ho
+            const ratePerMinute = 15; // Default rate, aap change kar sakte ho
             const totalTripValue = totalTripTime * ratePerMinute;
             
             // Get total paid

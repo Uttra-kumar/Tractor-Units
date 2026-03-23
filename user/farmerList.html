@@ -368,7 +368,7 @@
                         .from('payments')
                         .select('paid')
                         .eq('farmer_id', farmer.id)
-                        .eq('status', 'paid');
+                        .eq('status', 'due');
                     
                     const totalPaid = (payments || []).reduce((sum, p) => sum + (p.paid || 0), 0);
                     

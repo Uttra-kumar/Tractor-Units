@@ -173,7 +173,7 @@
                 document.getElementById('totalPaid').innerHTML = '₹' + totalPaid.toLocaleString('en-IN', { maximumFractionDigits: 2 });
                 
                 // SMART DUE - yehi real due hai
-                const finalDue = Math.max(0, smartDue);
+                const finalDue = Math.max(0, smartDue) - discount;
                 document.getElementById('totalDueAmount').innerHTML = '₹' + finalDue.toLocaleString('en-IN', { maximumFractionDigits: 2 });
                 
                 if (finalDue > 0) {

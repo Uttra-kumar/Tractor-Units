@@ -451,8 +451,8 @@
         </div>
 
         <div class="action-grid">
-            <button class="primary-action add-farmer-action" id="openFarmerBtn"><i class="fas fa-user-plus"></i> <span>? Add Farmer</span></button>
-            <button class="primary-action add-record-action" id="openRecordBtn"><i class="fas fa-clipboard-list"></i> <span>?? Add Fleet Record</span></button>
+            <button class="primary-action add-farmer-action" id="openFarmerBtn"><i class="fas fa-user-plus"></i> <span> Add Farmer</span></button>
+            <button class="primary-action add-record-action" id="openRecordBtn"><i class="fas fa-clipboard-list"></i> <span>Add Fleet Record</span></button>
         </div>
 
         <div class="records-panel">
@@ -525,7 +525,7 @@
 <script>
     // ---------- SUPABASE ----------
     const SUPABASE_URL = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EE9ZJizQ6w';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     // Auth guard
@@ -642,8 +642,7 @@
                     <td><i class="fas fa-user-check"></i> ${escapeHtml(rec.farmerName)}</td>
                     <td><span class="badge-time"><i class="far fa-clock"></i> ${rec.time} min</span></td>
                     <td class="row-actions">
-                        <button class="icon-btn edit-icon" onclick="openEditRecord('${rec.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="icon-btn delete-icon" onclick="deleteRecordById('${rec.id}')"><i class="fas fa-trash-alt"></i></button>
+                      
                     </td>
                 </tr>
             `;
@@ -809,7 +808,7 @@
     };
     window.logoutUser = () => { sessionStorage.removeItem('currentUser'); alert('Logged out'); window.location.href = '../index.html'; };
     
-    // init
+    // // init
     (async () => {
         await refreshFarmerDropdowns();
         await fetchAllFleetRecords();

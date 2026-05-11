@@ -451,8 +451,8 @@
         </div>
 
         <div class="action-grid">
-            <button class="primary-action add-farmer-action" id="openFarmerBtn"><i class="fas fa-user-plus"></i> <span>➕ Add Farmer</span></button>
-            <button class="primary-action add-record-action" id="openRecordBtn"><i class="fas fa-clipboard-list"></i> <span>📋 Add Fleet Record</span></button>
+            <button class="primary-action add-farmer-action" id="openFarmerBtn"><i class="fas fa-user-plus"></i> <span>? Add Farmer</span></button>
+            <button class="primary-action add-record-action" id="openRecordBtn"><i class="fas fa-clipboard-list"></i> <span>?? Add Fleet Record</span></button>
         </div>
 
         <div class="records-panel">
@@ -526,7 +526,7 @@
     // ---------- SUPABASE ----------
     const SUPABASE_URL = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EE9ZJizQ6w';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     // Auth guard
     const sessionUser = sessionStorage.getItem('currentUser');
@@ -539,7 +539,7 @@
     // ----- Global state -----
     let allFleetRecords = [];     // full dataset from DB
     let currentPage = 1;
-    const LIMIT_PER_PAGE = 6;     // ✅ Exactly 6 per page, latest first
+    const LIMIT_PER_PAGE = 6;     // ? Exactly 6 per page, latest first
     
     // ----- Helper: unique fleet ID generation -----
     async function generateUniqueFleetId() {
@@ -548,7 +548,7 @@
         while (!unique) {
             const randomPart = Math.floor(10000 + Math.random() * 90000);
             newId = `FLT${randomPart}`;
-            const { data, error } = await supabase.from('fleetentry').select('fleet_id').eq('fleet_id', newId);
+            const { data, error } = await client.from('fleetentry').select('fleet_id').eq('fleet_id', newId);
             if (error) console.error(error);
             if (!data || data.length === 0) unique = true;
         }
@@ -557,7 +557,7 @@
     
     // ----- load farmers for dropdowns (global)-----
     async function loadFarmersList() {
-        const { data, error } = await supabase.from('farmers').select('id, name').order('name');
+        const { data, error } = await client.from('farmers').select('id, name').order('name');
         if (error) return [];
         return data || [];
     }
@@ -583,7 +583,7 @@
     // ----- Fetch fleet records (latest first, full dataset for client-side pagination) -----
     async function fetchAllFleetRecords() {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await client
                 .from('fleetentry')
                 .select(`
                     id,
@@ -610,7 +610,7 @@
             renderTableByPage();
         } catch (err) {
             console.error(err);
-            document.getElementById('recordsTbody').innerHTML = `<tr><td colspan="5" class="empty-row">⚠️ Failed to load records</td></tr>`;
+            document.getElementById('recordsTbody').innerHTML = `<tr><td colspan="5" class="empty-row">?? Failed to load records</td></tr>`;
         }
     }
     
@@ -680,13 +680,13 @@
         if (!name) return alert('Farmer name required');
         const address = document.getElementById('farmerAddressInput').value;
         // generate farmerid like FARM001, FARM002 ...
-        const { data: lastFarmer } = await supabase.from('farmers').select('farmerid').order('id', { ascending: false }).limit(1);
+        const { data: lastFarmer } = await client.from('farmers').select('farmerid').order('id', { ascending: false }).limit(1);
         let newFarmerId = 'FARM001';
         if (lastFarmer && lastFarmer.length > 0) {
             const lastNum = parseInt(lastFarmer[0].farmerid.replace('FARM','')) || 0;
             newFarmerId = `FARM${String(lastNum + 1).padStart(3,'0')}`;
         }
-        const { error } = await supabase.from('farmers').insert([{
+        const { error } = await client.from('farmers').insert([{
             farmerid: newFarmerId,
             name: name,
             address: address || '',
@@ -706,9 +706,9 @@
         const timeVal = document.getElementById('recordMinutes').value;
         if (!farmerId || !timeVal) return alert('Select farmer and enter minutes');
         // get farmer name
-        const { data: farmerData } = await supabase.from('farmers').select('name').eq('id', farmerId).single();
+        const { data: farmerData } = await client.from('farmers').select('name').eq('id', farmerId).single();
         const fleetId = await generateUniqueFleetId();
-        const { error } = await supabase.from('fleetentry').insert([{
+        const { error } = await client.from('fleetentry').insert([{
             fleet_id: fleetId,
             farmer_id: parseInt(farmerId),
             name: farmerData?.name || 'Farmer',
@@ -743,8 +743,8 @@
         const farmerId = document.getElementById('editFarmerSelect').value;
         const minutes = document.getElementById('editMinutesInput').value;
         if (!farmerId || !minutes) return alert('All fields required');
-        const { data: farmer } = await supabase.from('farmers').select('name').eq('id', farmerId).single();
-        const { error } = await supabase.from('fleetentry').update({
+        const { data: farmer } = await client.from('farmers').select('name').eq('id', farmerId).single();
+        const { error } = await client.from('fleetentry').update({
             farmer_id: parseInt(farmerId),
             name: farmer?.name,
             time: parseInt(minutes)
@@ -757,7 +757,7 @@
     
     window.deleteRecordById = async (id) => {
         if (!confirm('Permanently delete this fleet entry?')) return;
-        const { error } = await supabase.from('fleetentry').delete().eq('id', id);
+        const { error } = await client.from('fleetentry').delete().eq('id', id);
         if (error) return alert('Delete failed: ' + error.message);
         await fetchAllFleetRecords();
     };

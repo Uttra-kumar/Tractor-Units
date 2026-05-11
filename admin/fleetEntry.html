@@ -3,289 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Fleet Entry</title>
+    <title>Fleet Entry | Smart Fleet Manager</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(145deg, #eef2f9 0%, #e2e8f0 100%);
             min-height: 100vh;
-            padding: 12px;
+            padding: 20px 16px;
         }
 
-        .container {
-            max-width: 1000px;
+        .glass-container {
+            max-width: 1280px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
+        }
+
+        /* main card */
+        .fleet-card {
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(2px);
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.05);
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            animation: slideUp 0.3s ease;
+            transition: all 0.2s ease;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 15px;
+        .header-gradient {
+            background: linear-gradient(105deg, #0f2b3d 0%, #1b4a6e 100%);
+            padding: 1.2rem 1.8rem;
             color: white;
         }
 
-        .top-bar {
+        .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            gap: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .back-btn, .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 25px;
+        .nav-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 18px;
+            border-radius: 60px;
             color: white;
-            font-size: 13px;
             font-weight: 500;
+            font-size: 0.85rem;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.28);
+            transform: translateY(-1px);
+        }
+
+        .info-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 12px 20px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .user-greeting {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-icon {
+            background: #ffb347;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .greeting-text h4 {
+            font-size: 0.7rem;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        .greeting-text h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .datetime-panel {
+            text-align: right;
+        }
+
+        .date-badge {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.3s ease;
         }
 
-        .info-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 10px 12px;
-            border-radius: 15px;
-        }
-
-        .user-welcome {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .user-welcome i {
-            font-size: 24px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 6px;
-            border-radius: 50%;
-        }
-
-        .user-text h4 {
-            font-size: 12px;
-            font-weight: 500;
-            opacity: 0.9;
-        }
-
-        .user-text h3 {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .datetime-center {
-            text-align: center;
-        }
-
-        .date {
-            font-size: 10px;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .time {
-            font-size: 16px;
+        .time-large {
+            font-size: 1.5rem;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            letter-spacing: 1px;
         }
 
-        .main-content {
-            padding: 20px 15px;
-        }
-
-        .button-grid {
+        .action-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin: 24px 20px 20px 20px;
+        }
+
+        .primary-action {
+            background: white;
+            border: none;
+            border-radius: 28px;
+            padding: 14px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .action-btn {
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.05);
             cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #e9edf2;
+        }
+
+        .primary-action i {
+            font-size: 1.3rem;
+        }
+
+        .primary-action.add-farmer-action {
+            color: #2c7a4d;
+            border-left: 4px solid #2c7a4d;
+        }
+
+        .primary-action.add-record-action {
+            color: #2c6e9e;
+            border-left: 4px solid #2c6e9e;
+        }
+
+        .primary-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+        }
+
+        .records-panel {
+            margin: 0 20px 30px 20px;
+        }
+
+        .section-header {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e0e0e0;
-        }
-
-        .add-farmer {
-            border-left: 3px solid #2ecc71;
-            color: #2ecc71;
-        }
-
-        .add-record {
-            border-left: 3px solid #4a90e2;
-            color: #4a90e2;
-        }
-
-        .action-btn i {
-            font-size: 18px;
-        }
-
-        .action-btn span {
-            font-size: 13px;
-            color: #333;
-        }
-
-        .records-section {
-            margin-top: 20px;
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .section-title i {
-            font-size: 18px;
-            color: #667eea;
-        }
-
-        .section-title h3 {
-            font-size: 16px;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            font-size: 12px;
-        }
-
-        th {
-            background: #f8f9fa;
-            padding: 12px 10px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 1px solid #e0e0e0;
-            position: sticky;
-            top: 0;
-        }
-
-        td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #f0f0f0;
-            color: #666;
-            font-weight:700;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-
-        .edit-btn, .delete-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .edit-btn {
-            background: #4a90e2;
-            color: white;
-        }
-
-        .delete-btn {
-            background: #e74c3c;
-            color: white;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
             align-items: center;
             gap: 10px;
-            margin-top: 20px;
-            padding: 15px;
+            margin-bottom: 18px;
+            border-left: 4px solid #1b4a6e;
+            padding-left: 14px;
         }
 
-        .page-btn {
-            padding: 8px 15px;
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+        .section-header i {
+            font-size: 1.3rem;
+            color: #1b4a6e;
+        }
+
+        .section-header h3 {
+            font-weight: 700;
+            color: #0f2b3d;
+        }
+
+        .stats-badge {
+            background: #eef2ff;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1b4a6e;
+        }
+
+        .table-wrapper {
+            border-radius: 24px;
+            border: 1px solid #edf2f7;
+            overflow-x: auto;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 16px 14px;
+            background: #f9fafc;
+            font-weight: 600;
+            color: #2c3e4e;
+            border-bottom: 1px solid #e4e9f0;
+        }
+
+        .data-table td {
+            padding: 14px 14px;
+            border-bottom: 1px solid #f0f3f9;
+            color: #1f2f3a;
+            font-weight: 500;
+        }
+
+        .badge-time {
+            background: #eaf9ed;
+            color: #1f7840;
+            padding: 5px 10px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 6px 10px;
+            border-radius: 30px;
+            transition: 0.2s;
         }
 
-        .page-btn:hover {
-            background: #667eea;
-            color: white;
+        .edit-icon {
+            color: #2c6e9e;
         }
 
-        .page-btn:disabled {
+        .delete-icon {
+            color: #c2412c;
+        }
+
+        .icon-btn:hover {
+            background: #f1f5f9;
+        }
+
+        /* pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            margin-top: 22px;
+            padding: 12px;
+        }
+
+        .page-control {
+            background: #f1f5f9;
+            border: 1px solid #dce3ec;
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .page-control:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .page-info {
-            font-size: 13px;
-            color: #666;
+        .page-control:not(:disabled):hover {
+            background: #1b4a6e;
+            color: white;
+            border-color: #1b4a6e;
         }
 
-        .modal {
+        .page-indicator {
+            background: #eef2ff;
+            padding: 6px 18px;
+            border-radius: 32px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* modals */
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -293,665 +323,497 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            backdrop-filter: blur(5px);
             align-items: center;
             justify-content: center;
+            z-index: 1000;
         }
 
-        .modal-content {
+        .modal-window {
             background: white;
-            border-radius: 16px;
             width: 90%;
-            max-width: 400px;
+            max-width: 460px;
+            border-radius: 32px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.25);
+            animation: fadeUp 0.2s ease;
         }
 
-        .modal-header {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .modal-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #ecf3fa;
         }
 
-        .modal-header h3 {
-            font-size: 16px;
-            color: #333;
+        .modal-head h3 {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-weight: 700;
         }
 
         .close-modal {
+            font-size: 1.8rem;
             cursor: pointer;
-            font-size: 20px;
-            color: #999;
+            line-height: 1;
+            color: #7e8c9e;
         }
 
         .modal-body {
-            padding: 15px;
+            padding: 1.5rem;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .form-field {
+            margin-bottom: 1.2rem;
         }
 
-        .form-group label {
+        .form-field label {
             display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-            font-size: 13px;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
             font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            color: #2d3e50;
+        }
+
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #cfdfed;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .save-action-btn {
+            background: linear-gradient(95deg, #0f2b3d, #1f5e89);
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
             cursor: pointer;
+            margin-top: 8px;
         }
 
-        .loading {
+        .empty-row {
             text-align: center;
-            padding: 20px;
+            padding: 40px;
+            color: #6c7e91;
         }
 
-        .loading i {
-            font-size: 24px;
-            color: #667eea;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 600px) {
-            .button-grid {
-                gap: 8px;
-            }
-            .action-btn {
-                padding: 10px;
-            }
-            .action-btn span {
-                font-size: 12px;
-            }
-            .info-bar {
+        @media (max-width: 640px) {
+            .info-badge {
                 flex-direction: column;
-                gap: 8px;
-                text-align: center;
+                align-items: flex-start;
             }
-            th, td {
-                font-size: 11px;
-                padding: 8px 6px;
+            .datetime-panel {
+                text-align: left;
+                width: 100%;
+            }
+            .action-grid {
+                gap: 12px;
+            }
+            .data-table th, .data-table td {
+                padding: 10px 8px;
+                font-size: 0.75rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="top-bar">
-                <button class="back-btn" onclick="goBack()">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Back</span>
-                </button>
-                <button class="logout-btn" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </button>
+<div class="glass-container">
+    <div class="fleet-card">
+        <div class="header-gradient">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="goBackDashboard()"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="nav-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
-            
-            <div class="info-bar">
-                <div class="user-welcome">
-                    <i class="fas fa-truck"></i>
-                    <div class="user-text">
-                        <h4>Fleet Entry</h4>
-                        <h3 id="userName">Loading...</h3>
+            <div class="info-badge">
+                <div class="user-greeting">
+                    <div class="avatar-icon"><i class="fas fa-truck-fast"></i></div>
+                    <div class="greeting-text">
+                        <h4>FLEET OPERATOR</h4>
+                        <h3 id="displayUserName">—</h3>
                     </div>
                 </div>
-                
-                <div class="datetime-center">
-                    <div class="date">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span id="currentDate">Loading...</span>
-                    </div>
-                    <div class="time">
-                        <i class="fas fa-clock"></i>
-                        <span id="currentTime">Loading...</span>
-                    </div>
+                <div class="datetime-panel">
+                    <div class="date-badge"><i class="far fa-calendar-alt"></i> <span id="todayDate"></span></div>
+                    <div class="time-large" id="liveClock">--:--:--</div>
                 </div>
             </div>
         </div>
-        
-        <div class="main-content">
-            <div class="button-grid">
-                <button class="action-btn add-farmer" onclick="openAddFarmerModal()">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Add Farmer</span>
-                </button>
-                
-                <button class="action-btn add-record" onclick="openAddRecordModal()">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Add Record</span>
-                </button>
+
+        <div class="action-grid">
+            <button class="primary-action add-farmer-action" id="openFarmerBtn"><i class="fas fa-user-plus"></i> <span>➕ Add Farmer</span></button>
+            <button class="primary-action add-record-action" id="openRecordBtn"><i class="fas fa-clipboard-list"></i> <span>📋 Add Fleet Record</span></button>
+        </div>
+
+        <div class="records-panel">
+            <div class="section-header">
+                <i class="fas fa-ship"></i>
+                <h3>Fleet Entry Logs</h3>
+                <div class="stats-badge"><i class="fas fa-database"></i> Latest entries · 6 per page</div>
             </div>
-            
-            <div class="records-section">
-                <div class="section-title">
-                    <i class="fas fa-list"></i>
-                    <h3>Fleet Records (Latest 10 per page)</h3>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Date</th>
-                                <th>Farmer</th>
-                                <th>Time</th>
-                                <th>Actions</th>
-                            </thead>
-                        <tbody id="recordsTableBody">
-                            <tr>
-                                <td colspan="5" class="loading">
-                                    <i class="fas fa-spinner"></i> Loading...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Pagination -->
-                <div class="pagination" id="pagination">
-                    <button class="page-btn" id="prevBtn" onclick="prevPage()">Previous</button>
-                    <span class="page-info" id="pageInfo">Page 1</span>
-                    <button class="page-btn" id="nextBtn" onclick="nextPage()">Next</button>
-                </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr><th># ID</th><th>Date & Time</th><th>Farmer</th><th>Duration</th><th style="width:100px">Actions</th></tr>
+                    </thead>
+                    <tbody id="recordsTbody">
+                        <tr><td colspan="5" class="empty-row"><i class="fas fa-spinner fa-pulse"></i> Loading fleet records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-container" id="paginationWrapper">
+                <button class="page-control" id="prevPageBtn"><i class="fas fa-chevron-left"></i> Previous</button>
+                <span class="page-indicator" id="pageIndicator">Page 1</span>
+                <button class="page-control" id="nextPageBtn">Next <i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
     </div>
-    
-    <!-- Add Farmer Modal -->
-    <div id="addFarmerModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-user-plus"></i> Add New Farmer</h3>
-                <span class="close-modal" onclick="closeModal('addFarmerModal')">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="addFarmerForm">
-                    <div class="form-group">
-                        <label>Farmer Name *</label>
-                        <input type="text" id="farmerName" required placeholder="Enter farmer name">
-                    </div>
-                    <div class="form-group">
-                        <label>Address</label>
-                        <input type="text" id="farmerAddress" placeholder="Enter address">
-                    </div>
-                    <button type="submit" class="save-btn">
-                        <i class="fas fa-save"></i> Save Farmer
-                    </button>
-                </form>
-            </div>
+</div>
+
+<!-- Modals -->
+<div id="farmerModal" class="modal-overlay">
+    <div class="modal-window">
+        <div class="modal-head"><h3><i class="fas fa-seedling"></i> Register Farmer</h3><span class="close-modal" data-close="farmerModal">&times;</span></div>
+        <div class="modal-body">
+            <form id="farmerFormSubmit">
+                <div class="form-field"><label>Full Name *</label><input type="text" id="farmerNameInput" placeholder="e.g. Rajesh Kumar" required></div>
+                <div class="form-field"><label>Address / Village</label><input type="text" id="farmerAddressInput" placeholder="Optional"></div>
+                <button type="submit" class="save-action-btn"><i class="fas fa-save"></i> Save Farmer</button>
+            </form>
         </div>
     </div>
-    
-    <!-- Add Fleet Record Modal -->
-    <div id="addRecordModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-plus-circle"></i> Add Fleet Record</h3>
-                <span class="close-modal" onclick="closeModal('addRecordModal')">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="addRecordForm">
-                    <div class="form-group">
-                        <label>Select Farmer *</label>
-                        <select id="farmerSelect" required>
-                            <option value="">Select a farmer</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Time (Minutes) *</label>
-                        <input type="number" id="timeMinutes" required placeholder="Enter time in minutes">
-                    </div>
-                    <button type="submit" class="save-btn">
-                        <i class="fas fa-save"></i> Save Record
-                    </button>
-                </form>
-            </div>
+</div>
+
+<div id="recordModal" class="modal-overlay">
+    <div class="modal-window">
+        <div class="modal-head"><h3><i class="fas fa-tachometer-alt"></i> New Fleet Entry</h3><span class="close-modal" data-close="recordModal">&times;</span></div>
+        <div class="modal-body">
+            <form id="recordFormSubmit">
+                <div class="form-field"><label>Select Farmer *</label><select id="recordFarmerSelect" required><option value="">-- choose farmer --</option></select></div>
+                <div class="form-field"><label>Time (minutes) *</label><input type="number" id="recordMinutes" min="1" placeholder="e.g. 45" required></div>
+                <button type="submit" class="save-action-btn"><i class="fas fa-plus-circle"></i> Create Fleet Entry</button>
+            </form>
         </div>
     </div>
-    
-    <!-- Edit Record Modal -->
-    <div id="editRecordModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-edit"></i> Edit Record</h3>
-                <span class="close-modal" onclick="closeModal('editRecordModal')">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="editRecordForm">
-                    <input type="hidden" id="editRecordId">
-                    <div class="form-group">
-                        <label>Select Farmer *</label>
-                        <select id="editFarmerSelect" required>
-                            <option value="">Select a farmer</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Time (Minutes) *</label>
-                        <input type="number" id="editTimeMinutes" required>
-                    </div>
-                    <button type="submit" class="save-btn">
-                        <i class="fas fa-save"></i> Update Record
-                    </button>
-                </form>
-            </div>
+</div>
+
+<div id="editModal" class="modal-overlay">
+    <div class="modal-window">
+        <div class="modal-head"><h3><i class="fas fa-pen-alt"></i> Edit Record</h3><span class="close-modal" data-close="editModal">&times;</span></div>
+        <div class="modal-body">
+            <form id="editFormSubmit">
+                <input type="hidden" id="editRecordId">
+                <div class="form-field"><label>Farmer</label><select id="editFarmerSelect" required></select></div>
+                <div class="form-field"><label>Minutes</label><input type="number" id="editMinutesInput" required></div>
+                <button type="submit" class="save-action-btn">Update Entry</button>
+            </form>
         </div>
     </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // ---------- SUPABASE ----------
+    const SUPABASE_URL = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EE9ZJizQ6w';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    // Auth guard
+    const sessionUser = sessionStorage.getItem('currentUser');
+    if (!sessionUser) {
+        window.location.href = '../index.html';
+    }
+    let currentUserObj = JSON.parse(sessionUser);
+    document.getElementById('displayUserName').innerText = currentUserObj?.username || currentUserObj?.id || 'Operator';
     
-    <script>
-        const supabaseUrl = 'https://iydamvrlxtwsnqvflaxq.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZGFtdnJseHR3c25xdmZsYXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwOTczMTIsImV4cCI6MjA3MzY3MzMxMn0.Z8m6XGyu9wsN_UJ8EZYr12BRemsO12_U8EEZ9JizQ6w';
-        const client = supabase.createClient(supabaseUrl, supabaseKey);
-        
-        // Check auth
-        const currentUser = sessionStorage.getItem('currentUser');
-        if (!currentUser) {
-            window.location.href = '../index.html';
-        } else {
-            const user = JSON.parse(currentUser);
-            document.getElementById('userName').textContent = user.username || user.id || 'User';
+    // ----- Global state -----
+    let allFleetRecords = [];     // full dataset from DB
+    let currentPage = 1;
+    const LIMIT_PER_PAGE = 6;     // ✅ Exactly 6 per page, latest first
+    
+    // ----- Helper: unique fleet ID generation -----
+    async function generateUniqueFleetId() {
+        let unique = false;
+        let newId = '';
+        while (!unique) {
+            const randomPart = Math.floor(10000 + Math.random() * 90000);
+            newId = `FLT${randomPart}`;
+            const { data, error } = await supabase.from('fleetentry').select('fleet_id').eq('fleet_id', newId);
+            if (error) console.error(error);
+            if (!data || data.length === 0) unique = true;
         }
-        
-        // Date time
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { 
-                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' 
-            });
-            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+        return newId;
+    }
+    
+    // ----- load farmers for dropdowns (global)-----
+    async function loadFarmersList() {
+        const { data, error } = await supabase.from('farmers').select('id, name').order('name');
+        if (error) return [];
+        return data || [];
+    }
+    
+    async function refreshFarmerDropdowns() {
+        const farmers = await loadFarmersList();
+        const recordSelect = document.getElementById('recordFarmerSelect');
+        const editSelect = document.getElementById('editFarmerSelect');
+        if (recordSelect) {
+            recordSelect.innerHTML = '<option value="">-- choose farmer --</option>';
+            farmers.forEach(f => {
+                recordSelect.innerHTML += `<option value="${f.id}">${escapeHtml(f.name)}</option>`;
             });
         }
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-        
-        let allRecords = [];
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        
-        // Generate random 5-digit Fleet ID
-        function generateRandomFleetId() {
-            const randomNum = Math.floor(10000 + Math.random() * 90000);
-            return `FLT${randomNum}`;
+        if (editSelect) {
+            editSelect.innerHTML = '<option value="">-- select farmer --</option>';
+            farmers.forEach(f => {
+                editSelect.innerHTML += `<option value="${f.id}">${escapeHtml(f.name)}</option>`;
+            });
+        }
+    }
+    
+    // ----- Fetch fleet records (latest first, full dataset for client-side pagination) -----
+    async function fetchAllFleetRecords() {
+        try {
+            const { data, error } = await supabase
+                .from('fleetentry')
+                .select(`
+                    id,
+                    fleet_id,
+                    time,
+                    created_at,
+                    farmer_id,
+                    name,
+                    farmers:farmer_id (name)
+                `)
+                .order('created_at', { ascending: false }); // latest first
+            
+            if (error) throw error;
+            // map cleanly
+            allFleetRecords = (data || []).map(record => ({
+                id: record.id,
+                fleet_id: record.fleet_id,
+                time: record.time,
+                created_at: record.created_at,
+                farmer_id: record.farmer_id,
+                farmerName: record.farmers?.name || record.name || 'Unknown Farmer'
+            }));
+            currentPage = 1;
+            renderTableByPage();
+        } catch (err) {
+            console.error(err);
+            document.getElementById('recordsTbody').innerHTML = `<tr><td colspan="5" class="empty-row">⚠️ Failed to load records</td></tr>`;
+        }
+    }
+    
+    // Render current page (slice based on LIMIT_PER_PAGE)
+    function renderTableByPage() {
+        const tbody = document.getElementById('recordsTbody');
+        if (!allFleetRecords.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-row"><i class="far fa-folder-open"></i> No fleet entries yet</td></tr>';
+            updatePaginationUI();
+            return;
         }
         
-        async function generateUniqueFleetId() {
-            let isUnique = false;
-            let newId = '';
-            
-            while (!isUnique) {
-                newId = generateRandomFleetId();
-                
-                const { data, error } = await client
-                    .from('fleetentry')
-                    .select('fleet_id')
-                    .eq('fleet_id', newId);
-                
-                if (error) {
-                    console.error('Error checking fleet ID:', error);
-                    break;
-                }
-                
-                if (!data || data.length === 0) {
-                    isUnique = true;
-                }
-            }
-            
-            return newId;
+        const startIdx = (currentPage - 1) * LIMIT_PER_PAGE;
+        const pageItems = allFleetRecords.slice(startIdx, startIdx + LIMIT_PER_PAGE);
+        
+        if (pageItems.length === 0 && currentPage > 1) {
+            currentPage = Math.max(1, Math.ceil(allFleetRecords.length / LIMIT_PER_PAGE));
+            return renderTableByPage();
         }
         
-        // Load farmers
-        async function loadFarmers() {
-            try {
-                const { data, error } = await client
-                    .from('farmers')
-                    .select('*')
-                    .order('name');
-                
-                if (error) throw error;
-                
-                const farmerSelect = document.getElementById('farmerSelect');
-                const editFarmerSelect = document.getElementById('editFarmerSelect');
-                
-                farmerSelect.innerHTML = '<option value="">Select a farmer</option>';
-                editFarmerSelect.innerHTML = '<option value="">Select a farmer</option>';
-                
-                data.forEach(farmer => {
-                    farmerSelect.innerHTML += `<option value="${farmer.id}">${farmer.name}</option>`;
-                    editFarmerSelect.innerHTML += `<option value="${farmer.id}">${farmer.name}</option>`;
-                });
-            } catch (error) {
-                console.error('Error loading farmers:', error);
-            }
+        tbody.innerHTML = pageItems.map((rec, idx) => {
+            const serial = startIdx + idx + 1;
+            const dateObj = new Date(rec.created_at);
+            const formattedDateTime = dateObj.toLocaleString(undefined, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+            return `
+                <tr>
+                    <td><strong>${serial}</strong></td>
+                    <td>${formattedDateTime}</td>
+                    <td><i class="fas fa-user-check"></i> ${escapeHtml(rec.farmerName)}</td>
+                    <td><span class="badge-time"><i class="far fa-clock"></i> ${rec.time} min</span></td>
+                    <td class="row-actions">
+                        <button class="icon-btn edit-icon" onclick="openEditRecord('${rec.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="icon-btn delete-icon" onclick="deleteRecordById('${rec.id}')"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        updatePaginationUI();
+    }
+    
+    function updatePaginationUI() {
+        const totalPages = Math.max(1, Math.ceil(allFleetRecords.length / LIMIT_PER_PAGE));
+        const pageSpan = document.getElementById('pageIndicator');
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
+        if (pageSpan) pageSpan.innerText = `Page ${currentPage} of ${totalPages}`;
+        if (prevBtn) prevBtn.disabled = currentPage === 1;
+        if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+    }
+    
+    window.prevPage = function() {
+        if (currentPage > 1) { currentPage--; renderTableByPage(); }
+    };
+    window.nextPage = function() {
+        const totalPages = Math.ceil(allFleetRecords.length / LIMIT_PER_PAGE);
+        if (currentPage < totalPages) { currentPage++; renderTableByPage(); }
+    };
+    
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => window.prevPage());
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => window.nextPage());
+    
+    // ----- CRUD operations -----
+    // Add Farmer
+    document.getElementById('farmerFormSubmit')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('farmerNameInput').value.trim();
+        if (!name) return alert('Farmer name required');
+        const address = document.getElementById('farmerAddressInput').value;
+        // generate farmerid like FARM001, FARM002 ...
+        const { data: lastFarmer } = await supabase.from('farmers').select('farmerid').order('id', { ascending: false }).limit(1);
+        let newFarmerId = 'FARM001';
+        if (lastFarmer && lastFarmer.length > 0) {
+            const lastNum = parseInt(lastFarmer[0].farmerid.replace('FARM','')) || 0;
+            newFarmerId = `FARM${String(lastNum + 1).padStart(3,'0')}`;
         }
-        
-        // Load all fleet entries
-        async function loadAllFleetEntries() {
-            try {
-                const { data, error } = await client
-                    .from('fleetentry')
-                    .select(`
-                        *,
-                        farmers:farmer_id (name)
-                    `)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                allRecords = data || [];
-                displayCurrentPage();
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('recordsTableBody').innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error loading records</td></tr>';
-            }
-        }
-        
-        // Display current page records
-        function displayCurrentPage() {
-            const tbody = document.getElementById('recordsTableBody');
-            
-            if (!allRecords || allRecords.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No records found</td></tr>';
-                updatePagination(0);
-                return;
-            }
-            
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageRecords = allRecords.slice(start, end);
-            const totalPages = Math.ceil(allRecords.length / itemsPerPage);
-            
-            tbody.innerHTML = pageRecords.map((record, idx) => {
-                const serialNo = start + idx + 1;
-                const date = new Date(record.created_at);
-                const formattedDate = date.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                return `
-                    <tr>
-                        <td><strong>${serialNo}</strong></td>
-                        <td>${formattedDate}</td>
-                        <td>${record.farmers?.name || record.name || 'Unknown'}</td>
-                        <td>${record.time} min</td>
-                        <td class="action-buttons">
-                            <button class="edit-btn" onclick="openEditModal(${record.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="delete-btn" onclick="deleteRecord(${record.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            
-            updatePagination(totalPages);
-        }
-        
-        // Update pagination controls
-        function updatePagination(totalPages) {
-            const pageInfo = document.getElementById('pageInfo');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-        }
-        
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                displayCurrentPage();
-            }
-        }
-        
-        function nextPage() {
-            const totalPages = Math.ceil(allRecords.length / itemsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                displayCurrentPage();
-            }
-        }
-        
-        // Add farmer
-        document.getElementById('addFarmerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('farmerName').value;
-            const address = document.getElementById('farmerAddress').value;
-            
-            if (!name) {
-                alert('Please enter farmer name');
-                return;
-            }
-            
-            try {
-                const { data: existing } = await client
-                    .from('farmers')
-                    .select('farmerid')
-                    .order('id', { ascending: false })
-                    .limit(1);
-                
-                let farmerId = 'FARM001';
-                if (existing && existing.length > 0) {
-                    const lastNum = parseInt(existing[0].farmerid.replace('FARM', ''));
-                    farmerId = `FARM${String(lastNum + 1).padStart(3, '0')}`;
-                }
-                
-                const { error } = await client
-                    .from('farmers')
-                    .insert([{
-                        farmerid: farmerId,
-                        name: name,
-                        address: address || '',
-                        created_at: new Date().toISOString()
-                    }]);
-                
-                if (error) throw error;
-                
-                alert('Farmer added successfully!');
-                closeModal('addFarmerModal');
-                document.getElementById('addFarmerForm').reset();
-                await loadFarmers();
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
+        const { error } = await supabase.from('farmers').insert([{
+            farmerid: newFarmerId,
+            name: name,
+            address: address || '',
+            created_at: new Date().toISOString()
+        }]);
+        if (error) return alert('Error: ' + error.message);
+        alert('Farmer registered successfully!');
+        closeModal('farmerModal');
+        document.getElementById('farmerFormSubmit').reset();
+        await refreshFarmerDropdowns();
+    });
+    
+    // Add Fleet Record
+    document.getElementById('recordFormSubmit')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const farmerId = document.getElementById('recordFarmerSelect').value;
+        const timeVal = document.getElementById('recordMinutes').value;
+        if (!farmerId || !timeVal) return alert('Select farmer and enter minutes');
+        // get farmer name
+        const { data: farmerData } = await supabase.from('farmers').select('name').eq('id', farmerId).single();
+        const fleetId = await generateUniqueFleetId();
+        const { error } = await supabase.from('fleetentry').insert([{
+            fleet_id: fleetId,
+            farmer_id: parseInt(farmerId),
+            name: farmerData?.name || 'Farmer',
+            time: parseInt(timeVal),
+            status: 'pending',
+            payment_status: 'unpaid',
+            created_at: new Date().toISOString()
+        }]);
+        if (error) return alert('DB error: ' + error.message);
+        alert('Fleet record added!');
+        closeModal('recordModal');
+        document.getElementById('recordFormSubmit').reset();
+        await fetchAllFleetRecords();   // refresh list (latest first)
+        await refreshFarmerDropdowns();
+    });
+    
+    // Edit record functions
+    window.openEditRecord = async (recordId) => {
+        const record = allFleetRecords.find(r => r.id == recordId);
+        if (!record) return alert('Record not found');
+        document.getElementById('editRecordId').value = record.id;
+        document.getElementById('editMinutesInput').value = record.time;
+        await refreshFarmerDropdowns();
+        const editSelect = document.getElementById('editFarmerSelect');
+        if (editSelect) editSelect.value = record.farmer_id;
+        openModal('editModal');
+    };
+    
+    document.getElementById('editFormSubmit')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editRecordId').value;
+        const farmerId = document.getElementById('editFarmerSelect').value;
+        const minutes = document.getElementById('editMinutesInput').value;
+        if (!farmerId || !minutes) return alert('All fields required');
+        const { data: farmer } = await supabase.from('farmers').select('name').eq('id', farmerId).single();
+        const { error } = await supabase.from('fleetentry').update({
+            farmer_id: parseInt(farmerId),
+            name: farmer?.name,
+            time: parseInt(minutes)
+        }).eq('id', id);
+        if (error) return alert('Update error: ' + error.message);
+        alert('Record updated');
+        closeModal('editModal');
+        await fetchAllFleetRecords();
+    });
+    
+    window.deleteRecordById = async (id) => {
+        if (!confirm('Permanently delete this fleet entry?')) return;
+        const { error } = await supabase.from('fleetentry').delete().eq('id', id);
+        if (error) return alert('Delete failed: ' + error.message);
+        await fetchAllFleetRecords();
+    };
+    
+    // ----- MODAL helpers-----
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    window.closeModal = closeModal;
+    document.querySelectorAll('.close-modal').forEach(el => {
+        el.addEventListener('click', (e) => {
+            const modalId = el.getAttribute('data-close');
+            if(modalId) closeModal(modalId);
         });
-        
-        // Add fleet record
-        document.getElementById('addRecordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const farmerId = document.getElementById('farmerSelect').value;
-            const time = document.getElementById('timeMinutes').value;
-            
-            if (!farmerId || !time) {
-                alert('Please fill all fields');
-                return;
-            }
-            
-            try {
-                const { data: farmer } = await client
-                    .from('farmers')
-                    .select('name')
-                    .eq('id', farmerId)
-                    .single();
-                
-                const fleetId = await generateUniqueFleetId();
-                
-                const { error } = await client
-                    .from('fleetentry')
-                    .insert([{
-                        fleet_id: fleetId,
-                        farmer_id: parseInt(farmerId),
-                        name: farmer.name,
-                        time: parseInt(time),
-                        status: 'pending',
-                        payment_status: 'unpaid',
-                        created_at: new Date().toISOString()
-                    }]);
-                
-                if (error) throw error;
-                
-                alert('Record added successfully!');
-                closeModal('addRecordModal');
-                document.getElementById('addRecordForm').reset();
-                await loadAllFleetEntries();
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        });
-        
-        // Open edit modal
-        async function openEditModal(id) {
-            try {
-                const { data, error } = await client
-                    .from('fleetentry')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-                
-                if (error) throw error;
-                
-                document.getElementById('editRecordId').value = data.id;
-                document.getElementById('editFarmerSelect').value = data.farmer_id;
-                document.getElementById('editTimeMinutes').value = data.time;
-                
-                openModal('editRecordModal');
-            } catch (error) {
-                alert('Error loading record');
-            }
-        }
-        
-        // Update record
-        document.getElementById('editRecordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const id = document.getElementById('editRecordId').value;
-            const farmerId = document.getElementById('editFarmerSelect').value;
-            const time = document.getElementById('editTimeMinutes').value;
-            
-            try {
-                const { data: farmer } = await client
-                    .from('farmers')
-                    .select('name')
-                    .eq('id', farmerId)
-                    .single();
-                
-                const { error } = await client
-                    .from('fleetentry')
-                    .update({
-                        farmer_id: parseInt(farmerId),
-                        name: farmer.name,
-                        time: parseInt(time)
-                    })
-                    .eq('id', id);
-                
-                if (error) throw error;
-                
-                alert('Record updated!');
-                closeModal('editRecordModal');
-                await loadAllFleetEntries();
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        });
-        
-        // Delete record
-        async function deleteRecord(id) {
-            if (confirm('Delete this record?')) {
-                try {
-                    const { error } = await client
-                        .from('fleetentry')
-                        .delete()
-                        .eq('id', id);
-                    
-                    if (error) throw error;
-                    
-                    alert('Record deleted!');
-                    await loadAllFleetEntries();
-                } catch (error) {
-                    alert('Error deleting record');
-                }
-            }
-        }
-        
-        // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        function openAddFarmerModal() {
-            openModal('addFarmerModal');
-        }
-        
-        async function openAddRecordModal() {
-            await loadFarmers();
-            openModal('addRecordModal');
-        }
-        
-        function goBack() {
-            const user = JSON.parse(sessionStorage.getItem('currentUser'));
-            if (user.role === 'admin') {
-                window.location.href = '../admin/fleetDashboard.html';
-            } else {
-                window.location.href = '../user/dashboard.html';
-            }
-        }
-        
-        function logout() {
-            sessionStorage.removeItem('currentUser');
-            alert('Logged out!');
-            window.location.href = '../index.html';
-        }
-        
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-        
-        // Initialize
-        loadFarmers();
-        loadAllFleetEntries();
-    </script>
+    });
+    window.openAddFarmerModal = () => openModal('farmerModal');
+    window.openAddRecordModal = async () => {
+        await refreshFarmerDropdowns();
+        openModal('recordModal');
+    };
+    document.getElementById('openFarmerBtn')?.addEventListener('click', () => openAddFarmerModal());
+    document.getElementById('openRecordBtn')?.addEventListener('click', () => window.openAddRecordModal());
+    
+    // close modals by clicking overlay
+    window.onclick = function(e) {
+        if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none';
+    };
+    
+    // helper escape
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    
+    // date time live
+    function updateDateTimeUI() {
+        const now = new Date();
+        document.getElementById('todayDate').innerText = now.toLocaleDateString(undefined, { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    }
+    updateDateTimeUI();
+    setInterval(updateDateTimeUI, 1000);
+    
+    // Navigation
+    window.goBackDashboard = () => {
+        const role = currentUserObj?.role;
+        if (role === 'admin') window.location.href = '../admin/dashboard.html';
+        else window.location.href = '../user/dashboard.html';
+    };
+    window.logoutUser = () => { sessionStorage.removeItem('currentUser'); alert('Logged out'); window.location.href = '../index.html'; };
+    
+    // init
+    (async () => {
+        await refreshFarmerDropdowns();
+        await fetchAllFleetRecords();
+    })();
+</script>
 </body>
 </html>

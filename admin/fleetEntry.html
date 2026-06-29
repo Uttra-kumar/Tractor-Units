@@ -804,7 +804,7 @@
     // Navigation
     window.goBackDashboard = () => {
         const role = currentUserObj?.role;
-        if (role === 'admin') window.location.href = '../admin/fleetDashboad.html';
+        if (role === 'admin') window.location.href = '../admin/fleetDashboard.html';
         else window.location.href = '../user/dashboard.html';
     };
     window.logoutUser = () => { sessionStorage.removeItem('currentUser'); alert('Logged out'); window.location.href = '../index.html'; };
